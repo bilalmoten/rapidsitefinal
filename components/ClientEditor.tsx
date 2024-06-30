@@ -1,4 +1,4 @@
-// "use client";
+"use client";
 
 // import React, { useState, useRef, useEffect } from "react";
 // import { Maximize2, Minimize2, Edit3 } from "lucide-react";
@@ -194,7 +194,152 @@
 
 // export default ClientEditor;
 
-"use client";
+// "use client";
+
+// import React, { useState, useRef, useEffect } from "react";
+// import ChatWindow from "./ChatWindow";
+// import MainEditingPanel from "./MainEditingPanel";
+// import FloatingControls from "./FloatingControls";
+// import TopBar from "./TopBar";
+// import PagesPanel from "./PagesPanel";
+// import TextPopup from "./TextPopup";
+
+// interface ClientEditorProps {
+//   content: string;
+// }
+
+// const ClientEditor: React.FC<ClientEditorProps> = ({ content }) => {
+//   const [siteContent, setSiteContent] = useState<string>(content);
+//   const [zoom, setZoom] = useState(100);
+//   const [isPickMode, setIsPickMode] = useState(false);
+//   const [hoveredElement, setHoveredElement] = useState<Element | null>(null);
+//   const [selectedElement, setSelectedElement] = useState<Element | null>(null);
+//   const iframeRef = useRef<HTMLIFrameElement>(null);
+
+//   useEffect(() => {
+//     const iframe = iframeRef.current;
+//     if (!iframe) {
+//       console.log("iframe not found");
+//       return;
+//     }
+
+//     const handleLoad = () => {
+//       const iframeDoc = iframe.contentDocument;
+//       if (!iframeDoc) {
+//         console.log("iframeDoc not found");
+//         return;
+//       }
+
+//       console.log("iframe loaded, writing content...");
+//       iframeDoc.open();
+//       iframeDoc.write(`
+
+//         ${siteContent}
+//       `);
+//       iframeDoc.close();
+//       updateEventListeners(iframeDoc);
+//       console.log("Content written to iframe");
+//     };
+
+//     const updateEventListeners = (iframeDoc: Document) => {
+//       removeEventListeners(iframeDoc);
+//       if (isPickMode) {
+//         addEventListeners(iframeDoc);
+//         console.log("Event listeners added");
+//       }
+//     };
+
+//     const addEventListeners = (doc: Document) => {
+//       if (doc.body) {
+//         doc.body.addEventListener("mouseover", handleMouseOver);
+//         doc.body.addEventListener("mouseout", handleMouseOut);
+//         doc.body.addEventListener("click", handleClick);
+//       }
+//     };
+
+//     const removeEventListeners = (doc: Document) => {
+//       if (doc.body) {
+//         doc.body.removeEventListener("mouseover", handleMouseOver);
+//         doc.body.removeEventListener("mouseout", handleMouseOut);
+//         doc.body.removeEventListener("click", handleClick);
+//       }
+//     };
+
+//     // Check if the iframe is already loaded
+//     if (iframe.contentDocument?.readyState === "complete") {
+//       handleLoad();
+//     } else {
+//       iframe.addEventListener("load", handleLoad);
+//     }
+
+//     return () => {
+//       iframe.removeEventListener("load", handleLoad);
+//       const iframeDoc = iframe.contentDocument;
+//       if (iframeDoc) {
+//         removeEventListeners(iframeDoc);
+//       }
+//     };
+//   }, [siteContent, isPickMode]);
+
+//   const handleMouseOver = (e: MouseEvent) => {
+//     e.stopPropagation();
+//     const target = e.target as Element;
+//     setHoveredElement(target);
+//     target.classList.add("hovered-element");
+//   };
+
+//   const handleMouseOut = (e: MouseEvent) => {
+//     const target = e.target as Element;
+//     target.classList.remove("hovered-element");
+//     setHoveredElement(null);
+//   };
+
+//   const handleClick = (e: MouseEvent) => {
+//     e.preventDefault();
+//     e.stopPropagation();
+//     const target = e.target as Element;
+//     setSelectedElement(target);
+//   };
+
+//   const handleZoomIn = () => setZoom((prev) => Math.min(prev + 10, 200));
+//   const handleZoomOut = () => setZoom((prev) => Math.max(prev - 10, 50));
+//   const togglePickMode = () => setIsPickMode(!isPickMode);
+
+//   return (
+//     <div className="flex flex-col h-screen bg-white">
+//       <div className="flex flex-1">
+//         <ChatWindow />
+//         <div className="flex-1 flex flex-col relative">
+//           <TopBar
+//             zoom={zoom}
+//             onZoomIn={handleZoomIn}
+//             onZoomOut={handleZoomOut}
+//           />
+//           <MainEditingPanel
+//             iframeRef={iframeRef}
+//             zoom={zoom}
+//             isPickMode={isPickMode}
+//             hoveredElement={hoveredElement}
+//             selectedElement={selectedElement}
+//           />
+//           {isPickMode && selectedElement && (
+//             <TextPopup
+//               selectedElement={selectedElement}
+//               onClose={() => setSelectedElement(null)}
+//             />
+//           )}
+//           <FloatingControls
+//             isPickMode={isPickMode}
+//             togglePickMode={togglePickMode}
+//           />
+//         </div>
+//         <PagesPanel />
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default ClientEditor;
 
 import React, { useState, useRef, useEffect } from "react";
 import ChatWindow from "./ChatWindow";
@@ -202,7 +347,7 @@ import MainEditingPanel from "./MainEditingPanel";
 import FloatingControls from "./FloatingControls";
 import TopBar from "./TopBar";
 import PagesPanel from "./PagesPanel";
-import TextPopup from "./TextPopup";
+import TextPopup from "./textpopup2";
 
 interface ClientEditorProps {
   content: string;
@@ -212,8 +357,14 @@ const ClientEditor: React.FC<ClientEditorProps> = ({ content }) => {
   const [siteContent, setSiteContent] = useState<string>(content);
   const [zoom, setZoom] = useState(100);
   const [isPickMode, setIsPickMode] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
   const [hoveredElement, setHoveredElement] = useState<Element | null>(null);
   const [selectedElement, setSelectedElement] = useState<Element | null>(null);
+  const [isanyelementselected, setisanyelementselected] = useState(false);
+  const [clickPosition, setClickPosition] = useState<{
+    x: number;
+    y: number;
+  } | null>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
   useEffect(() => {
@@ -243,7 +394,7 @@ const ClientEditor: React.FC<ClientEditorProps> = ({ content }) => {
 
     const updateEventListeners = (iframeDoc: Document) => {
       removeEventListeners(iframeDoc);
-      if (isPickMode) {
+      if (isPickMode || isEditMode) {
         addEventListeners(iframeDoc);
         console.log("Event listeners added");
       }
@@ -279,31 +430,89 @@ const ClientEditor: React.FC<ClientEditorProps> = ({ content }) => {
         removeEventListeners(iframeDoc);
       }
     };
-  }, [siteContent, isPickMode]);
+  }, [siteContent, isPickMode, isEditMode]);
 
   const handleMouseOver = (e: MouseEvent) => {
-    e.stopPropagation();
-    const target = e.target as Element;
-    setHoveredElement(target);
-    target.classList.add("hovered-element");
+    if ((!isPickMode && !isEditMode) || isanyelementselected) return;
+
+    if (isanyelementselected == false) {
+      e.stopPropagation();
+      const target = e.target as Element;
+      setHoveredElement(target);
+      target.classList.add("hovered-element");
+    }
   };
 
   const handleMouseOut = (e: MouseEvent) => {
+    if (!isPickMode && !isEditMode) return;
     const target = e.target as Element;
     target.classList.remove("hovered-element");
     setHoveredElement(null);
   };
 
   const handleClick = (e: MouseEvent) => {
+    if (selectedElement) {
+      setSelectedElement(null);
+      setClickPosition(null);
+      return;
+    }
+
     e.preventDefault();
     e.stopPropagation();
     const target = e.target as Element;
+    setSelectedElement(target);
+    setClickPosition({ x: e.clientX, y: e.clientY });
+    setisanyelementselected(true);
+
+    console.log("Element selected");
+    setClickPosition({ x: e.clientX, y: e.clientY });
+    if (isEditMode) {
+      if (target.tagName === "IMG") {
+        const input = document.createElement("input");
+        input.type = "file";
+        input.accept = "image/*";
+        input.onchange = (event) => {
+          const file = (event.target as HTMLInputElement).files?.[0];
+          if (file) {
+            const reader = new FileReader();
+            reader.onload = () => {
+              if (reader.result) {
+                target.setAttribute("src", reader.result as string);
+                setSiteContent(
+                  iframeRef.current?.contentDocument?.body?.innerHTML || ""
+                );
+              }
+            };
+            reader.readAsDataURL(file);
+          }
+        };
+        input.click();
+      } else if (
+        ["P", "H1", "H2", "H3", "H4", "H5", "H6", "SPAN", "DIV"].includes(
+          target.tagName
+        )
+      ) {
+        target.setAttribute("contenteditable", "true");
+        (target as HTMLElement).focus();
+
+        const handleBlur = () => {
+          target.removeAttribute("contenteditable");
+          setSiteContent(
+            iframeRef.current?.contentDocument?.body?.innerHTML || ""
+          );
+          target.removeEventListener("blur", handleBlur);
+        };
+
+        target.addEventListener("blur", handleBlur);
+      }
+    }
     setSelectedElement(target);
   };
 
   const handleZoomIn = () => setZoom((prev) => Math.min(prev + 10, 200));
   const handleZoomOut = () => setZoom((prev) => Math.max(prev - 10, 50));
   const togglePickMode = () => setIsPickMode(!isPickMode);
+  const toggleEditMode = () => setIsEditMode(!isEditMode);
 
   return (
     <div className="flex flex-col h-screen bg-white">
@@ -322,15 +531,21 @@ const ClientEditor: React.FC<ClientEditorProps> = ({ content }) => {
             hoveredElement={hoveredElement}
             selectedElement={selectedElement}
           />
-          {isPickMode && selectedElement && (
+          {isPickMode && selectedElement && clickPosition && (
             <TextPopup
               selectedElement={selectedElement}
-              onClose={() => setSelectedElement(null)}
+              clickPosition={clickPosition}
+              onClose={() => {
+                setSelectedElement(null);
+                setisanyelementselected(false);
+              }}
             />
           )}
           <FloatingControls
             isPickMode={isPickMode}
+            isEditMode={isEditMode}
             togglePickMode={togglePickMode}
+            toggleEditMode={toggleEditMode}
           />
         </div>
         <PagesPanel />
