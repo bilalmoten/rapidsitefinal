@@ -25,5 +25,5 @@ export async function POST(request: Request) {
         uploadData?.path ? `https://lervpgatcoelsswuahga.supabase.co/storage/v1/object/public/user_website_images/${uploadData.path}` : '';
 
     return NextResponse.json({ imageUrl });
-    // return NextResponse.json({ message: "Content updated successfully " });
+
 }
