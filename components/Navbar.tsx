@@ -9,9 +9,7 @@ export default function Navbar() {
         <div className="text-black text-lg font-bold">
           <Link href="/dashboard">AI Website Builder</Link>
         </div>
-        <div className="space-x-4">
-          <AuthButton />
-        </div>
+        <div className="space-x-4">{/* <AuthButton /> */}</div>
       </div>
     </nav>
   );
