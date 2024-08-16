@@ -1,5 +1,32 @@
 "use client";
 
+// import { type CoreMessage } from "ai";
+// import { useState, useEffect } from "react";
+// import { continueConversation } from "@/app/actions";
+// import { readStreamableValue } from "ai/rsc";
+// import { useRouter } from "next/navigation";
+// import { createClient } from "@/utils/supabase/client";
+
+// export const dynamic = "force-dynamic";
+// export const maxDuration = 30;
+
+// export default async function Chat({
+//   params,
+// }: {
+//   params: { website_id: string };
+// }) {
+//   const supabase = createClient();
+//   const {
+//     data: { user },
+//   } = await supabase.auth.getUser();
+
+//   const router = useRouter();
+//   const [messages, setMessages] = useState<CoreMessage[]>([]);
+//   const [input, setInput] = useState("");
+//   if (!user) {
+//     return router.push("/login");
+//   }
+
 import { type CoreMessage } from "ai";
 import { useState, useEffect } from "react";
 import { continueConversation } from "@/app/actions";
@@ -29,6 +56,9 @@ export default function Chat({ params }: { params: { website_id: string } }) {
       }
     })();
   }, []);
+
+  // ff
+  // ff
 
   return (
     <div className="flex flex-col w-full max-w-md py-24 mx-auto stretch">

@@ -1,0 +1,28 @@
+<svg width="800" height="800" viewBox="0 0 800 800" xmlns="http://www.w3.org/2000/svg">
+  <rect width="800" height="800" fill="none"/>
+  <g stroke="white" stroke-width="2" fill="none">
+    <!-- Vertical ellipses -->
+    <ellipse cx="400" cy="400" rx="350" ry="150"/>
+    <ellipse cx="400" cy="400" rx="350" ry="200"/>
+    <ellipse cx="400" cy="400" rx="350" ry="250"/>
+    <ellipse cx="400" cy="400" rx="350" ry="300"/>
+    <ellipse cx="400" cy="400" rx="350" ry="350"/>
+    <!-- Horizontal ellipses -->
+    <ellipse cx="400" cy="400" rx="150" ry="350" transform="rotate(90 400 400)"/>
+    <ellipse cx="400" cy="400" rx="200" ry="350" transform="rotate(90 400 400)"/>
+    <ellipse cx="400" cy="400" rx="250" ry="350" transform="rotate(90 400 400)"/>
+    <ellipse cx="400" cy="400" rx="300" ry="350" transform="rotate(90 400 400)"/>
+    <ellipse cx="400" cy="400" rx="350" ry="350" transform="rotate(90 400 400)"/>
+    <!-- Diagonal ellipses -->
+    <ellipse cx="400" cy="400" rx="150" ry="350" transform="rotate(45 400 400)"/>
+    <ellipse cx="400" cy="400" rx="200" ry="350" transform="rotate(45 400 400)"/>
+    <ellipse cx="400" cy="400" rx="250" ry="350" transform="rotate(45 400 400)"/>
+    <ellipse cx="400" cy="400" rx="300" ry="350" transform="rotate(45 400 400)"/>
+    <ellipse cx="400" cy="400" rx="350" ry="350" transform="rotate(45 400 400)"/>
+    <ellipse cx="400" cy="400" rx="150" ry="350" transform="rotate(135 400 400)"/>
+    <ellipse cx="400" cy="400" rx="200" ry="350" transform="rotate(135 400 400)"/>
+    <ellipse cx="400" cy="400" rx="250" ry="350" transform="rotate(135 400 400)"/>
+    <ellipse cx="400" cy="400" rx="300" ry="350" transform="rotate(135 400 400)"/>
+    <ellipse cx="400" cy="400" rx="350" ry="350" transform="rotate(135 400 400)"/>
+  </g>
+</svg>
