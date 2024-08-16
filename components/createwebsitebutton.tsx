@@ -1,6 +1,5 @@
 // import { useRouter } from "next/navigation";
 import { redirect } from "next/navigation";
-import { Button } from "./ui/button";
 
 export default function CreateWebsiteButton() {
   // const router = useRouter();
@@ -14,13 +13,12 @@ export default function CreateWebsiteButton() {
 
   return (
     <form action={handleCreateWebsite}>
-      <Button
-        variant="default"
+      <button
         onClick={handleCreateWebsite}
-        className="w-full justify-center mt-4"
+        className="mt-6 px-4 py-2 bg-blue-600 text-white rounded"
       >
-        Create New Site
-      </Button>
+        Create your first website
+      </button>
     </form>
   );
 }
