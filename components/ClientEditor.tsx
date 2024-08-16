@@ -277,7 +277,7 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
     if (iframeDoc) {
       const updatedContent = iframeDoc.body.innerHTML;
       setSiteContent(updatedContent);
-      const response = fetch("/api/save", {
+      const response = fetch("/api/save_website", {
         method: "POST",
         headers: {
           Accept: "application/json",
@@ -286,8 +286,11 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
           userId,
           content: updatedContent,
           title: "home", // Pass the websiteId
+          websiteId: websiteId,
         }),
       });
+      console.log("Response: " + response);
+
       // if (response) {
       //   toast.promise("site saved");
 
