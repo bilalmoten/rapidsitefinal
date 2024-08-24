@@ -1,5 +1,12 @@
-import React from "react";
-import { Maximize2, Minimize2 } from "lucide-react";
+import React, { useState } from "react";
+import {
+  Monitor,
+  Smartphone,
+  Tablet,
+  Maximize,
+  MoreHorizontal,
+  Code,
+} from "lucide-react";
 
 interface TopBarProps {
   zoom: number;
@@ -10,6 +17,9 @@ interface TopBarProps {
   pageTitle: string;
   pages: string[];
   onPageChange: (newPage: string) => void;
+  onViewportChange: (viewport: string) => void;
+  onThemeChange: () => void;
+  onCodeViewToggle: () => void;
 }
 
 const TopBar: React.FC<TopBarProps> = ({
@@ -21,11 +31,20 @@ const TopBar: React.FC<TopBarProps> = ({
   pageTitle,
   pages,
   onPageChange,
+  onViewportChange,
+  onThemeChange,
+  onCodeViewToggle,
 }) => {
+  const [activeViewport, setActiveViewport] = useState("desktop");
   const baseUrl = `https://${subdomain}.aiwebsitebuilder.tech/`;
 
+  const handleViewportChange = (viewport: string) => {
+    setActiveViewport(viewport);
+    onViewportChange(viewport);
+  };
+
   return (
-    <div className="bg-white p-4 flex justify-between items-center border-b border-gray-300 text-black">
+    <div className="bg-white p-2 flex items-center border-b border-gray-300 text-black">
       <div className="flex items-center space-x-2 flex-grow">
         <span className="text-green-600">
           <svg
@@ -54,19 +73,51 @@ const TopBar: React.FC<TopBarProps> = ({
           ))}
         </select>
       </div>
-      <div className="flex items-center space-x-2">
-        <button onClick={onZoomOut}>
-          <Minimize2 size={20} />
+      <div className="flex items-center space-x-2 border-l border-gray-300 pl-2">
+        <button
+          onClick={() => handleViewportChange("desktop")}
+          className={`p-1 ${activeViewport === "desktop" ? "bg-gray-200" : ""}`}
+        >
+          <Monitor size={20} />
         </button>
-        <span>{zoom}%</span>
-        <button onClick={onZoomIn}>
-          <Maximize2 size={20} />
+        <button
+          onClick={() => handleViewportChange("tablet")}
+          className={`p-1 ${activeViewport === "tablet" ? "bg-gray-200" : ""}`}
+        >
+          <Tablet size={20} />
+        </button>
+        <button
+          onClick={() => handleViewportChange("mobile")}
+          className={`p-1 ${activeViewport === "mobile" ? "bg-gray-200" : ""}`}
+        >
+          <Smartphone size={20} />
+        </button>
+        <button onClick={onZoomIn} className="p-1">
+          <Maximize size={20} />
+        </button>
+        <span className="text-sm">{zoom}%</span>
+      </div>
+      <div className="flex items-center space-x-2 border-l border-gray-300 pl-2">
+        <button
+          onClick={onThemeChange}
+          className="px-3 py-1 bg-gray-100 text-gray-700 rounded"
+        >
+          Theme
+        </button>
+        <button
+          onClick={onCodeViewToggle}
+          className="px-3 py-1 bg-black text-white rounded"
+        >
+          Code
         </button>
         <button
           onClick={onSave}
           className="px-3 py-1 bg-blue-500 text-white rounded"
         >
           Save
+        </button>
+        <button className="p-1">
+          <MoreHorizontal size={20} />
         </button>
       </div>
     </div>

@@ -42,6 +42,8 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
   } | null>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [pageTitle, setPageTitle] = useState<string>(initialPageTitle);
+  const [viewport, setViewport] = useState("desktop");
+  const [isCodeView, setIsCodeView] = useState(false);
 
   const handlePageChange = async (newPage: string) => {
     setPageTitle(newPage);
@@ -291,12 +293,6 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
     setIsEditMode(false);
   };
   const toggleEditMode = () => {
-    // handleSave();
-    const iframeDoc = iframeRef.current?.contentDocument;
-    if (iframeDoc) {
-      const updatedContent = iframeDoc.body.innerHTML;
-      setSiteContent(updatedContent);
-    }
     setIsEditMode(!isEditMode);
     setIsPickMode(false);
   };
@@ -333,32 +329,47 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
     }
   };
 
+  const handleViewportChange = (newViewport: string) => {
+    setViewport(newViewport);
+    // Implement logic to change the iframe size based on viewport
+  };
+
+  const handleThemeChange = () => {
+    // Implement theme change logic
+  };
+
+  const handleCodeViewToggle = () => {
+    setIsCodeView(!isCodeView);
+  };
+
   return (
     <div className="flex h-[calc(100vh-110px)] bg-white">
       <div className="flex-1 flex flex-col relative">
-        {/* <AddressBar
-          subdomain={subdomain}
-          pageTitle={pageTitle}
-          pages={pages}
-          onPageChange={handlePageChange}
-        /> */}
         <TopBar
           zoom={zoom}
           onZoomIn={handleZoomIn}
           onZoomOut={handleZoomOut}
+          onSave={handleSave}
           subdomain={subdomain}
           pageTitle={pageTitle}
           pages={pages}
           onPageChange={handlePageChange}
-          onSave={handleSave}
+          onViewportChange={handleViewportChange}
+          onThemeChange={handleThemeChange}
+          onCodeViewToggle={handleCodeViewToggle}
         />
-        <MainEditingPanel
-          iframeRef={iframeRef}
-          zoom={zoom}
-          isPickMode={isPickMode}
-          hoveredElement={hoveredElement}
-          selectedElement={selectedElement}
-        />
+        {isCodeView ? (
+          <div />
+        ) : (
+          // <CodeEditor content={siteContent} onChange={setSiteContent} />
+          <MainEditingPanel
+            iframeRef={iframeRef}
+            zoom={zoom}
+            isPickMode={isPickMode}
+            hoveredElement={hoveredElement}
+            selectedElement={selectedElement}
+          />
+        )}
         {isPickMode && selectedElement && clickPosition && (
           <TextPopup
             selectedElement={selectedElement}
