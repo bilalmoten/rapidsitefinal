@@ -1,17 +1,13 @@
-import React, { useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import {
   Monitor,
   Smartphone,
   Tablet,
-  Maximize,
+  Maximize2,
   MoreHorizontal,
-  Code,
 } from "lucide-react";
 
 interface TopBarProps {
-  zoom: number;
-  onZoomIn: () => void;
-  onZoomOut: () => void;
   onSave: () => void;
   subdomain: string;
   pageTitle: string;
@@ -20,12 +16,11 @@ interface TopBarProps {
   onViewportChange: (viewport: string) => void;
   onThemeChange: () => void;
   onCodeViewToggle: () => void;
+  iframeRef: React.RefObject<HTMLIFrameElement>;
+  viewport: string;
 }
 
 const TopBar: React.FC<TopBarProps> = ({
-  zoom,
-  onZoomIn,
-  onZoomOut,
   onSave,
   subdomain,
   pageTitle,
@@ -34,14 +29,80 @@ const TopBar: React.FC<TopBarProps> = ({
   onViewportChange,
   onThemeChange,
   onCodeViewToggle,
+  iframeRef,
+  viewport,
 }) => {
-  const [activeViewport, setActiveViewport] = useState("desktop");
   const baseUrl = `https://${subdomain}.aiwebsitebuilder.tech/`;
 
-  const handleViewportChange = (viewport: string) => {
-    setActiveViewport(viewport);
-    onViewportChange(viewport);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
+  const applyViewportStyles = useCallback(
+    (viewportType: string) => {
+      if (iframeRef.current) {
+        const parentDiv = iframeRef.current.parentElement;
+        if (parentDiv) {
+          switch (viewportType) {
+            case "desktop":
+              parentDiv.style.width = "100%";
+              parentDiv.style.height = "100%";
+              break;
+            case "tablet":
+              parentDiv.style.width = "768px";
+              parentDiv.style.height = "780px";
+              break;
+            case "mobile":
+              parentDiv.style.width = "375px";
+              parentDiv.style.height = "667px";
+              break;
+          }
+          iframeRef.current.style.width = "100%";
+          iframeRef.current.style.height = "100%";
+          iframeRef.current.style.overflow = "auto";
+        }
+      }
+    },
+    [iframeRef]
+  );
+
+  const handleViewportChange = (newViewport: string) => {
+    onViewportChange(newViewport);
+    applyViewportStyles(newViewport);
   };
+
+  const toggleFullScreen = () => {
+    if (!document.fullscreenElement) {
+      iframeRef.current
+        ?.requestFullscreen()
+        .then(() => {
+          setIsFullscreen(true);
+        })
+        .catch((err) => {
+          console.error(
+            `Error attempting to enable full-screen mode: ${err.message}`
+          );
+        });
+    } else {
+      document.exitFullscreen();
+    }
+  };
+
+  useEffect(() => {
+    const handleFullScreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+
+    document.addEventListener("fullscreenchange", handleFullScreenChange);
+
+    return () => {
+      document.removeEventListener("fullscreenchange", handleFullScreenChange);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!isFullscreen) {
+      applyViewportStyles(viewport);
+    }
+  }, [isFullscreen, viewport, applyViewportStyles]);
 
   return (
     <div className="bg-white p-2 flex items-center border-b border-gray-300 text-black">
@@ -76,26 +137,29 @@ const TopBar: React.FC<TopBarProps> = ({
       <div className="flex items-center space-x-2 border-l border-gray-300 pl-2">
         <button
           onClick={() => handleViewportChange("desktop")}
-          className={`p-1 ${activeViewport === "desktop" ? "bg-gray-200" : ""}`}
+          className={`p-1 ${viewport === "desktop" ? "bg-gray-200" : ""}`}
         >
           <Monitor size={20} />
         </button>
         <button
           onClick={() => handleViewportChange("tablet")}
-          className={`p-1 ${activeViewport === "tablet" ? "bg-gray-200" : ""}`}
+          className={`p-1 ${viewport === "tablet" ? "bg-gray-200" : ""}`}
         >
           <Tablet size={20} />
         </button>
         <button
           onClick={() => handleViewportChange("mobile")}
-          className={`p-1 ${activeViewport === "mobile" ? "bg-gray-200" : ""}`}
+          className={`p-1 ${viewport === "mobile" ? "bg-gray-200" : ""}`}
         >
           <Smartphone size={20} />
         </button>
-        <button onClick={onZoomIn} className="p-1">
-          <Maximize size={20} />
+        <button
+          onClick={toggleFullScreen}
+          className="p-1"
+          title="Full-screen preview"
+        >
+          <Maximize2 size={20} />
         </button>
-        <span className="text-sm">{zoom}%</span>
       </div>
       <div className="flex items-center space-x-2 border-l border-gray-300 pl-2">
         <button

@@ -331,7 +331,22 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
 
   const handleViewportChange = (newViewport: string) => {
     setViewport(newViewport);
-    // Implement logic to change the iframe size based on viewport
+    if (iframeRef.current) {
+      switch (newViewport) {
+        case "desktop":
+          iframeRef.current.style.width = "100%";
+          iframeRef.current.style.height = "100%";
+          break;
+        case "tablet":
+          iframeRef.current.style.width = "768px";
+          iframeRef.current.style.height = "1024px";
+          break;
+        case "mobile":
+          iframeRef.current.style.width = "375px";
+          iframeRef.current.style.height = "667px";
+          break;
+      }
+    }
   };
 
   const handleThemeChange = () => {
@@ -343,12 +358,12 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
   };
 
   return (
-    <div className="flex h-[calc(100vh-110px)] bg-white">
+    <div className="flex h-[calc(100vh-110px)] bg-gray-100">
       <div className="flex-1 flex flex-col relative">
         <TopBar
-          zoom={zoom}
-          onZoomIn={handleZoomIn}
-          onZoomOut={handleZoomOut}
+          // zoom={zoom}
+          // onZoomIn={handleZoomIn}
+          // onZoomOut={handleZoomOut}
           onSave={handleSave}
           subdomain={subdomain}
           pageTitle={pageTitle}
@@ -357,18 +372,39 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
           onViewportChange={handleViewportChange}
           onThemeChange={handleThemeChange}
           onCodeViewToggle={handleCodeViewToggle}
+          iframeRef={iframeRef}
+          viewport={viewport}
         />
         {isCodeView ? (
           <div />
         ) : (
-          // <CodeEditor content={siteContent} onChange={setSiteContent} />
-          <MainEditingPanel
-            iframeRef={iframeRef}
-            zoom={zoom}
-            isPickMode={isPickMode}
-            hoveredElement={hoveredElement}
-            selectedElement={selectedElement}
-          />
+          <div className="flex-1 flex items-center justify-center overflow-auto bg-gray-200 p-4">
+            <div
+              className={`relative bg-white shadow-lg ${
+                viewport !== "desktop" ? "rounded-lg overflow-hidden" : ""
+              }`}
+              style={{
+                width: viewport === "desktop" ? "100%" : "auto",
+                height: viewport === "desktop" ? "100%" : "auto",
+                maxWidth: "100%",
+                maxHeight: "100%",
+              }}
+            >
+              {viewport !== "desktop" && (
+                <div className="absolute top-0 left-0 right-0 h-6 bg-gray-300 flex items-center justify-center rounded-t-lg">
+                  <div className="w-16 h-1 bg-gray-400 rounded-full" />
+                </div>
+              )}
+              <MainEditingPanel
+                iframeRef={iframeRef}
+                zoom={zoom}
+                isPickMode={isPickMode}
+                hoveredElement={hoveredElement}
+                selectedElement={selectedElement}
+                viewport={viewport}
+              />
+            </div>
+          </div>
         )}
         {isPickMode && selectedElement && clickPosition && (
           <TextPopup
@@ -389,11 +425,7 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
           toggleEditMode={toggleEditMode}
         />
       </div>
-      <ChatWindow
-      // userId={userId}
-      // websiteId={websiteId}
-      // Add any other props that ChatWindow needs
-      />
+      <ChatWindow />
     </div>
   );
 };

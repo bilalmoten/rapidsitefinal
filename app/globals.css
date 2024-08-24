@@ -734,3 +734,13 @@ svg {
 }
 
 /* .group-hover:[animat. */
+
+.iframe-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  background-color: #f0f0f0;
+  min-height: 100vh;
+  padding: 20px;
+  box-sizing: border-box;
+}

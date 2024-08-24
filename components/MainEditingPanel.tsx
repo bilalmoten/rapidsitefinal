@@ -6,6 +6,7 @@ interface MainEditingPanelProps {
   isPickMode: boolean;
   hoveredElement: Element | null;
   selectedElement: Element | null;
+  viewport: string;
 }
 
 const MainEditingPanel: React.FC<MainEditingPanelProps> = ({
@@ -14,12 +15,21 @@ const MainEditingPanel: React.FC<MainEditingPanelProps> = ({
   isPickMode,
   hoveredElement,
   selectedElement,
+  viewport,
 }) => {
   return (
-    <div className="flex-1 relative overflow-hidden bg-white border border-gray-300 rounded-lg shadow-lg m-4">
+    <div
+      className="flex-1 relative overflow-auto"
+      style={{
+        width: viewport === "desktop" ? "100%" : "auto",
+        height: viewport === "desktop" ? "100%" : "auto",
+      }}
+    >
       <iframe
         ref={iframeRef}
-        className="w-full h-full border-0 rounded-lg"
+        className={`w-full h-full border-0 ${
+          viewport !== "desktop" ? "mt-6" : ""
+        }`}
         style={{
           transform: `scale(${zoom / 100})`,
           transformOrigin: "top left",
