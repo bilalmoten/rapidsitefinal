@@ -30,11 +30,11 @@ export default function DeleteWebsiteDialog({
     setIsLoading(true);
     const { error } = await supabase
       .from("websites")
-      .delete()
+      .update({ isdeleted: "yes" })
       .eq("id", websiteId);
 
     if (error) {
-      console.error("Error deleting website:", error);
+      console.error("Error marking website as deleted:", error);
     } else {
       router.refresh();
     }

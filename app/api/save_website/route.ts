@@ -7,7 +7,7 @@ export async function POST(request: Request) {
   const requestBody = await request.json();
   const { userId, content, title, website_id } = requestBody;
   console.log("Request body:");
-  console.log(requestBody);
+  console.log(`userId: ${userId}, title: ${title}, website_id: ${website_id}`);
   if (!userId || !content || !title || !website_id) {
     return NextResponse.json({ message: "Missing required fields" });
   }
@@ -20,11 +20,12 @@ export async function POST(request: Request) {
     .eq("title", title);
 
   if (error) {
+    console.log(error);
     return NextResponse.json({ message: "Error updating content", error });
   }
-
+  console.log(`Content updated successfully with the following details: userId: ${userId}, title: ${title}, website_id: ${website_id}`);
   return NextResponse.json({
     message:
-      "Content updated successfully with the following details: " + JSON.stringify(requestBody),
+      `Content updated successfully with the following details: userId: ${userId}, title: ${title}, website_id: ${website_id}`
   });
 }

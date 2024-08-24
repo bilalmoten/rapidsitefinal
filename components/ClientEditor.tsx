@@ -14,12 +14,14 @@ interface ClientEditorProps {
   content: string;
   userId: string; // User ID to identify the user
   websiteId: string; // Website ID to identify the website
+  pageTitle: string; // Page title to identify the page
 }
 
 const ClientEditor: React.FC<ClientEditorProps> = ({
   content,
   userId,
   websiteId,
+  pageTitle,
 }) => {
   const [siteContent, setSiteContent] = useState<string>(content);
   const [zoom, setZoom] = useState(100);
@@ -277,25 +279,25 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
     if (iframeDoc) {
       const updatedContent = iframeDoc.body.innerHTML;
       setSiteContent(updatedContent);
+
+      console.log("Saving with websiteId:", websiteId); // Add this line for debugging
+
       const response = fetch("/api/save_website", {
         method: "POST",
         headers: {
+          "Content-Type": "application/json", // Add this line
           Accept: "application/json",
         },
         body: JSON.stringify({
           userId,
           content: updatedContent,
-          title: "home", // Pass the websiteId
-          websiteId: websiteId,
+          title: pageTitle,
+          website_id: websiteId,
         }),
       });
-      console.log("Response: " + response);
 
-      // if (response) {
-      //   toast.promise("site saved");
+      console.log("Title:", pageTitle);
 
-      //   console.log("Content updated successfully");
-      // }
       toast.promise(response, {
         loading: "Saving...",
         success: "Site saved!",
