@@ -46,13 +46,13 @@ export default async function EditorPage({
   console.log("params.website_id:", params.website_id); // Add this line
 
   return (
-    <div className="h-screen w-full">
-      <ClientEditor
-        pageTitle={pages && pages[0].pages[0]}
-        content={page?.content || ""}
-        userId={user.id}
-        websiteId={params.website_id}
-      />
-    </div>
+    // <div>
+    <ClientEditor
+      pageTitle={pages && pages[0].pages[0]}
+      content={page?.content || ""}
+      userId={user.id}
+      websiteId={params.website_id}
+    />
+    // </div>
   );
 }

@@ -307,7 +307,7 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
   };
 
   return (
-    <div className="flex flex-col h-screen bg-white">
+    <div className="flex flex-col h-[calc(100vh-110px)] bg-white">
       <div className="flex flex-1">
         <ChatWindow />
         <div className="flex-1 flex flex-col relative">
@@ -343,7 +343,7 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
             toggleEditMode={toggleEditMode}
           />
         </div>
-        <PagesPanel />
+        {/* <PagesPanel /> */}
       </div>
     </div>
   );
