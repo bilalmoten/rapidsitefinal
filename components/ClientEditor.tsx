@@ -9,21 +9,27 @@ import TopBar from "./TopBar";
 import PagesPanel from "./PagesPanel";
 import TextPopup from "./textpopup2";
 import { toast } from "sonner";
+import AddressBar from "./AddressBar";
+import { createClient } from "@/utils/supabase/client";
 
 interface ClientEditorProps {
-  content: string;
+  initialContent: string;
   userId: string; // User ID to identify the user
   websiteId: string; // Website ID to identify the website
-  pageTitle: string; // Page title to identify the page
+  initialPageTitle: string; // Page title to identify the page
+  subdomain: string;
+  pages: string[];
 }
 
 const ClientEditor: React.FC<ClientEditorProps> = ({
-  content,
+  initialContent,
   userId,
   websiteId,
-  pageTitle,
+  initialPageTitle,
+  subdomain,
+  pages,
 }) => {
-  const [siteContent, setSiteContent] = useState<string>(content);
+  const [siteContent, setSiteContent] = useState<string>(initialContent);
   const [zoom, setZoom] = useState(100);
   const [isPickMode, setIsPickMode] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
@@ -35,6 +41,27 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
     y: number;
   } | null>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  const [pageTitle, setPageTitle] = useState<string>(initialPageTitle);
+
+  const handlePageChange = async (newPage: string) => {
+    setPageTitle(newPage);
+    const supabase = createClient();
+    const { data: page, error } = await supabase
+      .from("pages")
+      .select("content")
+      .eq("user_id", userId)
+      .eq("website_id", websiteId)
+      .eq("title", newPage)
+      .single();
+
+    if (error) {
+      console.error("Error fetching page content:", error);
+      toast.error("Error loading page content");
+      return;
+    }
+
+    setSiteContent(page?.content || "");
+  };
 
   useEffect(() => {
     const iframe = iframeRef.current;
@@ -307,44 +334,55 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
   };
 
   return (
-    <div className="flex flex-col h-[calc(100vh-110px)] bg-white">
-      <div className="flex flex-1">
-        <ChatWindow />
-        <div className="flex-1 flex flex-col relative">
-          <TopBar
-            zoom={zoom}
-            onZoomIn={handleZoomIn}
-            onZoomOut={handleZoomOut}
-            onSave={handleSave} // Pass the handleSave function to TopBar
-          />
-          <MainEditingPanel
-            iframeRef={iframeRef}
-            zoom={zoom}
-            isPickMode={isPickMode}
-            hoveredElement={hoveredElement}
+    <div className="flex h-[calc(100vh-110px)] bg-white">
+      <div className="flex-1 flex flex-col relative">
+        {/* <AddressBar
+          subdomain={subdomain}
+          pageTitle={pageTitle}
+          pages={pages}
+          onPageChange={handlePageChange}
+        /> */}
+        <TopBar
+          zoom={zoom}
+          onZoomIn={handleZoomIn}
+          onZoomOut={handleZoomOut}
+          subdomain={subdomain}
+          pageTitle={pageTitle}
+          pages={pages}
+          onPageChange={handlePageChange}
+          onSave={handleSave}
+        />
+        <MainEditingPanel
+          iframeRef={iframeRef}
+          zoom={zoom}
+          isPickMode={isPickMode}
+          hoveredElement={hoveredElement}
+          selectedElement={selectedElement}
+        />
+        {isPickMode && selectedElement && clickPosition && (
+          <TextPopup
             selectedElement={selectedElement}
+            clickPosition={clickPosition}
+            onClose={() => {
+              setSelectedElement(null);
+              setIsAnyElementSelected(false);
+            }}
+            screenHeight={window.innerHeight}
+            screenWidth={window.innerWidth}
           />
-          {isPickMode && selectedElement && clickPosition && (
-            <TextPopup
-              selectedElement={selectedElement}
-              clickPosition={clickPosition}
-              onClose={() => {
-                setSelectedElement(null);
-                setIsAnyElementSelected(false);
-              }}
-              screenHeight={window.innerHeight}
-              screenWidth={window.innerWidth}
-            />
-          )}
-          <FloatingControls
-            isPickMode={isPickMode}
-            isEditMode={isEditMode}
-            togglePickMode={togglePickMode}
-            toggleEditMode={toggleEditMode}
-          />
-        </div>
-        {/* <PagesPanel /> */}
+        )}
+        <FloatingControls
+          isPickMode={isPickMode}
+          isEditMode={isEditMode}
+          togglePickMode={togglePickMode}
+          toggleEditMode={toggleEditMode}
+        />
       </div>
+      <ChatWindow
+      // userId={userId}
+      // websiteId={websiteId}
+      // Add any other props that ChatWindow needs
+      />
     </div>
   );
 };

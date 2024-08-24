@@ -17,25 +17,25 @@ export default async function EditorPage({
     return redirect("/login");
   }
 
-  const { data: pages, error: pagesError } = await supabase
+  const { data: website, error: websiteError } = await supabase
     .from("websites")
-    .select("pages")
-    .eq("user_id", user.id)
-    .eq("id", params.website_id);
+    .select("subdomain, pages")
+    .eq("id", params.website_id)
+    .single();
 
-  console.log(pages);
-  console.log(pages && pages[0].pages[0]);
-  console.log(pages && pages[0].pages);
-  if (pagesError) {
-    console.error("Error fetching pages:", pagesError);
-    return <div>Error fetching page content.</div>;
+  if (websiteError) {
+    console.error("Error fetching website:", websiteError);
+    return <div>Error fetching website information.</div>;
   }
+
+  const initialPageTitle = website.pages[0];
+
   const { data: page, error: pageError } = await supabase
     .from("pages")
     .select("content")
     .eq("user_id", user.id)
     .eq("website_id", params.website_id)
-    .eq("title", pages && pages[0].pages[0])
+    .eq("title", initialPageTitle)
     .single();
 
   if (pageError) {
@@ -43,16 +43,16 @@ export default async function EditorPage({
     return <div>Error fetching page content.</div>;
   }
 
-  console.log("params.website_id:", params.website_id); // Add this line
+  console.log("params.website_id:", params.website_id);
 
   return (
-    // <div>
     <ClientEditor
-      pageTitle={pages && pages[0].pages[0]}
-      content={page?.content || ""}
+      initialPageTitle={initialPageTitle}
+      initialContent={page?.content || ""}
       userId={user.id}
       websiteId={params.website_id}
+      subdomain={website.subdomain}
+      pages={website.pages}
     />
-    // </div>
   );
 }
