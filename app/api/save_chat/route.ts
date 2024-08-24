@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/utils/supabase/server";
 
 export async function POST(request: Request) {
+
     const supabase = createClient();
     const requestBody = await request.json();
     const { userId, websiteID, chat_conversation } = requestBody;
@@ -25,6 +26,6 @@ export async function POST(request: Request) {
 
     return NextResponse.json({
         message:
-            "Content updated successfully with the following details: " + JSON.stringify(requestBody),
+            "Content updated successfully with the following details: ",
     });
 }

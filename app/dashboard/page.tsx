@@ -12,22 +12,56 @@ import BWT from "@/components/design/BWT";
 import Card from "@/components/design/Card";
 import Last from "@/components/design/Last";
 import Sidebar from "@/components/design/Sidebar";
-import Pagination from "@/components/design/Pagination"; 
+import Pagination from "@/components/design/Pagination";
 import Website from "./website";
+import ModeToggle from "@/components/modetoggle";
+import Navbar_new from "@/components/navbar-new";
 export default async function DashboardPage() {
   const supabase = createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-const items = [
-    { image: '/image1.png', heading: 'Personal Portfolio', content: 'Created 6 days ago' },
-    { image: '/image2.png', heading: 'Personal Portfolio', content: 'Created 6 days ago' },
-    { image: '/image3.png', heading: 'Personal Portfolio', content: 'Created 6 days ago' },
-    { image: '/image4.png', heading: 'Personal Portfolio', content: 'Created 6 days ago' },
-    { image: '/image5.png', heading: 'Personal Portfolio', content: 'Created 6 days ago' },
-    { image: '/image6.png', heading: 'Personal Portfolio', content: 'Created 6 days ago' },
-    { image: '/image7.png', heading: 'Personal Portfolio', content: 'Created 6 days ago' },
-    { image: '/image8.png', heading: 'Personal Portfolio', content: 'Created 6 days ago' },
+  const items = [
+    {
+      image: "/image1.png",
+      heading: "Personal Portfolio",
+      content: "Created 6 days ago",
+    },
+    {
+      image: "/image2.png",
+      heading: "Personal Portfolio",
+      content: "Created 6 days ago",
+    },
+    {
+      image: "/image3.png",
+      heading: "Personal Portfolio",
+      content: "Created 6 days ago",
+    },
+    {
+      image: "/image4.png",
+      heading: "Personal Portfolio",
+      content: "Created 6 days ago",
+    },
+    {
+      image: "/image5.png",
+      heading: "Personal Portfolio",
+      content: "Created 6 days ago",
+    },
+    {
+      image: "/image6.png",
+      heading: "Personal Portfolio",
+      content: "Created 6 days ago",
+    },
+    {
+      image: "/image7.png",
+      heading: "Personal Portfolio",
+      content: "Created 6 days ago",
+    },
+    {
+      image: "/image8.png",
+      heading: "Personal Portfolio",
+      content: "Created 6 days ago",
+    },
   ];
 
   if (!user) {
@@ -109,14 +143,15 @@ const items = [
     <main className="flex">
       <Sidebar user={user.id} />
       <div className="container px-10 py-5">
-        <div className="heading font-[700] text-[22px]">
-          Quick Start
-        </div>
+        {/* <div>
+           <div className="heading font-[700] text-[22px]">Quick Start</div>
+          <ModeToggle />
+          <Navbar_new email={user.email ?? ""} id={user.id} />
+        </div> */}
         <Website websites={websites} />
-      <BWT />
-      <Last />
-
-    </div>
-    </main >
+        <BWT />
+        <Last />
+      </div>
+    </main>
   );
 }

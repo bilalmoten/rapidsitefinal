@@ -40,6 +40,7 @@ export const maxDuration = 30;
 
 export default function Chat({ params }: { params: { website_id: string } }) {
   const supabase = createClient();
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const [messages, setMessages] = useState<CoreMessage[]>([]);
   const [input, setInput] = useState("");
@@ -59,6 +60,13 @@ export default function Chat({ params }: { params: { website_id: string } }) {
 
   // ff
   // ff
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col w-full max-w-md py-24 mx-auto stretch">
@@ -83,8 +91,23 @@ export default function Chat({ params }: { params: { website_id: string } }) {
           const result = await continueConversation(newMessages);
 
           for await (const content of readStreamableValue(result)) {
+            // if (content === "EXIT") {
+            //   const response = fetch("/api/save_chat", {
+            //     method: "POST",
+            //     headers: {
+            //       Accept: "application/json",
+            //     },
+            //     body: JSON.stringify({
+            //       userId: user?.id,
+            //       websiteID: params.website_id,
+            //       chat_conversation: messages,
+            //     }),
+            //   });
+            //   return router.push("/dashboard");
+            // }
             if (content === "EXIT") {
-              const response = fetch("/api/save_chat", {
+              setIsLoading(true);
+              await fetch("/api/save_chat", {
                 method: "POST",
                 headers: {
                   Accept: "application/json",
@@ -95,7 +118,27 @@ export default function Chat({ params }: { params: { website_id: string } }) {
                   chat_conversation: messages,
                 }),
               });
-              return router.push("/dashboard");
+              const timeout = setTimeout(() => {
+                setIsLoading(false);
+                return router.push(`/dashboard/editor/${params.website_id}`);
+              }, 5 * 60 * 1000); // 5 minutes
+
+              const response = await fetch(
+                `https://api2.azurewebsites.net/api/code_website?user_id=${user?.id}&website_id=${params.website_id}`,
+                {
+                  method: "POST",
+                }
+              );
+
+              clearTimeout(timeout);
+
+              if (response.ok) {
+                setIsLoading(false);
+                return router.push(`/dashboard/editor/${params.website_id}`);
+              } else {
+                setIsLoading(false);
+                alert("Something went wrong. Please try again.");
+              }
             }
             setMessages([
               ...newMessages,

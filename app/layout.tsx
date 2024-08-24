@@ -2,6 +2,8 @@ import { GeistSans } from "geist/font/sans";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import Navbar from "@/components/Navbar";
+import Navbar_new from "@/components/navbar-new";
+import { ThemeProvider } from "@/components/theme_provider";
 
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
@@ -9,8 +11,9 @@ const defaultUrl = process.env.VERCEL_URL
 
 export const metadata = {
   metadataBase: new URL(defaultUrl),
-  title: "Next.js and Supabase Starter Kit",
-  description: "The fastest way to build apps with Next.js and Supabase",
+  title: "RapidSite | AI Website Builder",
+  description:
+    "RapidSite: The AI Website Builder that understands your website design needs.",
 };
 
 export default function RootLayout({
@@ -21,11 +24,29 @@ export default function RootLayout({
   return (
     <html lang="en" className={GeistSans.className}>
       <body className="bg-background text-foreground">
-        {/* <Navbar /> */}
+        {/* <Navbar />
         <main className="min-h-screen flex flex-col items-center">
           {children}
         </main>
-        <Toaster richColors />
+        <Toaster richColors /> */}
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          {/* <div className=" flex row-auto">
+            <Sidebar /> */}
+          {/* <div className="flex flex-col w-full min-h-screen"> */}
+          <div>
+            {/* <Navbar_new email={""} id={""} /> */}
+            <main className="min-h-screen flex flex-col items-center">
+              {children}
+            </main>
+            <Toaster richColors />
+            {/* </div> */}
+          </div>
+        </ThemeProvider>
       </body>
     </html>
   );

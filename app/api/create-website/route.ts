@@ -1,7 +1,6 @@
 // api/create-website/route.ts
 import { NextResponse } from "next/server";
 import { createClient } from "@/utils/supabase/server";
-import { pages } from "next/dist/build/templates/app-page";
 
 export async function POST(request: Request) {
     console.log("POST function called"); // Added logging
