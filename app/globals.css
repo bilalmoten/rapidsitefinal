@@ -64,7 +64,7 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground m-0 p-0 overflow-x-hidden;
   }
 }
 
@@ -76,19 +76,22 @@
   background: #f2e8f2;
 }
 
+/* .cardContainer {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  justify-content: center;
+} */
 .cardContainer {
   display: flex;
   gap: 20px;
   flex-wrap: wrap;
   justify-content: center;
+  width: 100%;
+  padding: 0 20px;
 }
-
 .button:hover {
   background: #f2e8f2;
-}
-
-* {
-  /* overflow-x: hidden; */
 }
 
 .landingPage {

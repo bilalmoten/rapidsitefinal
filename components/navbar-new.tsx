@@ -10,8 +10,8 @@ interface NavbarProps {
 
 export default function Navbar_new({ email, id }: NavbarProps) {
   return (
-    <nav className="shadow-sm">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <nav className="shadow-sm ml-[200px]">
+      <div className="max-w-full px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center py-4">
           <h1 className="text-3xl font-semibold">Dashboard</h1>
           <h2 className="text-xl font-bold">Welcome back, {email}!</h2>

@@ -21,48 +21,6 @@ export default async function DashboardPage() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  // const items = [
-  //   {
-  //     image: "/image1.png",
-  //     heading: "Personal Portfolio",
-  //     content: "Created 6 days ago",
-  //   },
-  //   {
-  //     image: "/image2.png",
-  //     heading: "Personal Portfolio",
-  //     content: "Created 6 days ago",
-  //   },
-  //   {
-  //     image: "/image3.png",
-  //     heading: "Personal Portfolio",
-  //     content: "Created 6 days ago",
-  //   },
-  //   {
-  //     image: "/image4.png",
-  //     heading: "Personal Portfolio",
-  //     content: "Created 6 days ago",
-  //   },
-  //   {
-  //     image: "/image5.png",
-  //     heading: "Personal Portfolio",
-  //     content: "Created 6 days ago",
-  //   },
-  //   {
-  //     image: "/image6.png",
-  //     heading: "Personal Portfolio",
-  //     content: "Created 6 days ago",
-  //   },
-  //   {
-  //     image: "/image7.png",
-  //     heading: "Personal Portfolio",
-  //     content: "Created 6 days ago",
-  //   },
-  //   {
-  //     image: "/image8.png",
-  //     heading: "Personal Portfolio",
-  //     content: "Created 6 days ago",
-  //   },
-  // ];
 
   if (!user) {
     return redirect("/login");
@@ -82,10 +40,10 @@ export default async function DashboardPage() {
   return (
     <main className="flex">
       <Sidebar user={user.id} />
-      <div className="container px-10 py-5">
+      <div className="flex-1 ml-[200px] px-6 py-5">
         <Website websites={websites} />
-        <BWT />
-        <Last />
+        {/* <BWT /> */}
+        {/* <Last /> */}
       </div>
     </main>
   );
