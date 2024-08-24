@@ -107,8 +107,8 @@ const TopBar: React.FC<TopBarProps> = ({
   }, [isFullscreen, viewport, applyViewportStyles]);
 
   return (
-    <div className="bg-white p-2 flex items-center border-b border-gray-300 text-black">
-      <div className="flex items-center space-x-2 flex-grow">
+    <div className="bg-white p-2 flex items-center border-b border-gray-300 text-black ">
+      <div className="flex items-center space-x-2 px-16 flex-grow">
         <span className="text-green-600">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -136,7 +136,7 @@ const TopBar: React.FC<TopBarProps> = ({
           ))}
         </select>
       </div>
-      <div className="flex items-center space-x-2 border-l border-gray-300 pl-2">
+      <div className="flex items-center space-x-2 border-l border-gray-300 pl-4">
         <button
           onClick={() => handleViewportChange("desktop")}
           className={`p-1 ${viewport === "desktop" ? "bg-gray-200" : ""}`}
@@ -157,13 +157,13 @@ const TopBar: React.FC<TopBarProps> = ({
         </button>
         <button
           onClick={toggleFullScreen}
-          className="p-1"
+          className="p-1 pr-3"
           title="Full-screen preview"
         >
           <Maximize2 size={20} />
         </button>
       </div>
-      <div className="flex items-center space-x-2 border-l border-gray-300 pl-2">
+      <div className="flex items-center space-x-4 border-l border-gray-300 pl-4">
         <button
           onClick={onThemeChange}
           className="px-3 py-1 bg-gray-100 text-gray-700 rounded"
