@@ -11,6 +11,7 @@ import TextPopup from "./textpopup2";
 import { toast } from "sonner";
 import AddressBar from "./AddressBar";
 import { createClient } from "@/utils/supabase/client";
+import CodeView from "./CodeView";
 
 interface ClientEditorProps {
   initialContent: string;
@@ -43,7 +44,7 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [pageTitle, setPageTitle] = useState<string>(initialPageTitle);
   const [viewport, setViewport] = useState("desktop");
-  const [isCodeView, setIsCodeView] = useState(false);
+  const [isCodeViewActive, setIsCodeViewActive] = useState(false);
 
   const handlePageChange = async (newPage: string) => {
     setPageTitle(newPage);
@@ -339,7 +340,7 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
           break;
         case "tablet":
           iframeRef.current.style.width = "768px";
-          iframeRef.current.style.height = "1024px";
+          iframeRef.current.style.height = "780px";
           break;
         case "mobile":
           iframeRef.current.style.width = "375px";
@@ -353,8 +354,8 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
     // Implement theme change logic
   };
 
-  const handleCodeViewToggle = () => {
-    setIsCodeView(!isCodeView);
+  const toggleCodeView = () => {
+    setIsCodeViewActive(!isCodeViewActive);
   };
 
   return (
@@ -364,6 +365,8 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
           // zoom={zoom}
           // onZoomIn={handleZoomIn}
           // onZoomOut={handleZoomOut}
+          isCodeViewActive={isCodeViewActive}
+          onCodeViewToggle={toggleCodeView}
           onSave={handleSave}
           subdomain={subdomain}
           pageTitle={pageTitle}
@@ -371,41 +374,37 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
           onPageChange={handlePageChange}
           onViewportChange={handleViewportChange}
           onThemeChange={handleThemeChange}
-          onCodeViewToggle={handleCodeViewToggle}
+          // onCodeViewToggle={handleCodeViewToggle}
           iframeRef={iframeRef}
           viewport={viewport}
         />
-        {isCodeView ? (
-          <div />
-        ) : (
-          <div className="flex-1 flex items-center justify-center overflow-auto bg-gray-200 p-4">
-            <div
-              className={`relative bg-white shadow-lg ${
-                viewport !== "desktop" ? "rounded-lg overflow-hidden" : ""
-              }`}
-              style={{
-                width: viewport === "desktop" ? "100%" : "auto",
-                height: viewport === "desktop" ? "100%" : "auto",
-                maxWidth: "100%",
-                maxHeight: "100%",
-              }}
-            >
-              {viewport !== "desktop" && (
-                <div className="absolute top-0 left-0 right-0 h-6 bg-gray-300 flex items-center justify-center rounded-t-lg">
-                  <div className="w-16 h-1 bg-gray-400 rounded-full" />
-                </div>
-              )}
-              <MainEditingPanel
-                iframeRef={iframeRef}
-                zoom={zoom}
-                isPickMode={isPickMode}
-                hoveredElement={hoveredElement}
-                selectedElement={selectedElement}
-                viewport={viewport}
-              />
-            </div>
+        <div className="flex-1 flex items-center justify-center overflow-auto bg-gray-200 p-4">
+          <div
+            className={`relative bg-white shadow-lg ${
+              viewport !== "desktop" ? "rounded-lg overflow-hidden" : ""
+            }`}
+            style={{
+              width: viewport === "desktop" ? "100%" : "auto",
+              height: viewport === "desktop" ? "100%" : "auto",
+              maxWidth: "100%",
+              maxHeight: "100%",
+            }}
+          >
+            {viewport !== "desktop" && (
+              <div className="absolute top-0 left-0 right-0 h-6 bg-gray-300 flex items-center justify-center rounded-t-lg">
+                <div className="w-16 h-1 bg-gray-400 rounded-full" />
+              </div>
+            )}
+            <MainEditingPanel
+              iframeRef={iframeRef}
+              zoom={zoom}
+              isPickMode={isPickMode}
+              hoveredElement={hoveredElement}
+              selectedElement={selectedElement}
+              viewport={viewport}
+            />
           </div>
-        )}
+        </div>
         {isPickMode && selectedElement && clickPosition && (
           <TextPopup
             selectedElement={selectedElement}
@@ -426,6 +425,12 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
         />
       </div>
       <ChatWindow />
+      {isCodeViewActive && (
+        <CodeView
+          content={siteContent}
+          onClose={() => setIsCodeViewActive(false)}
+        />
+      )}
     </div>
   );
 };

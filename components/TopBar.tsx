@@ -18,6 +18,7 @@ interface TopBarProps {
   onCodeViewToggle: () => void;
   iframeRef: React.RefObject<HTMLIFrameElement>;
   viewport: string;
+  isCodeViewActive: boolean;
 }
 
 const TopBar: React.FC<TopBarProps> = ({
@@ -31,6 +32,7 @@ const TopBar: React.FC<TopBarProps> = ({
   onCodeViewToggle,
   iframeRef,
   viewport,
+  isCodeViewActive,
 }) => {
   const baseUrl = `https://${subdomain}.aiwebsitebuilder.tech/`;
 
@@ -170,7 +172,9 @@ const TopBar: React.FC<TopBarProps> = ({
         </button>
         <button
           onClick={onCodeViewToggle}
-          className="px-3 py-1 bg-black text-white rounded"
+          className={`px-3 py-1 rounded ${
+            isCodeViewActive ? "bg-blue-500 text-white" : "bg-black text-white"
+          }`}
         >
           Code
         </button>

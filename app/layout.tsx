@@ -4,6 +4,7 @@ import { Toaster } from "@/components/ui/sonner";
 import Navbar from "@/components/Navbar";
 import Navbar_new from "@/components/navbar-new";
 import { ThemeProvider } from "@/components/theme_provider";
+import "prismjs/themes/prism-tomorrow.css";
 
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
