@@ -1,5 +1,5 @@
 import { createClient } from "@/utils/supabase/server";
-import { Page } from "@/components/app-page";
+import { Page } from "@/components/app-page2";
 
 export default async function Index() {
   const supabase = createClient();
