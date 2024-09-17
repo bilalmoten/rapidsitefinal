@@ -51,7 +51,7 @@ const RecentProjects: React.FC<RecentProjectsProps> = ({ websites }) => {
                     Preview
                   </Button>
                 </Link>
-                <Link href={`/dashboard/edit/${website.id}`}>
+                <Link href={`/dashboard/editor/${website.id}`}>
                   <Button variant="outline" size="sm">
                     <Edit className="h-4 w-4 mr-2" />
                     Edit
