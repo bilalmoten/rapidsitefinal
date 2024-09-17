@@ -10,14 +10,30 @@ import { ArrowLeft } from "lucide-react";
 import ChatInterface from "@/components/ChatInterface";
 import { Button } from "@/components/ui/button";
 import Sidebar from "@/components/Sidebar";
-import { useChat, Message } from "ai/react";
-
-export const dynamic = "force-dynamic";
-export const maxDuration = 30;
+import { useChat } from "ai/react";
 
 export default function Chat({ params }: { params: { website_id: string } }) {
   const supabase = createClient();
   const router = useRouter();
+  const [user, setUser] = useState<User | null>(null);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [generationStartTime, setGenerationStartTime] = useState<number | null>(
+    null
+  );
+  const [isListening, setIsListening] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [showBuildButton, setShowBuildButton] = useState(false);
+  const [isChatActive, setIsChatActive] = useState(true);
+  const [colorScheme, setColorScheme] = useState<string[]>([
+    "#3B82F6",
+    "#10B981",
+    "#6366F1",
+  ]);
+  const [logo, setLogo] = useState<string | null>(null);
+  const [inspirationImages, setInspirationImages] = useState<string[]>([]);
+  const [inspirationLinks, setInspirationLinks] = useState<string[]>([]);
+  const [industry, setIndustry] = useState("");
+
   const {
     messages,
     input,
@@ -41,26 +57,15 @@ export default function Chat({ params }: { params: { website_id: string } }) {
     },
     onFinish: (message) => {
       console.log("Finished message:", message);
+      if (message.content.includes("EXIT")) {
+        const cleanContent = message.content.replace("EXIT", "").trim();
+        setShowBuildButton(true);
+        setIsChatActive(false);
+        startWebsiteGeneration();
+        updateSidebarInfo(cleanContent);
+      }
     },
   });
-  const [user, setUser] = useState<User | null>(null);
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [generationStartTime, setGenerationStartTime] = useState<number | null>(
-    null
-  );
-  const [isListening, setIsListening] = useState(false);
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [showBuildButton, setShowBuildButton] = useState(false);
-  const [isChatActive, setIsChatActive] = useState(true);
-  const [colorScheme, setColorScheme] = useState<string[]>([
-    "#3B82F6",
-    "#10B981",
-    "#6366F1",
-  ]);
-  const [logo, setLogo] = useState<string | null>(null);
-  const [inspirationImages, setInspirationImages] = useState<string[]>([]);
-  const [inspirationLinks, setInspirationLinks] = useState<string[]>([]);
-  const [industry, setIndustry] = useState("");
 
   useEffect(() => {
     (async () => {
@@ -107,101 +112,14 @@ export default function Chat({ params }: { params: { website_id: string } }) {
     e.preventDefault();
     if (!input.trim() || !isChatActive) return;
 
-    console.log("Submitting message:", input);
-
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      role: "user",
-      content: input,
-    };
-
-    setMessages((prevMessages) => {
-      console.log("Updated messages after user input:", [
-        ...prevMessages,
-        userMessage,
-      ]);
-      return [...prevMessages, userMessage];
-    });
-    setInput("");
     setLocalIsLoading(true);
-
     try {
-      const response = await fetch("/api/chat", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          messages: [...messages, userMessage],
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch response from AI");
-      }
-
-      const reader = response.body?.getReader();
-      const decoder = new TextDecoder();
-      let aiResponse = "";
-      let aiMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        role: "assistant",
-        content: "",
-      };
-
-      while (true) {
-        const { done, value } = await reader!.read();
-        if (done) break;
-        const chunk = decoder.decode(value);
-        console.log("Received chunk:", chunk);
-        const lines = chunk.split("\n");
-        for (const line of lines) {
-          if (line.startsWith("data: ")) {
-            const data = line.slice(6);
-            if (data === "[DONE]") {
-              break;
-            }
-            try {
-              const parsed = JSON.parse(data);
-              if (parsed.choices && parsed.choices[0].delta.content) {
-                const newContent = parsed.choices[0].delta.content;
-                aiResponse += newContent;
-                aiMessage.content += newContent;
-                setMessages((prevMessages) => {
-                  const updatedMessages = [
-                    ...prevMessages.slice(0, -1),
-                    { ...aiMessage },
-                  ];
-                  console.log(
-                    "Updated messages after AI response:",
-                    updatedMessages
-                  );
-                  return updatedMessages;
-                });
-              }
-            } catch (error) {
-              console.error("Error parsing JSON:", error);
-            }
-          }
-        }
-      }
-
-      console.log("Final AI response:", aiResponse);
-
-      if (aiResponse.includes("EXIT")) {
-        const cleanContent = aiResponse.replace("EXIT", "").trim();
-        setShowBuildButton(true);
-        setIsChatActive(false);
-        startWebsiteGeneration();
-        updateSidebarInfo(cleanContent);
-      }
+      await handleSubmit(e);
     } catch (error) {
       console.error("Error submitting message:", error);
     } finally {
       setLocalIsLoading(false);
     }
-
-    console.log("Messages after submission:", messages);
   };
 
   const startWebsiteGeneration = async () => {
@@ -324,9 +242,9 @@ export default function Chat({ params }: { params: { website_id: string } }) {
         </header>
 
         <ChatInterface
-          messages={messages as any}
+          messages={messages}
           input={input}
-          isLoading={localIsLoading}
+          isLoading={isLoading || localIsLoading}
           isListening={isListening}
           onInputChange={handleInputChange}
           onSubmit={customHandleSubmit}

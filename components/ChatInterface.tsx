@@ -1,5 +1,5 @@
-import React, { KeyboardEvent, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import React, { KeyboardEvent } from "react";
+import { motion } from "framer-motion";
 import { Send, Loader2, Mic } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -28,10 +28,6 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
   onSubmit,
   onVoiceInput,
 }) => {
-  useEffect(() => {
-    // console.log("Messages in ChatInterface:", messages);
-  }, [messages]);
-
   const getInitials = (role: string) => {
     return role === "assistant" ? "AI" : "ME";
   };
@@ -46,51 +42,48 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
   return (
     <div className="flex-1 overflow-hidden container mx-auto p-4 flex flex-col">
       <div className="flex-1 overflow-y-auto mb-4 space-y-4">
-        <AnimatePresence>
-          {messages.map((message, index) => (
-            <motion.div
-              key={`${message.id}-${index}`}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.5 }}
-              className={`flex ${
-                message.role === "user" ? "justify-end" : "justify-start"
+        {messages.map((message, index) => (
+          <motion.div
+            key={message.id || index}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className={`flex ${
+              message.role === "user" ? "justify-end" : "justify-start"
+            }`}
+          >
+            <div
+              className={`flex items-start space-x-2 max-w-[80%] ${
+                message.role === "user"
+                  ? "flex-row-reverse space-x-reverse"
+                  : ""
               }`}
             >
-              <div
-                className={`flex items-start space-x-2 max-w-[80%] ${
-                  message.role === "user"
-                    ? "flex-row-reverse space-x-reverse"
-                    : ""
+              <Avatar
+                className={`${
+                  message.role === "user" ? "bg-primary" : "bg-secondary"
                 }`}
               >
-                <Avatar
-                  className={`${
-                    message.role === "user" ? "bg-primary" : "bg-secondary"
-                  }`}
-                >
-                  <AvatarFallback>{getInitials(message.role)}</AvatarFallback>
-                </Avatar>
-                <div
-                  className={`rounded-lg p-3 ${
-                    message.role === "user"
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-secondary"
-                  }`}
-                >
-                  {message.role === "assistant" ? (
-                    <ReactMarkdown className="prose dark:prose-invert max-w-none">
-                      {message.content || ""}
-                    </ReactMarkdown>
-                  ) : (
-                    <p>{message.content || ""}</p>
-                  )}
-                </div>
+                <AvatarFallback>{getInitials(message.role)}</AvatarFallback>
+              </Avatar>
+              <div
+                className={`rounded-lg p-3 ${
+                  message.role === "user"
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-secondary"
+                }`}
+              >
+                {message.role === "assistant" ? (
+                  <ReactMarkdown className="prose dark:prose-invert max-w-none">
+                    {message.content}
+                  </ReactMarkdown>
+                ) : (
+                  <p>{message.content}</p>
+                )}
               </div>
-            </motion.div>
-          ))}
-        </AnimatePresence>
+            </div>
+          </motion.div>
+        ))}
       </div>
 
       <form onSubmit={onSubmit} className="flex space-x-2">

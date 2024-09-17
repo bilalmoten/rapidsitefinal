@@ -5,6 +5,12 @@ import { streamText } from 'ai';
 export const maxDuration = 30;
 
 export async function POST(req: Request) {
+    const azure = createAzure({
+        resourceName: "AnswerAI-bilal", // Azure resource name
+        apiKey: "523a50ed7a7444468d1ae5a384f032bf",
+    });
+
+    const { messages } = await req.json();
 
     const system_prompt = `# Senior Project Manager - Web Development Agency
 
@@ -37,23 +43,12 @@ export async function POST(req: Request) {
                 REMEMBER, The summary and "EXIT" are 2 seperate msgs. "EXIT" is the last msg. 
                 `;
 
-    const azure = createAzure({
-        resourceName: "AnswerAI-bilal", // Azure resource name
-        apiKey: "523a50ed7a7444468d1ae5a384f032bf",
-    });
-
-    const { messages } = await req.json();
 
     const result = await streamText({
         system: system_prompt,
         model: azure('gpt4o-azure'),
         messages,
     });
-
-    if (await result.text === "EXIT") {
-        // TODO: Process conversation and redirect to dashboard
-        console.log("Conversation processed");
-    }
 
     return result.toAIStreamResponse();
 }
