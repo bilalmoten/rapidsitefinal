@@ -14,13 +14,17 @@ import { createClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
 import { Trash2 } from "lucide-react";
 
-export default function DeleteWebsiteDialog({
-  websiteId,
-  websiteName,
-}: {
+interface DeleteWebsiteDialogProps {
   websiteId: string;
   websiteName: string;
-}) {
+  children: React.ReactNode;
+}
+
+const DeleteWebsiteDialog: React.FC<DeleteWebsiteDialogProps> = ({
+  websiteId,
+  websiteName,
+  children,
+}) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
@@ -74,6 +78,9 @@ export default function DeleteWebsiteDialog({
           </Button>
         </div>
       </DialogContent>
+      {/* {children} */}
     </Dialog>
   );
-}
+};
+
+export default DeleteWebsiteDialog;

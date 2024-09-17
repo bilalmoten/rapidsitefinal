@@ -16,7 +16,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = async ({
 
   return (
     <div className="w-full h-full">
-      <NavbarNew email={userEmail ?? ""} id={userId ?? ""} />
+      {/* <NavbarNew email={userEmail ?? ""} id={userId ?? ""} /> */}
       {children}
     </div>
   );

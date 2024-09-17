@@ -24,29 +24,15 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={GeistSans.className}>
-      <body className="bg-background text-foreground">
-        {/* <Navbar />
-        <main className="min-h-screen flex flex-col items-center">
-          {children}
-        </main>
-        <Toaster richColors /> */}
+      <body>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
           enableSystem
           disableTransitionOnChange
         >
-          {/* <div className=" flex row-auto">
-            <Sidebar /> */}
-          {/* <div className="flex flex-col w-full min-h-screen"> */}
-          <div>
-            {/* <Navbar_new email={""} id={""} /> */}
-            <main className="min-h-screen flex flex-col items-center">
-              {children}
-            </main>
-            <Toaster richColors />
-            {/* </div> */}
-          </div>
+          <main className="min-h-screen">{children}</main>
+          <Toaster richColors />
         </ThemeProvider>
       </body>
     </html>
