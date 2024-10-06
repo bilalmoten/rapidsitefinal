@@ -1,5 +1,5 @@
 import { createClient } from "@/utils/supabase/server";
-import { Page } from "@/components/app-page2";
+import LandingPage from "@/components/LandingPage";
 
 export default async function Index() {
   const supabase = createClient();
@@ -8,9 +8,5 @@ export default async function Index() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  return (
-    <div className="flex-1 w-full flex flex-col">
-      <Page user={user} />
-    </div>
-  );
+  return <LandingPage user={user} />;
 }

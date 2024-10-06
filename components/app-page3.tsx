@@ -9,8 +9,43 @@ import { Switch } from "@/components/ui/switch"
 import Link from 'next/link'
 import Image from 'next/image'
 
+// Utility function for class names
+const cn = (...classes: string[]) => classes.filter(Boolean).join(' ')
+
+// BorderBeam component
+const BorderBeam = ({
+  className,
+  size = 200,
+  duration = 15,
+  anchor = 90,
+  borderWidth = 1.5,
+  colorFrom = "#ffaa40",
+  colorTo = "#9c40ff",
+  delay = 0,
+}) => {
+  return (
+    <div
+      style={{
+        "--size": size,
+        "--duration": duration,
+        "--anchor": anchor,
+        "--border-width": borderWidth,
+        "--color-from": colorFrom,
+        "--color-to": colorTo,
+        "--delay": `-${delay}s`,
+      } as React.CSSProperties}
+      className={cn(
+        "pointer-events-none absolute inset-0 rounded-[inherit] [border:calc(var(--border-width)*1px)_solid_transparent]",
+        "![mask-clip:padding-box,border-box] ![mask-composite:intersect] [mask:linear-gradient(transparent,transparent),linear-gradient(white,white)]",
+        "after:absolute after:aspect-square after:w-[calc(var(--size)*1px)] after:animate-border-beam after:[animation-delay:var(--delay)] after:[background:linear-gradient(to_left,var(--color-from),var(--color-to),transparent)] after:[offset-anchor:calc(var(--anchor)*1%)_50%] after:[offset-path:rect(0_auto_auto_0_round_calc(var(--size)*1px))]",
+        className
+      )}
+    />
+  );
+};
+
 export function Page() {
-  const [darkMode, setDarkMode] = useState(true)
+  const [darkMode, setDarkMode] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
 
   const toggleDarkMode = () => {
@@ -26,13 +61,13 @@ export function Page() {
   }, [])
 
   return (
-    <div className={`min-h-screen relative overflow-hidden ${darkMode ? 'dark bg-gray-950 text-gray-100' : 'bg-white text-gray-900'}`}>
+    <div className={`min-h-screen relative overflow-hidden ${darkMode ? 'dark bg-gray-900 text-gray-100' : 'bg-white text-gray-900'}`}>
       <div className="absolute inset-0 z-0">
-        <div className={`absolute inset-0 ${darkMode ? 'bg-gradient-to-br from-gray-900 to-indigo-950' : 'bg-gradient-to-br from-indigo-50 to-purple-50'}`} />
+        <div className={`absolute inset-0 bg-gradient-to-br ${darkMode ? 'from-gray-800 to-gray-900' : 'from-indigo-100 to-purple-100'}`} />
         <svg className="absolute inset-0 w-full h-full" xmlns="http://www.w3.org/2000/svg">
           <defs>
             <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-              <path d="M 40 0 L 0 0 0 40" fill="none" stroke={darkMode ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.03)"} strokeWidth="1" />
+              <path d="M 40 0 L 0 0 0 40" fill="none" stroke={darkMode ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.05)"} strokeWidth="1" />
             </pattern>
           </defs>
           <rect width="100%" height="100%" fill="url(#grid)" />
@@ -40,7 +75,7 @@ export function Page() {
         <MovingBlob darkMode={darkMode} />
       </div>
       <div className="relative z-10">
-        <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? (darkMode ? 'bg-gray-900/80' : 'bg-white/80') + ' backdrop-blur-md shadow-md' : ''}`}>
+        <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? 'bg-white/80 dark:bg-gray-900/80 backdrop-blur-md shadow-md' : ''}`}>
           <div className="container mx-auto px-4 py-4 flex justify-between items-center">
             <motion.h1 
               className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 to-purple-600"
@@ -71,15 +106,15 @@ export function Page() {
         </header>
 
         <main className="pt-16">
-          <HeroSection />
-          <FeaturesSection />
-          <HowItWorksSection />
-          <TestimonialsSection />
-          <PricingSection />
-          <CtaSection />
+          <HeroSection darkMode={darkMode} />
+          <FeaturesSection darkMode={darkMode} />
+          <HowItWorksSection darkMode={darkMode} />
+          <TestimonialsSection darkMode={darkMode} />
+          <PricingSection darkMode={darkMode} />
+          <CtaSection darkMode={darkMode} />
         </main>
 
-        <Footer />
+        <Footer darkMode={darkMode} />
       </div>
     </div>
   )
@@ -88,7 +123,11 @@ export function Page() {
 function MovingBlob({ darkMode }) {
   return (
     <motion.div
-      className={`absolute top-0 left-0 w-[800px] h-[800px] rounded-full ${darkMode ? 'bg-gradient-to-r from-indigo-900 to-purple-900 opacity-20' : 'bg-gradient-to-r from-indigo-300 to-purple-300 opacity-30'} blur-3xl`}
+      className={`absolute top-0 left-0 w-[800px] h-[800px] rounded-full ${
+        darkMode 
+          ? 'bg-gradient-to-r from-indigo-900/30 to-purple-900/30' 
+          : 'bg-gradient-to-r from-indigo-300/30 to-purple-300/30'
+      } opacity-30 blur-3xl`}
       animate={{
         x: [0, 100, 0],
         y: [0, 50, 0],
@@ -103,7 +142,7 @@ function MovingBlob({ darkMode }) {
   )
 }
 
-function HeroSection() {
+function HeroSection({ darkMode }) {
   return (
     <section className="container mx-auto px-4 py-20 md:py-32 flex flex-col md:flex-row items-center">
       <div className="md:w-1/2 mb-10 md:mb-0">
@@ -116,7 +155,7 @@ function HeroSection() {
           Build Your Dream Website with AI
         </motion.h2>
         <motion.p 
-          className="text-xl mb-8 text-gray-600 dark:text-gray-300"
+          className={`text-xl mb-8 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
@@ -129,9 +168,13 @@ function HeroSection() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.4 }}
         >
-          <Button size="lg" className="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3 rounded-full">Get Started</Button>
-          <Button size="lg" variant="outline" className="text-indigo-600 border-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900 px-8 py-3 rounded-full">
+          <Button size="lg" className="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3 rounded-full relative overflow-hidden">
+            Get Started
+            <BorderBeam />
+          </Button>
+          <Button size="lg" variant="outline" className={`border-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 px-8 py-3 rounded-full relative overflow-hidden ${darkMode ? 'text-indigo-400' : 'text-indigo-600'}`}>
             Watch Demo
+            <BorderBeam colorFrom="#9c40ff" colorTo="#ffaa40" />
           </Button>
         </motion.div>
       </div>
@@ -153,7 +196,7 @@ function HeroSection() {
   )
 }
 
-function FeaturesSection() {
+function FeaturesSection({ darkMode }) {
   const features = [
     { icon: <MessageSquare className="h-8 w-8 mb-4 text-indigo-500" />, title: "AI-Powered Chat", description: "Describe your website and let our AI do the rest" },
     { icon: <Layout className="h-8 w-8 mb-4 text-indigo-500" />, title: "Stunning Designs", description: "Choose from a variety of beautiful, customizable templates" },
@@ -170,7 +213,11 @@ function FeaturesSection() {
         {features.map((feature, index) => (
           <motion.div 
             key={index} 
-            className="p-6 rounded-xl bg-white/10 dark:bg-gray-800/10 backdrop-blur-lg shadow-lg hover:shadow-xl transition-shadow duration-300 border border-gray-200 dark:border-gray-700"
+            className={`p-6 rounded-xl ${
+              darkMode 
+                ? 'bg-gray-800/30 backdrop-blur-md border border-gray-700/50' 
+                : 'bg-white/30 backdrop-blur-md border border-gray-200/50'
+            } shadow-lg hover:shadow-xl transition-shadow duration-300 relative overflow-hidden`}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: index * 0.1 }}
@@ -178,7 +225,8 @@ function FeaturesSection() {
           >
             {feature.icon}
             <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
-            <p className="text-gray-600 dark:text-gray-300">{feature.description}</p>
+            <p className={darkMode ? 'text-gray-300' : 'text-gray-600'}>{feature.description}</p>
+            <BorderBeam />
           </motion.div>
         ))}
       </div>
@@ -186,40 +234,33 @@ function FeaturesSection() {
   )
 }
 
-function HowItWorksSection() {
+function HowItWorksSection({ darkMode }) {
   const steps = [
-    { title: "Describe Your Vision", description: "Chat with our AI and describe the website you want to create", icon: <MessageSquare className="w-8 h-8 text-indigo-500" /> },
-    { title: "AI Generates Design", description: "Our AI creates a stunning design based on your requirements", icon: <Layout className="w-8 h-8 text-indigo-500" /> },
-    { title: "Customize and Refine", description: "Easily modify any part of your website with simple instructions", icon: <PenTool className="w-8 h-8 text-indigo-500" /> },
-    { title: "Publish and Share", description: "Publish your website to a free subdomain or export the code", icon: <Upload className="w-8 h-8 text-indigo-500" /> },
+    { title: "Describe Your Vision", description: "Chat with our AI and describe the website you want to create" },
+    { title: "AI Generates Design", description: "Our AI creates a stunning design based on your requirements" },
+    { title: "Customize and Refine", description: "Easily modify any part of your website with simple instructions" },
+    { title: "Publish and Share", description: "Publish your website to a free subdomain or export the code" },
   ]
 
   return (
     <section id="how-it-works" className="container mx-auto px-4 py-20">
       <h2 className="text-3xl md:text-4xl font-bold mb-16 text-center bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 to-purple-600">How It Works</h2>
-      <div className="relative">
-        <div className="absolute left-1/2 transform -translate-x-1/2 h-full w-1 bg-indigo-200 dark:bg-indigo-800"></div>
+      <div className="max-w-4xl mx-auto">
         {steps.map((step, index) => (
           <motion.div 
             key={index} 
-            className={`flex items-center mb-12 last:mb-0 ${index % 2 === 0 ? 'flex-row-reverse' : ''}`}
-            initial={{ opacity: 0, x: index % 2 === 0 ? 20 : -20 }}
+            className="flex items-center mb-12 last:mb-0"
+            initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5, delay: index * 0.2 }}
           >
-            <div className={`w-1/2 ${index % 2 === 0 ? 'pl-8' : 'pr-8'} flex ${index % 2 === 0 ? 'justify-start' : 'justify-end'}`}>
-              <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-md">
-                <div className="flex items-center mb-4">
-                  <div className="mr-4 bg-indigo-100 dark:bg-indigo-900 rounded-full p-2">
-                    {step.icon}
-                  </div>
-                  <h3 className="text-xl font-semibold">{step.title}</h3>
-                </div>
-                <p className="text-gray-600 dark:text-gray-300">{step.description}</p>
-              </div>
-            </div>
-            <div className="w-8 h-8 absolute left-1/2 transform -translate-x-1/2 -translate-y-1/2 rounded-full bg-indigo-500 border-4 border-white dark:border-gray-900 z-10 flex items-center justify-center text-white font-bold">
+            <div className="flex-shrink-0 w-12 h-12 rounded-full bg-indigo-500 text-white flex items-center justify-center font-bold text-xl mr-6 relative overflow-hidden">
               {index + 1}
+              <BorderBeam />
+            </div>
+            <div>
+              <h3 className="text-2xl font-semibold mb-2">{step.title}</h3>
+              <p className={darkMode ? 'text-gray-300' : 'text-gray-600'}>{step.description}</p>
             </div>
           </motion.div>
         ))}
@@ -228,7 +269,7 @@ function HowItWorksSection() {
   )
 }
 
-function TestimonialsSection() {
+function TestimonialsSection({ darkMode }) {
   const testimonials = [
     { name: "John Doe", role: "Entrepreneur", quote: "This AI website builder saved me so much time and money. I was able to create a professional-looking website for my business in just a few hours!", avatar: "/placeholder.svg?height=80&width=80" },
     { name: "Jane Smith", role: "Freelance Designer", quote: "As a designer, I was skeptical at first, but the AI-generated designs are impressive. It's a great starting point for my projects.", avatar: "/placeholder.svg?height=80&width=80" },
@@ -242,7 +283,11 @@ function TestimonialsSection() {
         {testimonials.map((testimonial, index) => (
           <motion.div 
             key={index} 
-            className="p-6 rounded-xl bg-white/10 dark:bg-gray-800/10 backdrop-blur-lg shadow-lg"
+            className={`p-6 rounded-xl ${
+              darkMode 
+                ? 'bg-gray-800/30 backdrop-blur-md border border-gray-700/50' 
+                : 'bg-white/30 backdrop-blur-md border border-gray-200/50'
+            } shadow-lg relative overflow-hidden`}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: index * 0.1 }}
@@ -251,10 +296,11 @@ function TestimonialsSection() {
               <Image src={testimonial.avatar} alt={testimonial.name} width={60} height={60} className="rounded-full mr-4" />
               <div>
                 <p className="font-semibold">{testimonial.name}</p>
-                <p className="text-sm text-gray-500 dark:text-gray-400">{testimonial.role}</p>
+                <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>{testimonial.role}</p>
               </div>
             </div>
-            <p className="italic text-gray-600 dark:text-gray-300">"{testimonial.quote}"</p>
+            <p className={`italic ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>"{testimonial.quote}"</p>
+            <BorderBeam />
           </motion.div>
         ))}
       </div>
@@ -262,36 +308,43 @@ function TestimonialsSection() {
   )
 }
 
-function PricingSection() {
+function PricingSection({ darkMode }) {
   const plans = [
-    { name: "Basic", price: "$9.99/mo", features: ["AI Website Generation", "Free Subdomain", "Basic Customization", "24/7 Support", "1 Website", "100k Visitors/month"] },
-    { name: "Pro", price: "$19.99/mo", features: ["Everything in Basic", "Custom Domain", "Advanced AI Editing", "Priority Support", "SEO Tools", "5 Websites", "500k Visitors/month"] },
-    { name: "Enterprise", price: "Custom", features: ["Everything in Pro", "Dedicated Account Manager", "Custom AI Training", "SLA", "White-label Solution", "Unlimited Websites", "Unlimited Visitors"] },
+    { name: "Basic", price: "$9.99/mo", features: ["AI Website Generation", "Free Subdomain", "Basic Customization", "24/7 Support"] },
+    { name: "Pro", price: "$19.99/mo", features: ["Everything in Basic", "Custom Domain", "Advanced AI Editing", "Priority Support", "SEO Tools"] },
+    { name: "Enterprise", price: "Custom", features: ["Everything in Pro", "Dedicated Account Manager", "Custom AI Training", "SLA", "White-label Solution"] },
   ]
 
   return (
     <section id="pricing" className="container mx-auto px-4 py-20">
       <h2 className="text-3xl md:text-4xl font-bold mb-16 text-center bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 to-purple-600">Choose Your Plan</h2>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
         {plans.map((plan, index) => (
           <motion.div 
             key={index} 
-            className="flex flex-col h-full p-8 rounded-xl bg-white/10 dark:bg-gray-800/10 backdrop-blur-lg shadow-lg hover:shadow-xl transition-shadow duration-300 border border-gray-200 dark:border-gray-700"
+            className={`p-8 rounded-xl ${
+              darkMode 
+                ? 'bg-gray-800/30 backdrop-blur-md border border-gray-700/50' 
+                : 'bg-white/30 backdrop-blur-md border border-gray-200/50'
+            } shadow-lg hover:shadow-xl transition-shadow duration-300 relative overflow-hidden`}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: index * 0.1 }}
           >
             <h3 className="text-2xl font-bold mb-4">{plan.name}</h3>
             <p className="text-4xl font-bold mb-6 text-indigo-600">{plan.price}</p>
-            <ul className="space-y-3 mb-8 flex-grow">
+            <ul className="space-y-3 mb-8">
               {plan.features.map((feature, featureIndex) => (
-                <li key={featureIndex} className="flex items-center text-gray-600 dark:text-gray-300">
+                <li key={featureIndex} className={`flex items-center ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
                   <ChevronRight className="h-5 w-5 mr-2 text-indigo-500" />
                   {feature}
                 </li>
               ))}
             </ul>
-            <Button className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-full mt-auto">Choose Plan</Button>
+            <Button className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-full relative overflow-hidden">
+              Choose Plan
+              <BorderBeam />
+            </Button>
           </motion.div>
         ))}
       </div>
@@ -299,56 +352,60 @@ function PricingSection() {
   )
 }
 
-function CtaSection() {
+function CtaSection({ darkMode }) {
   return (
     <section className="py-20 relative overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-purple-600 opacity-90" />
+      <div className={`absolute inset-0 ${darkMode ? 'bg-gradient-to-r from-indigo-900 to-purple-900 opacity-90' : 'bg-gradient-to-r from-indigo-500 to-purple-600 opacity-90'}`} />
       <div className="container mx-auto px-4 text-center relative z-10">
         <h2 className="text-3xl md:text-4xl font-bold mb-6 text-white">Ready to Build Your Dream Website?</h2>
         <p className="text-xl mb-8 max-w-2xl mx-auto text-white opacity-90">Join thousands of satisfied users and create your stunning website today with our AI-powered platform.</p>
-        <Button size="lg" className="bg-white text-indigo-600 hover:bg-gray-100 px-8 py-3 rounded-full text-lg font-semibold">
+        <Button size="lg" className={`${darkMode ? 'bg-white text-indigo-900' : 'bg-indigo-100 text-indigo-600'} hover:bg-opacity-90 px-8 py-3 rounded-full text-lg font-semibold relative overflow-hidden`}>
           Get Started for Free
+          <BorderBeam colorFrom="#9c40ff" colorTo="#ffaa40" />
         </Button>
       </div>
     </section>
   )
 }
 
-function Footer() {
+function Footer({ darkMode }) {
   return (
-    <footer className="bg-gray-100 dark:bg-gray-800 py-12">
+    <footer className={darkMode ? 'bg-gray-800 py-12' : 'bg-gray-100 py-12'}>
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
             <h3 className="text-lg font-semibold mb-4 text-indigo-600">AI Website Builder</h3>
-            <p className="text-gray-600 dark:text-gray-300">Creating stunning websites with the power of AI</p>
+            <p className={darkMode ? 'text-gray-300' : 'text-gray-600'}>Creating stunning websites with the power of AI</p>
           </div>
           <div>
             <h4 className="text-lg font-semibold mb-4 text-indigo-600">Product</h4>
-            <ul className="space-y-2 text-gray-600 dark:text-gray-300">
-              <li><Link href="#" className="hover:text-indigo-500 transition-colors">Features</Link></li>
-              <li><Link href="#" className="hover:text-indigo-500 transition-colors">Pricing</Link></li>
-              <li><Link href="#" className="hover:text-indigo-500 transition-colors">FAQ</Link></li>
+            <ul className="space-y-2">
+              <li><Link href="#" className={`hover:text-indigo-500 transition-colors ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>Features</Link></li>
+              <li><Link href="#" className={`hover:text-indigo-500 transition-colors ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>Pricing</Link></li>
+              <li><Link href="#" className={`hover:text-indigo-500 transition-colors ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>FAQ</Link></li>
             </ul>
           </div>
           <div>
             <h4 className="text-lg font-semibold mb-4 text-indigo-600">Company</h4>
-            <ul className="space-y-2 text-gray-600 dark:text-gray-300">
-              <li><Link href="#" className="hover:text-indigo-500 transition-colors">About Us</Link></li>
-              <li><Link href="#" className="hover:text-indigo-500 transition-colors">Careers</Link></li>
-              <li><Link href="#" className="hover:text-indigo-500 transition-colors">Contact</Link></li>
+            <ul className="space-y-2">
+              <li><Link href="#" className={`hover:text-indigo-500 transition-colors ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>About Us</Link></li>
+              <li><Link href="#" className={`hover:text-indigo-500 transition-colors ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>Careers</Link></li>
+              <li><Link href="#" className={`hover:text-indigo-500 transition-colors ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>Contact</Link></li>
             </ul>
           </div>
           <div>
             <h4 className="text-lg font-semibold mb-4 text-indigo-600">Stay Updated</h4>
-            <p className="mb-4 text-gray-600 dark:text-gray-300">Subscribe to our newsletter for the latest updates</p>
+            <p className={`mb-4 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>Subscribe to our newsletter for the latest updates</p>
             <form className="flex">
-              <Input type="email" placeholder="Enter your email" className="rounded-l-full" />
-              <Button type="submit" className="rounded-r-full bg-indigo-600 hover:bg-indigo-700 text-white">Subscribe</Button>
+              <Input type="email" placeholder="Enter your email" className={`rounded-l-full ${darkMode ? 'bg-gray-700 border-gray-600' : 'bg-white'}`} />
+              <Button type="submit" className="rounded-r-full bg-indigo-600 hover:bg-indigo-700 text-white relative overflow-hidden">
+                Subscribe
+                <BorderBeam />
+              </Button>
             </form>
           </div>
         </div>
-        <div className="mt-8 pt-8 border-t border-gray-200 dark:border-gray-700 text-center text-gray-600 dark:text-gray-300">
+        <div className={`mt-8 pt-8 border-t ${darkMode ? 'border-gray-700' : 'border-gray-200'} text-center ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
           <p>&copy; {new Date().getFullYear()} AI Website Builder. All rights reserved.</p>
         </div>
       </div>
