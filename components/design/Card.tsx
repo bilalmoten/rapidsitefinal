@@ -34,7 +34,11 @@ const Card: React.FC<CardProps> = ({ heading, image, website_id, content }) => {
             Preview
           </a>
         </Link>
-        <DeleteWebsiteDialog websiteId={website_id} websiteName={heading} />
+        <DeleteWebsiteDialog
+          websiteId={website_id}
+          websiteName={heading}
+          children={undefined}
+        />
       </div>
     </div>
   );
