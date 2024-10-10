@@ -2,6 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   Layout,
   Globe,
@@ -13,6 +14,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
+import { createClient } from "@/utils/supabase/client";
 
 interface SidebarProps {
   darkMode: boolean;
@@ -20,6 +22,18 @@ interface SidebarProps {
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ darkMode, toggleDarkMode }) => {
+  const router = useRouter();
+  const supabase = createClient();
+
+  const handleLogout = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      console.error("Error signing out:", error);
+    } else {
+      router.push("/login");
+    }
+  };
+
   return (
     <aside className="w-64 bg-gray-100 dark:bg-gray-800 p-4 flex flex-col">
       <div className="flex items-center mb-8">
@@ -71,7 +85,11 @@ const Sidebar: React.FC<SidebarProps> = ({ darkMode, toggleDarkMode }) => {
         <span className="ml-2">{darkMode ? "Dark" : "Light"} Mode</span>
         {darkMode ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
       </div>
-      <Button variant="ghost" className="mt-4 w-full justify-start">
+      <Button
+        variant="ghost"
+        className="mt-4 w-full justify-start"
+        onClick={handleLogout}
+      >
         <LogOut className="h-5 w-5 mr-3" />
         Log Out
       </Button>

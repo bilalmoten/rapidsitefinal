@@ -9,21 +9,28 @@ import TestimonialsSection from "./LPsections/TestimonialsSection";
 import PricingSection from "./LPsections/PricingSection";
 import CtaSection from "./LPsections/CtaSection";
 import { User } from "@supabase/supabase-js";
+
 interface LandingPageProps {
   user: User | null;
 }
 
 export default function LandingPage({ user }: LandingPageProps) {
   const [darkMode, setDarkMode] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
   const toggleDarkMode = () => {
     setDarkMode(!darkMode);
   };
 
+  const handleGetStarted = () => {
+    setIsLoading(true);
+    // Add your navigation logic here
+  };
+
   return (
-    <Layout darkMode={darkMode} toggleDarkMode={toggleDarkMode}>
+    <Layout darkMode={darkMode} toggleDarkMode={toggleDarkMode} user={user}>
       <main className="pt-16">
-        <HeroSection />
+        <HeroSection onGetStarted={handleGetStarted} isLoading={isLoading} />
         <FeaturesSection />
         <HowItWorksSection />
         <TestimonialsSection />

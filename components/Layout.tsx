@@ -6,18 +6,21 @@ import { Moon, Sun } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import Link from "next/link";
 import Footer from "./Footer";
-// import FluidGradient from "./FluidGradient";
+import { Button } from "@/components/ui/button";
+import { User } from "@supabase/supabase-js";
 
 interface LayoutProps {
   children: ReactNode;
   darkMode: boolean;
   toggleDarkMode: () => void;
+  user: User | null;
 }
 
 export default function Layout({
   children,
   darkMode,
   toggleDarkMode,
+  user,
 }: LayoutProps) {
   const [isScrolled, setIsScrolled] = useState(false);
 
@@ -121,6 +124,25 @@ export default function Layout({
                   )}
                 </motion.div>
               </AnimatePresence>
+              {user ? (
+                <Link href="/dashboard">
+                  <Button
+                    size="sm"
+                    className="bg-indigo-600 hover:bg-indigo-700 text-white"
+                  >
+                    Dashboard
+                  </Button>
+                </Link>
+              ) : (
+                <Link href="/login">
+                  <Button
+                    size="sm"
+                    className="bg-indigo-600 hover:bg-indigo-700 text-white"
+                  >
+                    Login
+                  </Button>
+                </Link>
+              )}
             </nav>
           </div>
         </header>

@@ -1,11 +1,24 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
+import Image from "next/image"; // Add this import
 
-export default function HeroSection() {
+interface HeroSectionProps {
+  onGetStarted: () => void;
+  isLoading: boolean;
+}
+
+export default function HeroSection({
+  onGetStarted,
+  isLoading,
+}: HeroSectionProps) {
   const router = useRouter();
+
+  const handleGetStarted = () => {
+    onGetStarted();
+    router.push("/login");
+  };
 
   return (
     <section className="container mx-auto px-4 py-20 md:py-32 flex flex-col md:flex-row items-center">
@@ -36,14 +49,28 @@ export default function HeroSection() {
           <Button
             size="lg"
             className="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3 rounded-full"
-            onClick={() => router.push("/login")}
+            onClick={handleGetStarted}
+            disabled={isLoading}
           >
-            Get Started
+            {isLoading ? (
+              <>
+                <span className="mr-2">Loading</span>
+                <motion.div
+                  className="inline-block"
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                >
+                  ⋯
+                </motion.div>
+              </>
+            ) : (
+              "Get Started"
+            )}
           </Button>
           <Button
             size="lg"
             variant="outline"
-            className="text-indigo-600 border-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900 px-8 py-3 rounded-full"
+            className="text-indigo-600 border-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 px-8 py-3 rounded-full"
           >
             Watch Demo
           </Button>
@@ -56,7 +83,7 @@ export default function HeroSection() {
         transition={{ duration: 0.5, delay: 0.2 }}
       >
         <Image
-          src="/placeholder.svg?height=400&width=600"
+          src="/placeholder.svg"
           alt="AI Website Builder"
           width={600}
           height={400}
