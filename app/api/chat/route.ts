@@ -46,7 +46,8 @@ export async function POST(req: Request) {
 
     const result = await streamText({
         system: system_prompt,
-        model: azure('gpt4o-azure'),
+        model: azure('gpt-4o-mini'),
+        // model: azure('gpt4o-azure'),
         messages,
     });
 

@@ -135,13 +135,28 @@ export default function Chat({ params }: { params: { website_id: string } }) {
         chat_conversation: messages,
       }),
     });
+    console.log("chat saved");
+    console.log(
+      `link: http://localhost:7071/api/code_website?user_id=${user?.id}&website_id=${params.website_id}&model=gpt4o-mini`
+    );
 
-    await fetch(
-      `https://api2.azurewebsites.net/api/code_website?user_id=${user?.id}&website_id=${params.website_id}`,
+    const response = await fetch(
+      // `https://api2.azurewebsites.net/api/code_website?user_id=${user?.id}&website_id=${params.website_id}`,
+      `http://localhost:7071/api/code_website?user_id=${user?.id}&website_id=${params.website_id}&model=gpt4o-mini`,
       {
         method: "POST",
       }
     );
+
+    console.log(response);
+
+    // Check if the response is successful
+    if (response.ok) {
+      // Redirect the user to a new page after the fetch is complete
+      router.push(`/dashboard/editor/${params.website_id}`);
+    } else {
+      console.error("Failed to generate website");
+    }
   };
 
   const updateSidebarInfo = (content: string) => {

@@ -5,6 +5,15 @@ import { redirect } from "next/navigation";
 import { SubmitButton } from "./submit-button";
 import Image from "next/image";
 
+import { Lock } from "lucide-react";
+import dynamic from "next/dynamic";
+import AnimatedLoginContent from "@/components/AnimatedLoginContent";
+
+const MotionDiv = dynamic(
+  () => import("framer-motion").then((mod) => mod.motion.div),
+  { ssr: false }
+);
+
 export default function Login({
   searchParams,
 }: {
@@ -32,57 +41,7 @@ export default function Login({
   return (
     <div className="flex h-screen">
       <div className="w-2/5 bg-gradient-to-br from-indigo-500 to-purple-600 text-white flex flex-col justify-center items-center p-12 relative overflow-hidden">
-        <div className="absolute inset-0 bg-black opacity-50"></div>
-        <div className="relative z-10 text-center">
-          <h1 className="text-4xl font-bold mb-6">Welcome to Our Platform</h1>
-          <p className="text-xl mb-8">
-            Discover the power of our tools and services
-          </p>
-          <ul className="text-left space-y-4">
-            <li className="flex items-center">
-              <svg
-                className="w-6 h-6 mr-2"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                  clipRule="evenodd"
-                />
-              </svg>
-              Advanced Analytics
-            </li>
-            <li className="flex items-center">
-              <svg
-                className="w-6 h-6 mr-2"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                  clipRule="evenodd"
-                />
-              </svg>
-              Seamless Integration
-            </li>
-            <li className="flex items-center">
-              <svg
-                className="w-6 h-6 mr-2"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                  clipRule="evenodd"
-                />
-              </svg>
-              24/7 Support
-            </li>
-          </ul>
-        </div>
+        <AnimatedLoginContent />
         <div className="absolute bottom-0 left-0 right-0">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320">
             <path
