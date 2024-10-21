@@ -10,7 +10,7 @@ import { ArrowLeft } from "lucide-react";
 import ChatInterface from "@/components/ChatInterface";
 import { Button } from "@/components/ui/button";
 import Sidebar from "@/components/Sidebar";
-import { useChat } from "ai/react";
+import { useChat, Message } from "ai/react";
 
 export default function Chat({ params }: { params: { website_id: string } }) {
   const supabase = createClient();
@@ -124,8 +124,9 @@ export default function Chat({ params }: { params: { website_id: string } }) {
     }
   };
 
-  const startWebsiteGeneration = async () => {
+  const startWebsiteGeneration = async (newMessages?: Message[]) => {
     setIsProcessing(true);
+    console.log("the messages are these " + messages);
     await fetch("/api/save_chat", {
       method: "POST",
       headers: {
@@ -134,17 +135,17 @@ export default function Chat({ params }: { params: { website_id: string } }) {
       body: JSON.stringify({
         userId: user?.id,
         websiteID: params.website_id,
-        chat_conversation: messages,
+        chat_conversation: newMessages || messages,
       }),
     });
     console.log("chat saved");
     console.log(
-      `link: http://localhost:7071/api/code_website?user_id=${user?.id}&website_id=${params.website_id}&model=gpt4o-mini`
+      `link: http://localhost:7071/api/code_website?user_id=${user?.id}&website_id=${params.website_id}&model=o1-mini`
     );
 
     const response = await fetch(
-      // `https://api2.azurewebsites.net/api/code_website?user_id=${user?.id}&website_id=${params.website_id}`,
-      `http://localhost:7071/api/code_website?user_id=${user?.id}&website_id=${params.website_id}&model=gpt4o-mini`,
+      // `https://api2.azurewebsites.net/api/code_website?user_id=${user?.id}&website_id=${params.website_id}&model=o1-mini`,
+      `http://localhost:7071/api/code_website?user_id=${user?.id}&website_id=${params.website_id}&model=o1-mini`,
       {
         method: "POST",
       }
@@ -267,20 +268,31 @@ export default function Chat({ params }: { params: { website_id: string } }) {
         throw new Error("Received empty content from AI");
       }
 
-      // Update messages with user input and AI response
-      setMessages([
-        { id: Date.now().toString(), role: "user", content: promptInput },
+      const enhancedPrompt = `Please make a plan for the website of the user. A simple short plan detailing the website's purpose, pages, sections, design, color scheme, and any other relevant details. 1 page max.
+    USER REQUEST: ${promptInput}`;
+
+      // Create new messages array with correct types
+      const newMessages: Message[] = [
+        ...messages,
+        { id: "2", role: "user", content: enhancedPrompt },
         {
-          id: (Date.now() + 1).toString(),
+          id: "3",
           role: "assistant",
           content: aiResponse,
         },
-      ]);
+      ];
+
+      // Update messages state
+      setMessages(newMessages);
+
+      console.log("Updated messages:", messages);
 
       setShowBuildButton(true);
       setIsChatActive(false);
       updateSidebarInfo(aiResponse);
-      await startWebsiteGeneration();
+
+      // Start website generation with the new messages
+      await startWebsiteGeneration(newMessages);
     } catch (error) {
       console.error("Error processing prompt:", error);
       const errorMessage =
