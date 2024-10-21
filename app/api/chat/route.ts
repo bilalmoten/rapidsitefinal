@@ -1,4 +1,4 @@
-import { createAzure } from '@ai-sdk/azure';
+import { createAzure, azure } from '@ai-sdk/azure';
 import { streamText } from 'ai';
 
 // Allow streaming responses up to 30 seconds
@@ -51,5 +51,6 @@ export async function POST(req: Request) {
         messages,
     });
 
-    return result.toAIStreamResponse();
+    return result.toDataStreamResponse();
+    // return result.toAIStreamResponse();
 }

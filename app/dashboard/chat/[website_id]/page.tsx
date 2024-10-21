@@ -33,6 +33,8 @@ export default function Chat({ params }: { params: { website_id: string } }) {
   const [inspirationImages, setInspirationImages] = useState<string[]>([]);
   const [inspirationLinks, setInspirationLinks] = useState<string[]>([]);
   const [industry, setIndustry] = useState("");
+  const [chatMode, setChatMode] = useState<"prompt" | "conversation">("prompt");
+  const [promptInput, setPromptInput] = useState("");
 
   const {
     messages,
@@ -182,7 +184,11 @@ export default function Chat({ params }: { params: { website_id: string } }) {
 
   const handleLogoUpload = (file: File) => {
     const reader = new FileReader();
-    reader.onload = (e) => setLogo(e.target?.result as string);
+    reader.onload = (e) => {
+      if (e.target && e.target.result) {
+        setLogo(e.target.result as string);
+      }
+    };
     reader.readAsDataURL(file);
   };
 
@@ -224,6 +230,67 @@ export default function Chat({ params }: { params: { website_id: string } }) {
     // You can add any additional logic here for starting the website build process
   };
 
+  const handlePromptSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!promptInput.trim()) return;
+
+    setIsProcessing(true);
+    try {
+      console.log(
+        "Sending request to /api/prompt_chat with prompt:",
+        promptInput
+      );
+      const response = await fetch("/api/prompt_chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ prompt: promptInput }),
+      });
+
+      console.log("Response status:", response.status);
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("Error response:", errorText);
+        throw new Error(
+          `Failed to get AI response: ${response.status} ${errorText}`
+        );
+      }
+
+      const data = await response.json();
+      const aiResponse = data.text;
+
+      console.log("Processed AI response:", aiResponse);
+
+      if (!aiResponse) {
+        throw new Error("Received empty content from AI");
+      }
+
+      // Update messages with user input and AI response
+      setMessages([
+        { id: Date.now().toString(), role: "user", content: promptInput },
+        {
+          id: (Date.now() + 1).toString(),
+          role: "assistant",
+          content: aiResponse,
+        },
+      ]);
+
+      setShowBuildButton(true);
+      setIsChatActive(false);
+      updateSidebarInfo(aiResponse);
+      await startWebsiteGeneration();
+    } catch (error) {
+      console.error("Error processing prompt:", error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      alert(`An error occurred while processing your prompt: ${errorMessage}`);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
   if (isProcessing || isGenerating) {
     return (
       <div className="flex flex-col justify-center items-center min-h-screen w-full px-4">
@@ -256,23 +323,48 @@ export default function Chat({ params }: { params: { website_id: string } }) {
           </div>
         </header>
 
-        <ChatInterface
-          messages={messages}
-          input={input}
-          isLoading={isLoading || localIsLoading}
-          isListening={isListening}
-          onInputChange={handleInputChange}
-          onSubmit={customHandleSubmit}
-          onVoiceInput={handleVoiceInput}
-          isChatActive={isChatActive}
-        />
-
-        {showBuildButton && (
-          <div className="p-4 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
-            <Button onClick={handleBuildWebsite} className="w-full">
-              Start Building My Website...
+        {chatMode === "prompt" ? (
+          <div className="flex-1 p-4">
+            <form onSubmit={handlePromptSubmit} className="space-y-4">
+              <textarea
+                value={promptInput}
+                onChange={(e) => setPromptInput(e.target.value)}
+                placeholder="Describe your website idea in a few sentences..."
+                className="w-full p-2 border rounded-md"
+                rows={4}
+              />
+              <Button type="submit" className="w-full">
+                Generate Website
+              </Button>
+            </form>
+            <Button
+              onClick={() => setChatMode("conversation")}
+              variant="outline"
+              className="w-full mt-4"
+            >
+              Start a Detailed Conversation Instead
             </Button>
           </div>
+        ) : (
+          <>
+            <ChatInterface
+              messages={messages}
+              input={input}
+              isLoading={isLoading || localIsLoading}
+              isListening={isListening}
+              onInputChange={handleInputChange}
+              onSubmit={customHandleSubmit}
+              onVoiceInput={handleVoiceInput}
+              isChatActive={isChatActive}
+            />
+            {showBuildButton && (
+              <div className="p-4 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
+                <Button onClick={handleBuildWebsite} className="w-full">
+                  Start Building My Website...
+                </Button>
+              </div>
+            )}
+          </>
         )}
       </div>
       <Sidebar
