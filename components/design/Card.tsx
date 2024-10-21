@@ -7,9 +7,16 @@ interface CardProps {
   image: string;
   website_id: string;
   content: string;
+  subdomain: string;
 }
 
-const Card: React.FC<CardProps> = ({ heading, image, website_id, content }) => {
+const Card: React.FC<CardProps> = ({
+  heading,
+  image,
+  website_id,
+  content,
+  subdomain,
+}) => {
   return (
     <div className="w-[288.33px] h-[231.9px]">
       <img
@@ -29,11 +36,14 @@ const Card: React.FC<CardProps> = ({ heading, image, website_id, content }) => {
             Edit
           </a>
         </Link>
-        <Link href={`/preview/${website_id}`} legacyBehavior>
-          <a className="bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600">
-            Preview
-          </a>
-        </Link>
+        <a
+          href={`https://${subdomain}.aiwebsitebuilder.tech`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600"
+        >
+          Preview
+        </a>
         <DeleteWebsiteDialog
           websiteId={website_id}
           websiteName={heading}

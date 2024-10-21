@@ -12,6 +12,7 @@ interface Website {
   thumbnail_url: string;
   website_name: string;
   website_description?: string;
+  subdomain: string;
 }
 
 interface WebsiteProps {
@@ -43,6 +44,7 @@ const Website: React.FC<WebsiteProps> = ({ websites }) => {
                 website_id={website.id}
                 heading={website.website_name}
                 content={website.website_description || ""}
+                subdomain={website.subdomain}
               />
             </React.Fragment>
           ))

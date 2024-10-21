@@ -11,7 +11,13 @@ import AIAssistantPopup from "./AIAssistantPopup";
 
 interface DashboardContentProps {
   user: any;
-  websites: any[];
+  websites: {
+    id: string;
+    website_name: string;
+    website_description: string;
+    thumbnail_url: string;
+    subdomain: string;
+  }[];
   projectCount: number;
 }
 

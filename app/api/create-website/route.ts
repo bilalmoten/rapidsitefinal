@@ -21,7 +21,7 @@ export async function POST(request: Request) {
 
     const { data, error } = await supabase
         .from("websites")
-        .insert({ user_id: userId, website_name: title, website_description: description, subdomain: subdomain, thumbnail_url: "https://d1csarkz8obe9u.cloudfront.net/posterpreviews/website-building-tutorial-youtube-thumbnail-design-template-65458d2b58bd9624b45f5cfdefcff157_screen.jpg?ts=1606639135", pages: [] })
+        .insert({ user_id: userId, website_name: title, website_description: description, subdomain, thumbnail_url: "https://example.com/placeholder.jpg", pages: [] })
         .select("id");
 
     if (error) {
