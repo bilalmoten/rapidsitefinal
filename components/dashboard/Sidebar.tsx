@@ -15,6 +15,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { createClient } from "@/utils/supabase/client";
+import ModeToggle from "../modetoggle";
 
 interface SidebarProps {
   darkMode: boolean;
@@ -82,6 +83,7 @@ const Sidebar: React.FC<SidebarProps> = ({ darkMode, toggleDarkMode }) => {
       </nav>
       <div className="flex items-center justify-between pt-4 border-t">
         <Switch checked={darkMode} onCheckedChange={toggleDarkMode} />
+        {/* <ModeToggle /> */}
         <span className="ml-2">{darkMode ? "Dark" : "Light"} Mode</span>
         {darkMode ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
       </div>
