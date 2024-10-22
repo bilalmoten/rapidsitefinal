@@ -1,7 +1,7 @@
 // components/ClientEditor.tsx
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import ChatWindow from "./ChatWindow";
 import MainEditingPanel from "./MainEditingPanel";
 import FloatingControls from "./FloatingControls";
@@ -33,7 +33,7 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
   const [siteContent, setSiteContent] = useState<string>(initialContent);
   const [zoom, setZoom] = useState(100);
   const [isPickMode, setIsPickMode] = useState(false);
-  const [isEditMode, setIsEditMode] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false); // Ensure this is false by default
   const [hoveredElement, setHoveredElement] = useState<Element | null>(null);
   const [selectedElement, setSelectedElement] = useState<Element | null>(null);
   const [isAnyElementSelected, setIsAnyElementSelected] = useState(false);
@@ -45,6 +45,8 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
   const [pageTitle, setPageTitle] = useState<string>(initialPageTitle);
   const [viewport, setViewport] = useState("desktop");
   const [isCodeViewActive, setIsCodeViewActive] = useState(false);
+  const [userRequest, setUserRequest] = useState("");
+  const [isTextPopupOpen, setIsTextPopupOpen] = useState(false);
 
   const handlePageChange = async (newPage: string) => {
     setPageTitle(newPage);
@@ -66,6 +68,40 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
     setSiteContent(page?.content || "");
   };
 
+  const updateEventListeners = (iframeDoc: Document) => {
+    iframeDoc.body.removeEventListener("mouseover", handleMouseOver);
+    iframeDoc.body.removeEventListener("mouseout", handleMouseOut);
+    iframeDoc.body.removeEventListener("click", handleClick);
+
+    // Only add hover effects for pick mode
+    if (isPickMode) {
+      iframeDoc.body.addEventListener("mouseover", handleMouseOver);
+      iframeDoc.body.addEventListener("mouseout", handleMouseOut);
+    }
+
+    // Add click listener for both modes
+    if (isPickMode || isEditMode) {
+      iframeDoc.body.addEventListener("click", handleClick);
+    }
+  };
+
+  const handleKeyDown = useCallback(
+    (e: KeyboardEvent) => {
+      if (e.key === "Escape" && (isAnyElementSelected || isTextPopupOpen)) {
+        e.preventDefault(); // Prevent default Escape key behavior
+        setSelectedElement(null);
+        setClickPosition(null);
+        setIsAnyElementSelected(false);
+        setIsTextPopupOpen(false);
+        const selectedElements = document.querySelectorAll(".selected-element");
+        selectedElements.forEach((el) =>
+          el.classList.remove("selected-element")
+        );
+      }
+    },
+    [isAnyElementSelected, isTextPopupOpen]
+  );
+
   useEffect(() => {
     const iframe = iframeRef.current;
     if (!iframe) return;
@@ -83,49 +119,24 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
       tailwindLink.href =
         "https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css";
       iframeDoc.head.appendChild(tailwindLink);
+
+      // Only update event listeners when modes change
       updateEventListeners(iframeDoc);
     };
 
-    const updateEventListeners = (iframeDoc: Document) => {
-      removeEventListeners(iframeDoc);
-      if (isPickMode || isEditMode) {
-        addEventListeners(iframeDoc);
-      }
-    };
+    iframe.srcdoc = siteContent;
+    iframe.onload = handleLoad;
 
-    const addEventListeners = (doc: Document) => {
-      if (doc.body) {
-        doc.body.addEventListener("mouseover", handleMouseOver);
-        doc.body.addEventListener("mouseout", handleMouseOut);
-        doc.body.addEventListener("click", handleClick);
-      }
-    };
-
-    const removeEventListeners = (doc: Document) => {
-      if (doc.body) {
-        doc.body.removeEventListener("mouseover", handleMouseOver);
-        doc.body.removeEventListener("mouseout", handleMouseOut);
-        doc.body.removeEventListener("click", handleClick);
-      }
-    };
-
-    if (iframe.contentDocument?.readyState === "complete") {
-      handleLoad();
-    } else {
-      iframe.addEventListener("load", handleLoad);
-    }
+    document.addEventListener("keydown", handleKeyDown);
 
     return () => {
-      iframe.removeEventListener("load", handleLoad);
-      const iframeDoc = iframe.contentDocument;
-      if (iframeDoc) {
-        removeEventListeners(iframeDoc);
-      }
+      iframe.onload = null;
+      document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [siteContent, isPickMode, isEditMode]);
+  }, [siteContent, isPickMode, isEditMode]); // Add isEditMode to dependencies
 
   const handleMouseOver = (e: MouseEvent) => {
-    if ((!isPickMode && !isEditMode) || isAnyElementSelected) return;
+    if (!isPickMode || isAnyElementSelected || isTextPopupOpen) return;
     e.stopPropagation();
     const target = e.target as Element;
     setHoveredElement(target);
@@ -133,36 +144,10 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
   };
 
   const handleMouseOut = (e: MouseEvent) => {
-    if (!isPickMode && !isEditMode) return;
+    if (!isPickMode || isAnyElementSelected || isTextPopupOpen) return;
     const target = e.target as Element;
     target.classList.remove("hovered-element");
     setHoveredElement(null);
-  };
-
-  const handleClick = (e: MouseEvent) => {
-    if (selectedElement) {
-      setSelectedElement(null);
-      setClickPosition(null);
-      setIsAnyElementSelected(false);
-      return;
-    }
-    e.preventDefault();
-    e.stopPropagation();
-    const target = e.target as Element;
-    setSelectedElement(target);
-    setClickPosition({ x: e.clientX, y: e.clientY });
-    setIsAnyElementSelected(true);
-    if (isEditMode) {
-      if (target.tagName === "IMG") {
-        handleImageEdit(target);
-      } else if (
-        ["P", "H1", "H2", "H3", "H4", "H5", "H6", "SPAN", "DIV"].includes(
-          target.tagName
-        )
-      ) {
-        handleTextEdit(target);
-      }
-    }
   };
 
   const handleImageEdit = (target: Element) => {
@@ -201,15 +186,19 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
   };
 
   const handleTextEdit = (target: Element) => {
+    if (!isEditMode) return; // Add this check
+
     target.setAttribute("contenteditable", "true");
     (target as HTMLElement).focus();
+
     const handleBlur = () => {
-      target.removeAttribute("contenteditable");
-      updateElementContent(target);
-      target.removeEventListener("blur", handleBlur);
-      setSelectedElement(null);
-      setIsAnyElementSelected(false);
+      if (target.getAttribute("contenteditable") === "true") {
+        target.removeAttribute("contenteditable");
+        updateElementContent(target);
+        target.removeEventListener("blur", handleBlur);
+      }
     };
+
     target.addEventListener("blur", handleBlur);
   };
 
@@ -291,25 +280,52 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
   const handleZoomOut = () => setZoom((prev) => Math.max(prev - 10, 50));
   const togglePickMode = () => {
     setIsPickMode(!isPickMode);
-    setIsEditMode(false);
+    if (isEditMode) setIsEditMode(false);
+    // Reset selection state when toggling modes
+    setSelectedElement(null);
+    setClickPosition(null);
+    setIsAnyElementSelected(false);
+    setIsTextPopupOpen(false);
+    const selectedElements = document.querySelectorAll(".selected-element");
+    selectedElements.forEach((el) => el.classList.remove("selected-element"));
   };
   const toggleEditMode = () => {
+    // If we're currently in edit mode, save before exiting
+    if (isEditMode) {
+      handleSave();
+    }
+
     setIsEditMode(!isEditMode);
-    setIsPickMode(false);
+    if (isPickMode) setIsPickMode(false);
+
+    // Reset selection state when toggling modes
+    setSelectedElement(null);
+    setClickPosition(null);
+    setIsAnyElementSelected(false);
+    setIsTextPopupOpen(false);
+    const selectedElements = document.querySelectorAll(".selected-element");
+    selectedElements.forEach((el) => el.classList.remove("selected-element"));
   };
 
   const handleSave = async () => {
     const iframeDoc = iframeRef.current?.contentDocument;
     if (iframeDoc) {
+      // Remove all contenteditable attributes before saving
+      const editableElements = iframeDoc.querySelectorAll(
+        '[contenteditable="true"]'
+      );
+      editableElements.forEach((el) => el.removeAttribute("contenteditable"));
+
+      // Get the cleaned HTML content
       const updatedContent = iframeDoc.body.innerHTML;
       setSiteContent(updatedContent);
 
-      console.log("Saving with websiteId:", websiteId); // Add this line for debugging
+      console.log("Saving with websiteId:", websiteId);
 
       const response = fetch("/api/save_website", {
         method: "POST",
         headers: {
-          "Content-Type": "application/json", // Add this line
+          "Content-Type": "application/json",
           Accept: "application/json",
         },
         body: JSON.stringify({
@@ -356,6 +372,126 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
 
   const toggleCodeView = () => {
     setIsCodeViewActive(!isCodeViewActive);
+  };
+
+  const handleUserRequest = async (request: string) => {
+    if (!selectedElement || !iframeRef.current?.contentDocument) return;
+
+    const elementCode = selectedElement.outerHTML;
+
+    try {
+      const response = await fetch("/api/handle_element_request", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          elementCode,
+          userRequest: request,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to process request");
+      }
+
+      const result = await response.json();
+      console.log("API response:", result);
+
+      if (result.updatedCode) {
+        // Create a temporary element to hold the new content
+        const tempDiv = document.createElement("div");
+        tempDiv.innerHTML = result.updatedCode;
+        const newElement = tempDiv.firstElementChild;
+
+        if (newElement && selectedElement.parentNode) {
+          // Replace the old element with the new one
+          selectedElement.parentNode.replaceChild(newElement, selectedElement);
+
+          // Update the site content state
+          const iframeDoc = iframeRef.current.contentDocument;
+          if (iframeDoc) {
+            const updatedContent = iframeDoc.documentElement.outerHTML;
+            setSiteContent(updatedContent);
+
+            // Force a re-render of the iframe
+            iframeRef.current.srcdoc = updatedContent;
+
+            // Reset selection state
+            setSelectedElement(null);
+            setIsAnyElementSelected(false);
+            setIsTextPopupOpen(false);
+            const selectedElements =
+              iframeDoc.querySelectorAll(".selected-element");
+            selectedElements.forEach((el: Element) =>
+              el.classList.remove("selected-element")
+            );
+
+            // Re-enable hover effects
+            updateEventListeners(iframeDoc);
+
+            toast.success("Element updated successfully");
+          } else {
+            toast.error("Failed to access iframe document");
+          }
+        } else {
+          toast.error("Failed to update element");
+        }
+      } else {
+        toast.error("No updated code received");
+      }
+    } catch (error) {
+      console.error("Error processing request:", error);
+      toast.error("Failed to process request");
+    }
+  };
+
+  const handleClick = (e: MouseEvent) => {
+    if (!isPickMode && !isEditMode) return;
+    e.preventDefault();
+    e.stopPropagation();
+    const target = e.target as Element;
+
+    if (isPickMode) {
+      // Handle pick mode behavior
+      if (isAnyElementSelected) {
+        // Deselect element
+        setSelectedElement(null);
+        setClickPosition(null);
+        setIsAnyElementSelected(false);
+        setIsTextPopupOpen(false);
+        const selectedElements = document.querySelectorAll(".selected-element");
+        selectedElements.forEach((el) =>
+          el.classList.remove("selected-element")
+        );
+      } else {
+        // Select element and show text popup
+        setSelectedElement(target);
+        setClickPosition({ x: e.clientX, y: e.clientY });
+        setIsAnyElementSelected(true);
+        setIsTextPopupOpen(true);
+        target.classList.add("selected-element");
+      }
+    } else if (isEditMode) {
+      // Remove any existing contenteditable attributes first
+      const editableElements =
+        iframeRef.current?.contentDocument?.querySelectorAll(
+          '[contenteditable="true"]'
+        );
+      editableElements?.forEach((el) => el.removeAttribute("contenteditable"));
+
+      // Handle edit mode behavior
+      if (target.tagName.toLowerCase() === "img") {
+        // Changed this line
+        handleImageEdit(target);
+      } else if (
+        ["P", "H1", "H2", "H3", "H4", "H5", "H6", "SPAN", "DIV"].includes(
+          target.tagName
+        )
+      ) {
+        handleTextEdit(target);
+      }
+    }
   };
 
   return (
@@ -405,16 +541,23 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
             />
           </div>
         </div>
-        {isPickMode && selectedElement && clickPosition && (
+        {isPickMode && selectedElement && clickPosition && isTextPopupOpen && (
           <TextPopup
             selectedElement={selectedElement}
             clickPosition={clickPosition}
             onClose={() => {
               setSelectedElement(null);
               setIsAnyElementSelected(false);
+              setIsTextPopupOpen(false);
+              const selectedElements =
+                document.querySelectorAll(".selected-element");
+              selectedElements.forEach((el) =>
+                el.classList.remove("selected-element")
+              );
             }}
             screenHeight={window.innerHeight}
             screenWidth={window.innerWidth}
+            onSubmitRequest={handleUserRequest}
           />
         )}
         <FloatingControls

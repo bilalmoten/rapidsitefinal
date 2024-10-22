@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 interface TextPopupProps {
   selectedElement: Element | null;
@@ -6,6 +6,7 @@ interface TextPopupProps {
   onClose: () => void;
   screenHeight: number;
   screenWidth: number;
+  onSubmitRequest: (request: string) => void;
 }
 
 const TextPopup: React.FC<TextPopupProps> = ({
@@ -14,8 +15,11 @@ const TextPopup: React.FC<TextPopupProps> = ({
   onClose,
   screenHeight,
   screenWidth,
+  onSubmitRequest,
 }) => {
   const popupRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [request, setRequest] = useState("");
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -25,6 +29,12 @@ const TextPopup: React.FC<TextPopupProps> = ({
     };
 
     document.addEventListener("mousedown", handleClickOutside);
+
+    // Focus the input field when the component mounts
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
+
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
@@ -38,6 +48,13 @@ const TextPopup: React.FC<TextPopupProps> = ({
   // Calculate the actual top and left positions for the popup
   const top = Math.min(clickPosition.y, maxTop);
   const left = Math.min(clickPosition.x, maxLeft);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSubmitRequest(request);
+    setRequest("");
+    onClose();
+  };
 
   return (
     <div
@@ -53,13 +70,26 @@ const TextPopup: React.FC<TextPopupProps> = ({
       <h2 className="mb-2">
         Request changes to {selectedElement.tagName.toLowerCase()}:
       </h2>
-      <textarea
-        className="w-full h-24 p-2 border rounded-md bg-slate-200"
-        placeholder="Explain your changes"
-      />
-      <button className="mt-2 px-3 py-1 bg-blue-500 text-white rounded">
-        Request
-      </button>
+      <form onSubmit={handleSubmit}>
+        <input
+          ref={inputRef}
+          type="text"
+          value={request}
+          onChange={(e) => setRequest(e.target.value)}
+          placeholder="Enter your request..."
+          className="w-full p-2 border rounded mb-2"
+          autoFocus
+        />
+        <div className="flex justify-between items-center">
+          <button
+            type="submit"
+            className="px-3 py-1 bg-blue-500 text-white rounded"
+          >
+            Submit
+          </button>
+          <span className="text-sm text-gray-500">Press Esc to close</span>
+        </div>
+      </form>
     </div>
   );
 };
