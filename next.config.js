@@ -2,6 +2,12 @@
 const nextConfig = {
     images: {
         domains: ['d1csarkz8obe9u.cloudfront.net'],
+        remotePatterns: [
+            {
+                protocol: "https",
+                hostname: "**",
+            },
+        ],
     },
 };
 

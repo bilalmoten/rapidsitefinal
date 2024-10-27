@@ -1,11 +1,15 @@
 import React from "react";
-import { Edit3 } from "lucide-react";
+import { Edit3, Undo, Redo } from "lucide-react";
 
 interface FloatingControlsProps {
   isPickMode: boolean;
   isEditMode: boolean;
   togglePickMode: () => void;
   toggleEditMode: () => void;
+  onUndo: () => void;
+  onRedo: () => void;
+  canUndo: boolean;
+  canRedo: boolean;
 }
 
 const FloatingControls: React.FC<FloatingControlsProps> = ({
@@ -13,6 +17,10 @@ const FloatingControls: React.FC<FloatingControlsProps> = ({
   isEditMode,
   togglePickMode,
   toggleEditMode,
+  onUndo,
+  onRedo,
+  canUndo,
+  canRedo,
 }) => {
   return (
     <div className="bg-white p-4 flex justify-between items-center border-b border-gray-300">
@@ -34,6 +42,26 @@ const FloatingControls: React.FC<FloatingControlsProps> = ({
         >
           <Edit3 size={20} className="mr-2" />
           {isEditMode ? "Exit Edit Mode" : "Edit Mode"}
+        </button>
+        <button
+          className={`px-4 py-2 rounded flex items-center ${
+            !canUndo ? "opacity-50 cursor-not-allowed" : ""
+          }`}
+          onClick={onUndo}
+          disabled={!canUndo}
+        >
+          <Undo size={20} className="mr-2" />
+          Undo
+        </button>
+        <button
+          className={`px-4 py-2 rounded flex items-center ${
+            !canRedo ? "opacity-50 cursor-not-allowed" : ""
+          }`}
+          onClick={onRedo}
+          disabled={!canRedo}
+        >
+          <Redo size={20} className="mr-2" />
+          Redo
         </button>
       </div>
       <button className="bg-blue-500 text-white px-4 py-2 rounded">

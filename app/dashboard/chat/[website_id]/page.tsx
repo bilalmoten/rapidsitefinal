@@ -140,7 +140,7 @@ export default function Chat({ params }: { params: { website_id: string } }) {
     });
     console.log("chat saved");
     console.log(
-      `link: http://localhost:7071/api/code_website?user_id=${user?.id}&website_id=${params.website_id}&model=o1-mini`
+      `link: https://api2.azurewebsites.net/api/code_website?user_id=${user?.id}&website_id=${params.website_id}&model=o1-mini`
     );
 
     const response = await fetch(

@@ -47,6 +47,8 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
   const [isCodeViewActive, setIsCodeViewActive] = useState(false);
   const [userRequest, setUserRequest] = useState("");
   const [isTextPopupOpen, setIsTextPopupOpen] = useState(false);
+  const [undoStack, setUndoStack] = useState<string[]>([initialContent]); // Store HTML states
+  const [currentStateIndex, setCurrentStateIndex] = useState(0);
 
   const handlePageChange = async (newPage: string) => {
     setPageTitle(newPage);
@@ -399,6 +401,10 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
       console.log("API response:", result);
 
       if (result.updatedCode) {
+        // Store current state before making changes
+        const currentContent =
+          iframeRef.current.contentDocument?.documentElement.outerHTML || "";
+
         // Create a temporary element to hold the new content
         const tempDiv = document.createElement("div");
         tempDiv.innerHTML = result.updatedCode;
@@ -412,6 +418,16 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
           const iframeDoc = iframeRef.current.contentDocument;
           if (iframeDoc) {
             const updatedContent = iframeDoc.documentElement.outerHTML;
+
+            toast.success("Element updated successfully", {
+              action: {
+                label: "Undo",
+                onClick: () => handleUndo(),
+              },
+            });
+
+            // Store the new state
+            pushNewState(updatedContent);
             setSiteContent(updatedContent);
 
             // Force a re-render of the iframe
@@ -494,6 +510,65 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
     }
   };
 
+  const pushNewState = (newContent: string) => {
+    // Remove any states after current index (for when we're undoing and then making new changes)
+    const newStack = undoStack.slice(0, currentStateIndex + 1);
+    // Add new state
+    newStack.push(newContent);
+    // If we exceed 100 states, remove oldest
+    if (newStack.length > 100) {
+      newStack.shift();
+    }
+    setUndoStack(newStack);
+    setCurrentStateIndex(newStack.length - 1);
+  };
+
+  const handleUndo = () => {
+    if (currentStateIndex > 0) {
+      setCurrentStateIndex(currentStateIndex - 1);
+      setSiteContent(undoStack[currentStateIndex - 1]);
+      // Update iframe content
+      if (iframeRef.current) {
+        iframeRef.current.srcdoc = undoStack[currentStateIndex - 1];
+      }
+    }
+  };
+
+  const handleRedo = () => {
+    if (currentStateIndex < undoStack.length - 1) {
+      setCurrentStateIndex(currentStateIndex + 1);
+      setSiteContent(undoStack[currentStateIndex + 1]);
+      // Update iframe content
+      if (iframeRef.current) {
+        iframeRef.current.srcdoc = undoStack[currentStateIndex + 1];
+      }
+    }
+  };
+
+  // Add this near your other useEffect hooks
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Check if Ctrl (or Cmd on Mac) is pressed
+      if ((e.ctrlKey || e.metaKey) && !e.shiftKey) {
+        if (e.key === "z") {
+          e.preventDefault(); // Prevent browser's default undo
+          handleUndo();
+        } else if (e.key === "y") {
+          e.preventDefault(); // Prevent browser's default redo
+          handleRedo();
+        }
+      }
+    };
+
+    // Add the event listener
+    document.addEventListener("keydown", handleKeyDown);
+
+    // Cleanup
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [currentStateIndex, undoStack]); // Dependencies ensure we have latest state
+
   return (
     <div className="flex h-[calc(100vh-110px)] bg-gray-100">
       <div className="flex-1 flex flex-col relative">
@@ -565,6 +640,10 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
           isEditMode={isEditMode}
           togglePickMode={togglePickMode}
           toggleEditMode={toggleEditMode}
+          onUndo={handleUndo}
+          onRedo={handleRedo}
+          canUndo={currentStateIndex > 0}
+          canRedo={currentStateIndex < undoStack.length - 1}
         />
       </div>
       <ChatWindow />

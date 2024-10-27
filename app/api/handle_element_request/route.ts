@@ -1,6 +1,71 @@
 import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
+    try {
+        const { elementCode, userRequest, creativity = 0.6 } = await request.json();
+
+        const apiKey = "523a50ed7a7444468d1ae5a384f032bf";
+        const endpoint = "https://answerai-bilal.openai.azure.com/openai/deployments/gpt-4o-mini/chat/completions?api-version=2024-09-01-preview";
+
+        // Craft a specific prompt for modifying HTML
+        const prompt = `As a web developer, modify the following HTML code section based on this request: "${userRequest}"
+
+Current HTML section:
+${elementCode}
+
+Requirements:
+1. Provide ONLY the modified HTML code - no explanations
+2. The new code must be a direct replacement for the current code, whether its a full page, a section, or a single element
+3. You can modify anything including HTML structure, Tailwind classes, content, and styling
+4. The code should be complete and valid HTML
+5. Feel free to add new elements, change layouts, modify colors, or restructure as requested
+6. Use Tailwind CSS for styling
+
+Remember: Your response should be just the HTML code that will replace the current section.`;
+
+        const response = await fetch(endpoint, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'api-key': apiKey,
+            },
+            body: JSON.stringify({
+                messages: [{ role: 'user', content: prompt }],
+                temperature: creativity,
+                max_tokens: 2000,
+            }),
+        });
+
+        if (!response.ok) {
+            throw new Error(`Azure API request failed: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        const updatedCode = data.choices[0].message.content.trim();
+
+        // Basic validation to ensure we got HTML code
+        if (!updatedCode.includes('<') || !updatedCode.includes('>')) {
+            throw new Error('Invalid HTML received from AI');
+        }
+
+        return NextResponse.json({
+            message: "Request processed",
+            updatedCode
+        });
+
+    } catch (error: unknown) {
+        console.error('Error processing request:', error);
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+        return NextResponse.json(
+            { error: 'Failed to process request', details: errorMessage },
+            { status: 500 }
+        );
+    }
+}
+
+// Original dummy code for reference:
+/*
+export async function POST(request: Request) {
     const { elementCode, userRequest } = await request.json();
 
     // Here, you would typically process the request and generate the updated code
@@ -16,3 +81,4 @@ export async function POST(request: Request) {
         updatedCode
     });
 }
+*/
