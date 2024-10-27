@@ -144,8 +144,8 @@ export default function Chat({ params }: { params: { website_id: string } }) {
     );
 
     const response = await fetch(
-      `https://api2.azurewebsites.net/api/code_website?user_id=${user?.id}&website_id=${params.website_id}&model=o1-mini`,
-      // `http://localhost:7071/api/code_website?user_id=${user?.id}&website_id=${params.website_id}&model=o1-mini`,
+      // `https://api2.azurewebsites.net/api/code_website?user_id=${user?.id}&website_id=${params.website_id}&model=o1-mini`,
+      `http://localhost:7071/api/code_website?user_id=${user?.id}&website_id=${params.website_id}&model=o1-mini`,
       {
         method: "POST",
       }
@@ -273,7 +273,13 @@ export default function Chat({ params }: { params: { website_id: string } }) {
 
       // Create new messages array with correct types
       const newMessages: Message[] = [
-        ...messages,
+        // ...messages,
+        {
+          id: "1",
+          role: "assistant",
+          content:
+            "Hello! I'm your AI assistant. Let's create your dream website. To get started, could you tell me about your business and what kind of website you're looking for?",
+        },
         { id: "2", role: "user", content: enhancedPrompt },
         {
           id: "3",
