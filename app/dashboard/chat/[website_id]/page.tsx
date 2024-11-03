@@ -144,8 +144,8 @@ export default function Chat({ params }: { params: { website_id: string } }) {
     );
 
     const response = await fetch(
-      // `https://api2.azurewebsites.net/api/code_website?user_id=${user?.id}&website_id=${params.website_id}&model=o1-mini`,
-      `http://localhost:7071/api/code_website?user_id=${user?.id}&website_id=${params.website_id}&model=o1-mini`,
+      `https://api2.azurewebsites.net/api/code_website?user_id=${user?.id}&website_id=${params.website_id}&model=o1-mini`,
+      // `http://localhost:7071/api/code_website?user_id=${user?.id}&website_id=${params.website_id}&model=o1-mini`,
       {
         method: "POST",
       }
