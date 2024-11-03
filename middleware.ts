@@ -37,6 +37,13 @@ export async function middleware(request: NextRequest) {
   // Handle subdomains
   const subdomain = host.replace('.aiwebsitebuilder.tech', '');
 
+  // Don't rewrite auth-related paths on subdomains
+  if (url.pathname.startsWith('/login') ||
+    url.pathname.startsWith('/register') ||
+    url.pathname.startsWith('/auth')) {
+    return res;
+  }
+
   // Prevent direct access to /sites folder
   if (url.pathname.startsWith(`/sites`)) {
     url.pathname = `/404`;

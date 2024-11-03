@@ -1,8 +1,6 @@
 import { createClient } from "@/utils/supabase/server";
-import { redirect } from "next/navigation";
-import { Metadata, Viewport } from "next";
+import { notFound } from "next/navigation";
 import Script from "next/script";
-import Link from "next/link";
 import { JSDOM } from "jsdom";
 
 export default async function SubdomainPage({
@@ -11,14 +9,6 @@ export default async function SubdomainPage({
   params: { subdomain: string };
 }) {
   const supabase = createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    console.log("No user found, redirecting to login");
-    return redirect("/login");
-  }
 
   console.log("Fetching website data for subdomain:", params.subdomain);
   const { data: website, error: websiteError } = await supabase
@@ -29,14 +19,12 @@ export default async function SubdomainPage({
 
   if (websiteError) {
     console.error("Error fetching website:", websiteError);
-    return (
-      <div>Error fetching website information: {websiteError.message}</div>
-    );
+    return notFound();
   }
 
   if (!website || !website.pages || website.pages.length === 0) {
     console.error("No pages found for website");
-    return <div>No pages found for this website.</div>;
+    return notFound();
   }
 
   const initialPageTitle = website.pages[0];
@@ -46,19 +34,18 @@ export default async function SubdomainPage({
   const { data: page, error: pageError } = await supabase
     .from("pages")
     .select("content")
-    .eq("user_id", user.id)
     .eq("website_id", website.id)
     .eq("title", initialPageTitle)
     .single();
 
   if (pageError) {
     console.error("Error fetching page content:", pageError);
-    return <div>Error fetching page content: {pageError.message}</div>;
+    return notFound();
   }
 
   if (!page) {
     console.error("No page content found");
-    return <div>No content found for this page.</div>;
+    return notFound();
   }
 
   // Function to replace static links with dynamic Next.js Links
@@ -110,7 +97,7 @@ export async function generateMetadata({
   params,
 }: {
   params: { subdomain: string };
-}): Promise<Metadata> {
+}) {
   const supabase = createClient();
   const { data: website } = await supabase
     .from("websites")
@@ -123,7 +110,7 @@ export async function generateMetadata({
   };
 }
 
-export function generateViewport(): Viewport {
+export function generateViewport() {
   return {
     width: "device-width",
     initialScale: 1,
