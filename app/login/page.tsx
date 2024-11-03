@@ -4,16 +4,17 @@ import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
 import { SubmitButton } from "./submit-button";
 import Image from "next/image";
-
 import { Lock } from "lucide-react";
 import MotionWrapper from "@/components/MotionWrapper";
 import AnimatedLoginContent from "@/components/AnimatedLoginContent";
 
-export default function Login({
-  searchParams,
-}: {
-  searchParams: { message: string };
-}) {
+interface LoginPageProps {
+  searchParams: Promise<{ message: string }>;
+}
+
+export default async function Login({ searchParams }: LoginPageProps) {
+  const params = await searchParams;
+
   const signIn = async (formData: FormData) => {
     "use server";
 
@@ -35,7 +36,7 @@ export default function Login({
 
   return (
     <MotionWrapper className="flex min-h-screen flex-col items-center justify-center py-2">
-      <AnimatedLoginContent searchParams={searchParams} />
+      <AnimatedLoginContent searchParams={params} />
     </MotionWrapper>
   );
 }
