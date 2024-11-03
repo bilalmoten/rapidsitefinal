@@ -1,14 +1,18 @@
+import React from "react";
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
 import { Metadata, Viewport } from "next";
 import Script from "next/script";
 import { JSDOM } from "jsdom";
 
-export default async function SubdomainSubPage({
-  params,
-}: {
-  params: { subdomain: string; page: string };
-}) {
+interface SitePageProps {
+  params: {
+    subdomain: string;
+    page: string;
+  };
+}
+
+export default async function SitePage({ params }: SitePageProps) {
   const supabase = await createClient();
   const {
     data: { user },

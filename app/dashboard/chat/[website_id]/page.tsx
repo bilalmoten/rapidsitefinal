@@ -11,8 +11,19 @@ import ChatInterface from "@/components/ChatInterface";
 import { Button } from "@/components/ui/button";
 import Sidebar from "@/components/Sidebar";
 import { useChat, Message } from "ai/react";
+import React from "react";
 
-export default function Chat({ params }: { params: { website_id: string } }) {
+// Add interface for params
+interface ChatPageProps {
+  params: {
+    website_id: string;
+  };
+}
+
+export default function ChatPage({ params }: ChatPageProps) {
+  // Use React.use() to unwrap the params
+  const websiteId = React.use(Promise.resolve(params.website_id));
+
   const supabase = createClient();
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
@@ -87,12 +98,12 @@ export default function Chat({ params }: { params: { website_id: string } }) {
         const { data, error } = await supabase
           .from("websites")
           .select("status")
-          .eq("id", params.website_id)
+          .eq("id", websiteId)
           .single();
 
         if (data && data.status === "completed") {
           setIsGenerating(false);
-          router.push(`/dashboard/editor/${params.website_id}`);
+          router.push(`/dashboard/editor/${websiteId}`);
         } else if (
           generationStartTime &&
           Date.now() - generationStartTime > 120000
@@ -134,17 +145,17 @@ export default function Chat({ params }: { params: { website_id: string } }) {
       },
       body: JSON.stringify({
         userId: user?.id,
-        websiteID: params.website_id,
+        websiteID: websiteId,
         chat_conversation: newMessages || messages,
       }),
     });
     console.log("chat saved");
     console.log(
-      `link: https://api2.azurewebsites.net/api/code_website?user_id=${user?.id}&website_id=${params.website_id}&model=o1-mini`
+      `link: https://api2.azurewebsites.net/api/code_website?user_id=${user?.id}&website_id=${websiteId}&model=o1-mini`
     );
 
     const response = await fetch(
-      `https://api2.azurewebsites.net/api/code_website?user_id=${user?.id}&website_id=${params.website_id}&model=o1-mini`,
+      `https://api2.azurewebsites.net/api/code_website?user_id=${user?.id}&website_id=${websiteId}&model=o1-mini`,
       // `http://localhost:7071/api/code_website?user_id=${user?.id}&website_id=${params.website_id}&model=o1-mini`,
       {
         method: "POST",
@@ -156,7 +167,7 @@ export default function Chat({ params }: { params: { website_id: string } }) {
     // Check if the response is successful
     if (response.ok) {
       // Redirect the user to a new page after the fetch is complete
-      router.push(`/dashboard/editor/${params.website_id}`);
+      router.push(`/dashboard/editor/${websiteId}`);
     } else {
       console.error("Failed to generate website");
     }

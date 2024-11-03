@@ -1,3 +1,4 @@
+import React from "react";
 import { createClient } from "@/utils/supabase/server";
 import { notFound } from "next/navigation";
 import { formatDate } from "@/lib/utils";
@@ -15,17 +16,21 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 
-export default async function BlogPost({
-  params,
-}: {
-  params: { slug: string };
-}) {
+interface BlogPostPageProps {
+  params: {
+    slug: string;
+  };
+}
+
+export default async function BlogPostPage({ params }: BlogPostPageProps) {
+  const slug = React.use(Promise.resolve(params.slug));
+
   const supabase = await createClient();
 
   const { data: post, error } = await supabase
     .from("blog_posts")
     .select("*")
-    .eq("slug", params.slug)
+    .eq("slug", slug)
     .single();
 
   if (error || !post) {
