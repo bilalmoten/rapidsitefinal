@@ -6,13 +6,8 @@ import { SubmitButton } from "./submit-button";
 import Image from "next/image";
 
 import { Lock } from "lucide-react";
-import dynamic from "next/dynamic";
 import AnimatedLoginContent from "@/components/AnimatedLoginContent";
-
-const MotionDiv = dynamic(
-  () => import("framer-motion").then((mod) => mod.motion.div),
-  { ssr: false }
-);
+import MotionWrapper from "@/components/MotionWrapper";
 
 export default function Login({
   searchParams,
@@ -41,7 +36,9 @@ export default function Login({
   return (
     <div className="flex h-screen">
       <div className="w-2/5 bg-gradient-to-br from-indigo-500 to-purple-600 text-white flex flex-col justify-center items-center p-12 relative overflow-hidden">
-        <AnimatedLoginContent />
+        <MotionWrapper>
+          <AnimatedLoginContent />
+        </MotionWrapper>
         <div className="absolute bottom-0 left-0 right-0">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320">
             <path
