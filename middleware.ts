@@ -24,6 +24,14 @@ export async function middleware(request: NextRequest) {
     host = `${hostname.split('---')[0]}.aiwebsitebuilder.tech`;
   }
 
+  // Don't rewrite paths that should be public
+  if (url.pathname.startsWith('/blog') ||
+    url.pathname.startsWith('/login') ||
+    url.pathname.startsWith('/register') ||
+    url.pathname.startsWith('/auth')) {
+    return res;
+  }
+
   // If it's the main domain, just return the session-updated response
   if (
     host === 'aiwebsitebuilder.tech' ||
@@ -36,13 +44,6 @@ export async function middleware(request: NextRequest) {
 
   // Handle subdomains
   const subdomain = host.replace('.aiwebsitebuilder.tech', '');
-
-  // Don't rewrite auth-related paths on subdomains
-  if (url.pathname.startsWith('/login') ||
-    url.pathname.startsWith('/register') ||
-    url.pathname.startsWith('/auth')) {
-    return res;
-  }
 
   // Prevent direct access to /sites folder
   if (url.pathname.startsWith(`/sites`)) {

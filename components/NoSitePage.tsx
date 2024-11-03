@@ -75,7 +75,7 @@ export default function NoSitePage({ subdomain }: { subdomain: string }) {
 
           <div className="space-y-4">
             <Link
-              href="/login"
+              href="https://aiwebsitebuilder.tech/signup"
               className="inline-block bg-indigo-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-indigo-700 transition-colors duration-200"
             >
               Create Your Website Now

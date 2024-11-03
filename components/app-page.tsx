@@ -111,6 +111,12 @@ export function Page() {
               >
                 Pricing
               </Link>
+              <Link
+                href="/blog"
+                className="hover:text-indigo-500 transition-colors text-sm font-medium"
+              >
+                Blog
+              </Link>
               <Switch checked={darkMode} onCheckedChange={toggleDarkMode} />
               <AnimatePresence mode="wait" initial={false}>
                 <motion.div
