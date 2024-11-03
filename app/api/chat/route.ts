@@ -6,8 +6,8 @@ export const maxDuration = 30;
 
 export async function POST(req: Request) {
     const azure = createAzure({
-        resourceName: "AnswerAI-bilal", // Azure resource name
-        apiKey: "523a50ed7a7444468d1ae5a384f032bf",
+        resourceName: process.env.AZURE_RESOURCE_NAME!,
+        apiKey: process.env.AZURE_API_KEY!,
     });
 
     const { messages } = await req.json();
@@ -47,7 +47,6 @@ export async function POST(req: Request) {
     const result = await streamText({
         system: system_prompt,
         model: azure('gpt-4o-mini'),
-        // model: azure('gpt4o-azure'),
         messages,
     });
 
