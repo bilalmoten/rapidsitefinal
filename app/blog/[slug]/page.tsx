@@ -17,16 +17,14 @@ import {
 import Link from "next/link";
 
 interface BlogPostPageProps {
-  params: {
+  params: Promise<{
     slug: string;
-  };
-  searchParams: { [key: string]: string | string[] | undefined };
+  }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
-export default async function BlogPostPage({
-  params,
-  searchParams,
-}: BlogPostPageProps) {
+export default async function BlogPostPage(props: BlogPostPageProps) {
+  const params = await props.params;
   const slug = params.slug;
 
   const supabase = await createClient();

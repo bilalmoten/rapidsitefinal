@@ -4,11 +4,12 @@ import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
 import { SubmitButton } from "../login/submit-button";
 
-export default function Signup({
-  searchParams,
-}: {
-  searchParams: { message: string };
-}) {
+export default async function Signup(
+  props: {
+    searchParams: Promise<{ message: string }>;
+  }
+) {
+  const searchParams = await props.searchParams;
   const signUp = async (formData: FormData) => {
     "use server";
 

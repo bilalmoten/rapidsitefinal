@@ -6,13 +6,14 @@ import Script from "next/script";
 import { JSDOM } from "jsdom";
 
 interface SitePageProps {
-  params: {
+  params: Promise<{
     subdomain: string;
     page: string;
-  };
+  }>;
 }
 
-export default async function SitePage({ params }: SitePageProps) {
+export default async function SitePage(props: SitePageProps) {
+  const params = await props.params;
   const supabase = await createClient();
   const {
     data: { user },
@@ -109,11 +110,12 @@ export default async function SitePage({ params }: SitePageProps) {
   );
 }
 
-export async function generateMetadata({
-  params,
-}: {
-  params: { subdomain: string };
-}): Promise<Metadata> {
+export async function generateMetadata(
+  props: {
+    params: Promise<{ subdomain: string }>;
+  }
+): Promise<Metadata> {
+  const params = await props.params;
   const supabase = await createClient();
   const { data: website } = await supabase
     .from("websites")

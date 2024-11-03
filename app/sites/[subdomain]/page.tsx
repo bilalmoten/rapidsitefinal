@@ -4,11 +4,12 @@ import Script from "next/script";
 import { JSDOM } from "jsdom";
 import NoSitePage from "@/components/NoSitePage";
 
-export default async function SubdomainPage({
-  params,
-}: {
-  params: { subdomain: string };
-}) {
+export default async function SubdomainPage(
+  props: {
+    params: Promise<{ subdomain: string }>;
+  }
+) {
+  const params = await props.params;
   const supabase = await createClient();
 
   console.log("Fetching website data for subdomain:", params.subdomain);
@@ -86,11 +87,12 @@ export default async function SubdomainPage({
   );
 }
 
-export async function generateMetadata({
-  params,
-}: {
-  params: { subdomain: string };
-}) {
+export async function generateMetadata(
+  props: {
+    params: Promise<{ subdomain: string }>;
+  }
+) {
+  const params = await props.params;
   const supabase = await createClient();
   const { data: website } = await supabase
     .from("websites")

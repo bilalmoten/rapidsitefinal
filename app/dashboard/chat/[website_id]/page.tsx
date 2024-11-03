@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, use } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
 import { User } from "@supabase/supabase-js";
@@ -15,12 +15,13 @@ import React from "react";
 
 // Add interface for params
 interface ChatPageProps {
-  params: {
+  params: Promise<{
     website_id: string;
-  };
+  }>;
 }
 
-export default function ChatPage({ params }: ChatPageProps) {
+export default function ChatPage(props: ChatPageProps) {
+  const params = use(props.params);
   // Use React.use() to unwrap the params
   const websiteId = React.use(Promise.resolve(params.website_id));
 

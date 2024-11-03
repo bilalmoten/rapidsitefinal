@@ -3,11 +3,12 @@ import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
 import ClientEditor from "@/components/ClientEditor";
 
-export default async function EditorPage({
-  params,
-}: {
-  params: { website_id: string };
-}) {
+export default async function EditorPage(
+  props: {
+    params: Promise<{ website_id: string }>;
+  }
+) {
+  const params = await props.params;
   const supabase = await createClient();
   const {
     data: { user },
