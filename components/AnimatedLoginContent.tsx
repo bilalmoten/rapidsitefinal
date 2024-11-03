@@ -3,7 +3,17 @@
 import { motion } from "framer-motion";
 import { Lock } from "lucide-react";
 
-export default function AnimatedLoginContent() {
+interface AnimatedLoginContentProps {
+  searchParams?: {
+    message?: string;
+  };
+}
+
+export default function AnimatedLoginContent({
+  searchParams,
+}: AnimatedLoginContentProps) {
+  const message = searchParams?.message;
+
   return (
     <>
       <motion.div
