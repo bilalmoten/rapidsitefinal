@@ -24,8 +24,9 @@
     "@radix-ui/react-toast": "^1.2.1",
     "@react-email/components": "^0.0.26",
     "@react-three/fiber": "^8.17.5",
+    "@sparticuz/chromium": "^119.0.2",
     "@supabase/ssr": "latest",
-    "@supabase/supabase-js": "latest",
+    "@supabase/supabase-js": "^2.46.1",
     "@tabler/icons-react": "^3.11.0",
     "@tsparticles/engine": "^3.5.0",
     "@tsparticles/react": "^3.0.0",
@@ -49,6 +50,7 @@
     "next-themes": "^0.3.0",
     "postcss": "8.4.33",
     "prismjs": "^1.29.0",
+    "puppeteer-core": "^10.1.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-hot-toast": "^2.4.1",
@@ -71,7 +73,8 @@
     "three": "^0.167.1",
     "tsparticles-slim": "^2.12.0",
     "typescript": "5.3.3",
-    "vanilla-tilt": "^1.8.1"
+    "vanilla-tilt": "^1.8.1",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@types/node": "20.11.5",

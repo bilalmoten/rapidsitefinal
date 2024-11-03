@@ -9,7 +9,7 @@ export default async function SubdomainSubPage({
 }: {
   params: { subdomain: string; page: string };
 }) {
-  const supabase = createClient();
+  const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -110,7 +110,7 @@ export async function generateMetadata({
 }: {
   params: { subdomain: string };
 }): Promise<Metadata> {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: website } = await supabase
     .from("websites")
     .select("title")

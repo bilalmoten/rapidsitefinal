@@ -3,7 +3,7 @@ import { createClient } from "@/utils/supabase/server";
 
 export async function POST(request: Request) {
 
-    const supabase = createClient();
+    const supabase = await createClient();
     const requestBody = await request.json();
     const { userId, websiteID, chat_conversation } = requestBody;
     console.log("Request body:");

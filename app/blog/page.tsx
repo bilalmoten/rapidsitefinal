@@ -46,7 +46,7 @@ export const metadata: Metadata = {
 };
 
 async function getInitialPosts() {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data } = await supabase
     .from("blog_posts")
     .select("id, title, slug, excerpt, cover_image, author, created_at")

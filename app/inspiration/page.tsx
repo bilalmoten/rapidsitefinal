@@ -3,7 +3,7 @@ import { createClient } from "@/utils/supabase/server";
 import Image from "next/image";
 
 export default async function InspirationPage() {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: websites, error } = await supabase
     .from("websites")
     .select("id, website_name, thumbnail_url")

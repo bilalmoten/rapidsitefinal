@@ -52,7 +52,7 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
 
   const handlePageChange = async (newPage: string) => {
     setPageTitle(newPage);
-    const supabase = createClient();
+    const supabase = await createClient();
     const { data: page, error } = await supabase
       .from("pages")
       .select("content")

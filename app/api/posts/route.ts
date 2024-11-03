@@ -7,7 +7,7 @@ export async function GET(request: Request) {
     const limit = 6
     const offset = (page - 1) * limit
 
-    const supabase = createClient()
+    const supabase = await createClient()
     const { data, error } = await supabase
         .from("blog_posts")
         .select("id, title, slug, excerpt, cover_image, author, created_at")

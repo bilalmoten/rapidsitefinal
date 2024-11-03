@@ -8,7 +8,7 @@ export default async function EditorPage({
 }: {
   params: { website_id: string };
 }) {
-  const supabase = createClient();
+  const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();

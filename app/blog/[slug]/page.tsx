@@ -20,7 +20,7 @@ export default async function BlogPost({
 }: {
   params: { slug: string };
 }) {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const { data: post, error } = await supabase
     .from("blog_posts")

@@ -9,7 +9,7 @@ export default async function SubdomainPage({
 }: {
   params: { subdomain: string };
 }) {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   console.log("Fetching website data for subdomain:", params.subdomain);
   const { data: website, error: websiteError } = await supabase
@@ -91,7 +91,7 @@ export async function generateMetadata({
 }: {
   params: { subdomain: string };
 }) {
-  const supabase = createClient();
+  const supabase = await createClient();
   const { data: website } = await supabase
     .from("websites")
     .select("title")

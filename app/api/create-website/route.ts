@@ -5,7 +5,7 @@ import { createClient } from "@/utils/supabase/server";
 export async function POST(request: Request) {
     console.log("POST function called"); // Added logging
 
-    const supabase = createClient();
+    const supabase = await createClient();
     const requestBody = await request.json();
     const { userId, title, subdomain, description } = requestBody;
 

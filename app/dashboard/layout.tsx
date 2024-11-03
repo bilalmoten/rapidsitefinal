@@ -7,7 +7,7 @@ const Layout: React.FC<{ children: React.ReactNode }> = async ({
   children,
 }) => {
   // Assuming you have a way to get the user id and email
-  const supabase = createClient();
+  const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();

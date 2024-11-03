@@ -13,7 +13,7 @@ export const dynamic = "force-dynamic";
 export const maxDuration = 30;
 
 export default function Chat({ params }: { params: { website_id: string } }) {
-  const supabase = createClient();
+  const supabase = await createClient();
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const [messages, setMessages] = useState<CoreMessage[]>([]);
