@@ -58,9 +58,10 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    // Keep your existing matchers and add the subdomain matcher
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
-    // Add matcher for root path when accessed via subdomain
-    "/"
+    // Add routes that need auth
+    '/dashboard/:path*',
+    '/settings/:path*',
+    // But exclude /sites routes
+    '/((?!sites|api|_next/static|_next/image|favicon.ico).*)',
   ],
 };

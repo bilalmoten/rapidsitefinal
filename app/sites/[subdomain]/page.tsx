@@ -2,6 +2,7 @@ import { createClient } from "@/utils/supabase/server";
 import { notFound } from "next/navigation";
 import Script from "next/script";
 import { JSDOM } from "jsdom";
+import NoSitePage from "@/components/NoSitePage";
 
 export default async function SubdomainPage({
   params,
@@ -17,14 +18,13 @@ export default async function SubdomainPage({
     .eq("subdomain", params.subdomain)
     .single();
 
-  if (websiteError) {
-    console.error("Error fetching website:", websiteError);
-    return notFound();
-  }
-
-  if (!website || !website.pages || website.pages.length === 0) {
-    console.error("No pages found for website");
-    return notFound();
+  if (
+    websiteError ||
+    !website ||
+    !website.pages ||
+    website.pages.length === 0
+  ) {
+    return <NoSitePage subdomain={params.subdomain} />;
   }
 
   const initialPageTitle = website.pages[0];
@@ -38,17 +38,10 @@ export default async function SubdomainPage({
     .eq("title", initialPageTitle)
     .single();
 
-  if (pageError) {
-    console.error("Error fetching page content:", pageError);
-    return notFound();
+  if (pageError || !page) {
+    return <NoSitePage subdomain={params.subdomain} />;
   }
 
-  if (!page) {
-    console.error("No page content found");
-    return notFound();
-  }
-
-  // Function to replace static links with dynamic Next.js Links
   const replaceLinks = (content: string) => {
     const dom = new JSDOM(content);
     const document = dom.window.document;
