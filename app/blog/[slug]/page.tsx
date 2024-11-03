@@ -27,7 +27,7 @@ export default async function BlogPostPage({
   params,
   searchParams,
 }: BlogPostPageProps) {
-  const slug = React.use(Promise.resolve(params.slug));
+  const slug = params.slug;
 
   const supabase = await createClient();
 
