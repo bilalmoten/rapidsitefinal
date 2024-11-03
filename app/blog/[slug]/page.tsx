@@ -20,9 +20,13 @@ interface BlogPostPageProps {
   params: {
     slug: string;
   };
+  searchParams: { [key: string]: string | string[] | undefined };
 }
 
-export default async function BlogPostPage({ params }: BlogPostPageProps) {
+export default async function BlogPostPage({
+  params,
+  searchParams,
+}: BlogPostPageProps) {
   const slug = React.use(Promise.resolve(params.slug));
 
   const supabase = await createClient();
