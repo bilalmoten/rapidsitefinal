@@ -5,6 +5,9 @@ import Navbar from "@/components/Navbar";
 import Navbar_new from "@/components/navbar-new";
 import { ThemeProvider } from "@/components/theme-provider";
 import "prismjs/themes/prism-tomorrow.css";
+import { Analytics } from "@vercel/analytics/react";
+
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
@@ -34,6 +37,8 @@ export default function RootLayout({
           <main className="min-h-screen">{children}</main>
           <Toaster richColors />
         </ThemeProvider>
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
