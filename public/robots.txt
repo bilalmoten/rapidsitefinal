@@ -6,10 +6,8 @@ Disallow: /api/
 Disallow: /login/
 Disallow: /signup/
 
-# Sitemaps
+# Sitemap
 Sitemap: https://aiwebsitebuilder.tech/sitemap.xml
-Sitemap: https://aiwebsitebuilder.tech/sitemap-1.xml
-Sitemap: https://aiwebsitebuilder.tech/sitemap-2.xml
 
 # Host
 Host: https://aiwebsitebuilder.tech

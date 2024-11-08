@@ -11,14 +11,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         .select("slug, created_at")
         .eq("published", true)
 
-    // Get public websites that opted in for SEO
+    // Get all public websites
     const { data: publicWebsites } = await supabase
         .from("websites")
         .select("subdomain, updated_at")
-        .eq("is_public", true)
-        .eq("seo_indexed", true)
         .eq("isdeleted", false)
-        .limit(1000)
+    // Optionally keep these filters if you want users to control SEO
+    // .eq("is_public", true)
+    // .eq("seo_indexed", true)
 
     // Static routes
     const staticRoutes = [
