@@ -380,6 +380,7 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
     if (!selectedElement || !iframeRef.current?.contentDocument) return;
 
     const elementCode = selectedElement.outerHTML;
+    const fullPageCode = initialContent;
 
     try {
       const response = await fetch("/api/handle_element_request", {
@@ -388,6 +389,8 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
+          fullPageCode: fullPageCode,
+          model: "o1-mini",
           elementCode,
           userRequest: request,
         }),

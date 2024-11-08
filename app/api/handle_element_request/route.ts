@@ -2,16 +2,19 @@ import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
     try {
-        const { elementCode, userRequest, creativity = 0.6 } = await request.json();
+        const { elementCode, userRequest, fullPageCode, model, creativity = 0.6 } = await request.json();
 
         const apiKey = "523a50ed7a7444468d1ae5a384f032bf";
-        const endpoint = "https://answerai-bilal.openai.azure.com/openai/deployments/gpt-4o-mini/chat/completions?api-version=2024-09-01-preview";
+        const endpoint = model === "o1-mini" ? "https://answerai-bilal.openai.azure.com/openai/deployments/o1-mini/chat/completions?api-version=2024-09-01-preview" : "https://answerai-bilal.openai.azure.com/openai/deployments/gpt-4o-mini/chat/completions?api-version=2024-09-01-preview";
 
         // Craft a specific prompt for modifying HTML
         const prompt = `As a web developer, modify the following HTML code section based on this request: "${userRequest}"
 
 Current HTML section:
 ${elementCode}
+
+Full Page code: ONLY FOR REFERENCE:
+${fullPageCode}
 
 Requirements:
 1. Provide ONLY the modified HTML code - no explanations
@@ -32,13 +35,19 @@ Remember: Your response should be just the HTML code that will replace the curre
             },
             body: JSON.stringify({
                 messages: [{ role: 'user', content: prompt }],
-                temperature: creativity,
-                max_tokens: 2000,
+                // temperature: creativity,
+                // max_tokens: 2000,
             }),
         });
 
         if (!response.ok) {
-            throw new Error(`Azure API request failed: ${response.statusText}`);
+            const errorText = await response.text();
+            console.error('Azure API Error Details:', {
+                status: response.status,
+                statusText: response.statusText,
+                body: errorText
+            });
+            throw new Error(`Azure API request failed: ${response.status} ${response.statusText} - ${errorText}`);
         }
 
         const data = await response.json();
