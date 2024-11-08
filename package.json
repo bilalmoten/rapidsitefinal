@@ -3,7 +3,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "postbuild": "next-sitemap"
   },
   "dependencies": {
     "@ai-sdk/azure": "^0.0.48",
@@ -48,6 +49,7 @@
     "jsdom": "^25.0.1",
     "lucide-react": "^0.399.0",
     "next": "latest",
+    "next-sitemap": "^4.2.3",
     "next-themes": "^0.3.0",
     "postcss": "8.4.33",
     "prismjs": "^1.29.0",
