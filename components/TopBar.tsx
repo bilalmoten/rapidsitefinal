@@ -131,7 +131,7 @@ const TopBar: React.FC<TopBarProps> = ({
         >
           {pages.map((page) => (
             <option key={page} value={page}>
-              {page}.html
+              {page}
             </option>
           ))}
         </select>
