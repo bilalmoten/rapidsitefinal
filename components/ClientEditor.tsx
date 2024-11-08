@@ -13,6 +13,17 @@ import AddressBar from "./AddressBar";
 import { createClient } from "@/utils/supabase/client";
 import CodeView from "./CodeView";
 // import HoverPill from "./HoverPill";
+import ImageEditPill from "./ImageEditPill";
+import TextFormatBar from "./TextFormatBar";
+import {
+  applyFormatting,
+  getElementFormatting,
+  getFormatBarPosition,
+  highlightElement,
+  setActiveHighlight,
+  applyFormattingToSelection,
+} from "@/lib/editor/textFormatting";
+import { TextFormatAction, TextFormats } from "@/types/editor";
 
 interface ClientEditorProps {
   initialContent: string;
@@ -55,6 +66,27 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
     x: number;
     y: number;
   } | null>(null);
+  const [showImagePill, setShowImagePill] = useState(false);
+  const [imagePillPosition, setImagePillPosition] = useState({ x: 0, y: 0 });
+  const [selectedImage, setSelectedImage] = useState<Element | null>(null);
+  const [showFormatBar, setShowFormatBar] = useState(false);
+  const [formatBarState, setFormatBarState] = useState<{
+    isActive: boolean;
+    position: { x: number; y: number };
+    currentFormats: TextFormats;
+  }>({
+    isActive: false,
+    position: { x: 0, y: 0 },
+    currentFormats: {
+      bold: false,
+      italic: false,
+      underline: false,
+      alignment: "left",
+      fontSize: "base",
+    },
+  });
+  const [formatBarAction, setFormatBarAction] =
+    useState<TextFormatAction | null>(null);
 
   const handlePageChange = async (newPage: string) => {
     // Save current page before switching
@@ -87,13 +119,11 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
     iframeDoc.body.removeEventListener("mouseout", handleMouseOut);
     iframeDoc.body.removeEventListener("click", handleClick);
 
-    // Only add hover effects for pick mode
     if (isPickMode) {
       iframeDoc.body.addEventListener("mouseover", handleMouseOver);
       iframeDoc.body.addEventListener("mouseout", handleMouseOut);
     }
 
-    // Add click listener for both modes
     if (isPickMode || isEditMode) {
       iframeDoc.body.addEventListener("click", handleClick);
     }
@@ -128,13 +158,69 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
       iframeDoc.write(siteContent);
       iframeDoc.close();
 
+      // Add Tailwind CSS
       const tailwindLink = iframeDoc.createElement("link");
       tailwindLink.rel = "stylesheet";
       tailwindLink.href =
         "https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css";
       iframeDoc.head.appendChild(tailwindLink);
 
-      // Only update event listeners when modes change
+      // Add your global styles with more specific selectors
+      const globalStyles = iframeDoc.createElement("style");
+      globalStyles.textContent = `
+          /* Selection styles */
+          *[contenteditable="true"] {
+              position: relative;
+              outline: none !important;
+              z-index: 1;
+          }
+
+          *[contenteditable="true"]::selection {
+              background: rgba(59, 130, 246, 0.3) !important;
+              color: inherit;
+          }
+
+          *[contenteditable="true"]::-moz-selection {
+              background: rgba(59, 130, 246, 0.3) !important;
+              color: inherit;
+          }
+
+          /* Active element styles */
+          .text-highlight-active {
+              position: relative;
+              background-color: rgba(59, 130, 246, 0.1) !important;
+              border-radius: 4px;
+          }
+
+          .text-highlight-active::after {
+              content: "";
+              position: absolute;
+              inset: -2px;
+              border: 2px solid rgba(59, 130, 246, 0.5);
+              box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+              border-radius: 4px;
+              pointer-events: none;
+              z-index: -1;
+          }
+
+          /* Hover highlight styles */
+          .text-highlight {
+              position: relative;
+          }
+
+          .text-highlight::after {
+              content: "";
+              position: absolute;
+              inset: -2px;
+              background-color: rgba(59, 130, 246, 0.15);
+              border: 2px dashed rgba(59, 130, 246, 0.4);
+              border-radius: 4px;
+              pointer-events: none;
+              z-index: -1;
+          }
+      `;
+      iframeDoc.head.appendChild(globalStyles);
+
       updateEventListeners(iframeDoc);
     };
 
@@ -147,7 +233,7 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
       iframe.onload = null;
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [siteContent, isPickMode, isEditMode]); // Add isEditMode to dependencies
+  }, [siteContent, isPickMode, isEditMode]);
 
   const handleMouseOver = (e: MouseEvent) => {
     if (!isPickMode || isAnyElementSelected || isTextPopupOpen) return;
@@ -207,20 +293,89 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
   };
 
   const handleTextEdit = (target: Element) => {
-    if (!isEditMode) return; // Add this check
+    if (!isEditMode) return;
 
+    // Remove any existing contenteditable attributes
+    const editableElements =
+      iframeRef.current?.contentDocument?.querySelectorAll(
+        '[contenteditable="true"]'
+      );
+    editableElements?.forEach((el) => {
+      el.removeAttribute("contenteditable");
+      el.classList.remove("text-highlight-active");
+    });
+
+    setSelectedElement(target);
+    setShowFormatBar(true);
+
+    // Get position considering iframe offset
+    const position = getFormatBarPosition(target);
+
+    setFormatBarState({
+      isActive: true,
+      position: position,
+      currentFormats: getElementFormatting(target),
+    });
+
+    setActiveHighlight(target);
     target.setAttribute("contenteditable", "true");
     (target as HTMLElement).focus();
 
-    const handleBlur = () => {
-      if (target.getAttribute("contenteditable") === "true") {
-        target.removeAttribute("contenteditable");
-        updateElementContent(target);
-        target.removeEventListener("blur", handleBlur);
+    // Add selection change handler
+    const handleSelectionChange = () => {
+      const selection = target.ownerDocument?.getSelection();
+      if (selection && !selection.isCollapsed) {
+        // Update format bar position based on selection
+        const range = selection.getRangeAt(0);
+        const rect = range.getBoundingClientRect();
+        const iframeRect = (
+          target.ownerDocument as any
+        ).defaultView.frameElement.getBoundingClientRect();
+
+        setFormatBarState((prev) => ({
+          ...prev,
+          position: {
+            x: rect.left + iframeRect.left + rect.width / 2,
+            y: Math.max(rect.top + iframeRect.top - 45, 10),
+          },
+        }));
+
+        // If there's a pending format action, apply it to the selection
+        if (formatBarAction) {
+          applyFormattingToSelection(target, formatBarAction);
+          setFormatBarAction(null);
+        }
       }
     };
 
-    target.addEventListener("blur", handleBlur);
+    target.ownerDocument?.addEventListener(
+      "selectionchange",
+      handleSelectionChange
+    );
+
+    const handleBlur = (ev: FocusEvent) => {
+      const formatBar = document.querySelector(".format-bar");
+      const relatedTarget = ev.relatedTarget as Node | null;
+
+      if (formatBar?.contains(relatedTarget)) {
+        setTimeout(() => (target as HTMLElement).focus(), 0);
+        return;
+      }
+
+      target.removeAttribute("contenteditable");
+      updateElementContent(target);
+      setFormatBarState((prev) => ({ ...prev, isActive: false }));
+      setShowFormatBar(false);
+      setSelectedElement(null);
+      target.classList.remove("text-highlight-active");
+      target.ownerDocument?.removeEventListener(
+        "selectionchange",
+        handleSelectionChange
+      );
+      target.removeEventListener("blur", handleBlur as EventListener);
+    };
+
+    target.addEventListener("blur", handleBlur as EventListener);
   };
 
   const updateElementAttribute = (
@@ -237,9 +392,14 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
 
   const updateElementContent = (element: Element) => {
     const updatedContent = updateElementInHTML(element, (el) => {
-      el.textContent = element.textContent;
+      el.innerHTML = element.innerHTML;
+      // Copy over all classes
+      el.className = element.className;
       return el.outerHTML;
     });
+
+    // Push to undo stack
+    pushNewState(updatedContent);
     setSiteContent(updatedContent);
   };
 
@@ -524,8 +684,9 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
 
       // Handle edit mode behavior
       if (target.tagName.toLowerCase() === "img") {
-        // Changed this line
-        handleImageEdit(target);
+        setSelectedImage(target);
+        setImagePillPosition({ x: e.clientX, y: e.clientY });
+        setShowImagePill(true);
       } else if (
         ["P", "H1", "H2", "H3", "H4", "H5", "H6", "SPAN", "DIV"].includes(
           target.tagName
@@ -600,6 +761,30 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
     setEditMode(mode);
     // Show text popup with the selected mode
     setIsTextPopupOpen(true);
+  };
+
+  const handleImageUpload = () => {
+    if (selectedImage) {
+      handleImageEdit(selectedImage);
+    }
+    setShowImagePill(false);
+  };
+
+  const handleAddImageLink = () => {
+    if (selectedImage) {
+      const link = prompt("Enter image URL:");
+      if (link) {
+        (selectedImage as HTMLImageElement).src = link;
+        updateElementAttribute(selectedImage, "src", link);
+      }
+    }
+    setShowImagePill(false);
+  };
+
+  const handleAIGenerate = () => {
+    // To be implemented later
+    toast.info("AI Image Generation coming soon!");
+    setShowImagePill(false);
   };
 
   return (
@@ -685,6 +870,34 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
           canUndo={currentStateIndex > 0}
           canRedo={currentStateIndex < undoStack.length - 1}
         />
+        {showImagePill && (
+          <ImageEditPill
+            position={imagePillPosition}
+            onUpload={handleImageUpload}
+            onAddLink={handleAddImageLink}
+            onAIGenerate={handleAIGenerate}
+            onClose={() => setShowImagePill(false)}
+          />
+        )}
+        {showFormatBar && (
+          <TextFormatBar
+            position={formatBarState.position}
+            isActive={formatBarState.isActive}
+            currentFormats={formatBarState.currentFormats}
+            onFormat={(action) => {
+              if (selectedElement) {
+                applyFormatting(selectedElement, action);
+                // Update the format bar state to reflect changes
+                setFormatBarState((prev) => ({
+                  ...prev,
+                  currentFormats: getElementFormatting(selectedElement),
+                }));
+                // Update the content in the main document
+                updateElementContent(selectedElement);
+              }
+            }}
+          />
+        )}
       </div>
       <ChatWindow />
       {isCodeViewActive && (

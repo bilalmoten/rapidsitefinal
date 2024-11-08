@@ -744,3 +744,56 @@ svg {
   padding: 20px;
   box-sizing: border-box;
 }
+
+/* Update the text highlight styles */
+.text-highlight::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background-color: rgba(59, 130, 246, 0.15);
+  border: 2px dashed rgba(59, 130, 246, 0.4);
+  border-radius: 4px;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.text-highlight-active {
+  position: relative;
+  background-color: rgba(59, 130, 246, 0.1) !important;
+  border-radius: 4px;
+}
+
+.text-highlight-active::after {
+  content: "";
+  position: absolute;
+  left: -2px;
+  right: -2px;
+  top: -2px;
+  bottom: -2px;
+  border: 2px solid rgba(59, 130, 246, 0.5);
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+  border-radius: 4px;
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* Add this to ensure proper positioning */
+[contenteditable="true"] {
+  position: relative;
+  outline: none;
+  z-index: 1;
+}
+
+/* Add these styles for text selection */
+[contenteditable="true"]::selection {
+  background: rgba(59, 130, 246, 0.3) !important;
+  color: inherit;
+}
+
+[contenteditable="true"]::-moz-selection {
+  background: rgba(59, 130, 246, 0.3) !important;
+  color: inherit;
+}
