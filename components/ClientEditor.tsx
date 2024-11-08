@@ -464,8 +464,6 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
 
             // Re-enable hover effects
             updateEventListeners(iframeDoc);
-
-            toast.success("Element updated successfully");
           } else {
             toast.error("Failed to access iframe document");
           }
@@ -475,9 +473,12 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
       } else {
         toast.error("No updated code received");
       }
+
+      return response; // Return the response instead of result
     } catch (error) {
       console.error("Error processing request:", error);
       toast.error("Failed to process request");
+      throw error; // Re-throw the error to be caught by the TextPopup
     }
   };
 
