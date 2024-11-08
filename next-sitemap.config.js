@@ -10,9 +10,12 @@ module.exports = {
         '/protected/*',
         '/login/*',
         '/signup/*',
+        '/opengraph-image.png',
+        '/twitter-image.png',
+        '*/opengraph-image.png',
+        '*/twitter-image.png',
     ],
     robotsTxtOptions: {
-        additionalSitemaps: [],
         policies: [
             {
                 userAgent: '*',
@@ -29,5 +32,6 @@ module.exports = {
     },
     changefreq: 'daily',
     priority: 0.7,
-    generateIndexSitemap: false, // Since your site is small, we don't need an index
+    generateIndexSitemap: false,
+    sitemapSize: 5000,
 }
