@@ -1,7 +1,5 @@
-import { MetadataRoute } from 'next'
 import { createClient } from "@/utils/supabase/server"
 
-// This will create multiple sitemap files: sitemap-1.xml, sitemap-2.xml, etc.
 export async function GET(
     request: Request,
     { params }: { params: { id: string } }
@@ -19,16 +17,22 @@ export async function GET(
         .eq("isdeleted", false)
         .range(offset, offset + limit - 1)
 
-    const sitemap = websites?.map(site => ({
-        url: `https://${site.subdomain}.aiwebsitebuilder.tech`,
-        lastModified: new Date(site.updated_at),
-        changeFrequency: 'daily' as const,
-        priority: 0.5,
-    })) || []
+    // Generate XML directly
+    const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    ${websites?.map(site => `
+    <url>
+        <loc>https://${site.subdomain}.aiwebsitebuilder.tech</loc>
+        <lastmod>${new Date(site.updated_at).toISOString()}</lastmod>
+        <changefreq>daily</changefreq>
+        <priority>0.5</priority>
+    </url>`).join('') || ''}
+</urlset>`
 
-    return new Response(JSON.stringify(sitemap), {
+    return new Response(xml, {
         headers: {
             'Content-Type': 'application/xml',
+            'Cache-Control': 'public, max-age=3600',
         },
     })
 } 
