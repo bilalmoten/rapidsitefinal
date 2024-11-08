@@ -15,10 +15,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const { data: publicWebsites } = await supabase
         .from("websites")
         .select("subdomain, updated_at")
-        .eq("isdeleted", false)
-    // Optionally keep these filters if you want users to control SEO
-    // .eq("is_public", true)
-    // .eq("seo_indexed", true)
+        .eq("isdeleted", "no")
+        // Optionally keep these filters if you want users to control SEO
+        .eq("is_public", true)
+        .eq("seo_indexed", true)
 
     // Static routes
     const staticRoutes = [
