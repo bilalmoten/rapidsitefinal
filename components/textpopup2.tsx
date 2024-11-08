@@ -30,7 +30,15 @@ const TextPopup: React.FC<TextPopupProps> = ({
       }
     };
 
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        onClose();
+      }
+    };
+
     document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleEscape);
 
     if (inputRef.current) {
       inputRef.current.focus();
@@ -38,6 +46,7 @@ const TextPopup: React.FC<TextPopupProps> = ({
 
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleEscape);
     };
   }, [onClose]);
 
