@@ -29,14 +29,6 @@ export const applyFormatting = (element: Element, action: TextFormatAction): voi
                 element.classList.add(`text-${action.value}`);
             }
             break;
-        case 'size':
-            // Remove existing size classes
-            element.classList.remove('text-sm', 'text-base', 'text-lg');
-            // Add new size
-            if (action.value) {
-                element.classList.add(`text-${action.value}`);
-            }
-            break;
     }
 };
 
@@ -46,7 +38,6 @@ export const getElementFormatting = (element: Element): TextFormats => {
         italic: element.classList.contains('italic'),
         underline: element.classList.contains('underline'),
         alignment: getAlignment(element),
-        fontSize: getFontSize(element)
     };
 };
 
@@ -64,12 +55,6 @@ const getAlignment = (element: Element): 'left' | 'center' | 'right' => {
     if (element.classList.contains('text-center')) return 'center';
     if (element.classList.contains('text-right')) return 'right';
     return 'left';
-};
-
-const getFontSize = (element: Element): string => {
-    if (element.classList.contains('text-sm')) return 'sm';
-    if (element.classList.contains('text-lg')) return 'lg';
-    return 'base';
 };
 
 // Update the highlight functions
@@ -128,11 +113,6 @@ export const applyFormattingToSelection = (element: Element, action: TextFormatA
             break;
         case 'underline':
             span.classList.add('underline');
-            break;
-        case 'size':
-            if (action.value) {
-                span.classList.add(`text-${action.value}`);
-            }
             break;
     }
 

@@ -6,15 +6,8 @@ import {
   AlignLeft,
   AlignCenter,
   AlignRight,
-  Type,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import {
   Tooltip,
   TooltipContent,
@@ -36,7 +29,6 @@ const TextFormatBar: React.FC<TextFormatBarProps> = ({
   onFormat,
   currentFormats,
 }) => {
-  // Prevent clicks from triggering blur
   const handleButtonClick = (e: React.MouseEvent, action: TextFormatAction) => {
     e.preventDefault();
     e.stopPropagation();
@@ -55,7 +47,7 @@ const TextFormatBar: React.FC<TextFormatBarProps> = ({
           transform: `translateY(${isActive ? "0" : "10px"})`,
           border: "1px solid rgba(0,0,0,0.1)",
         }}
-        onMouseDown={(e) => e.preventDefault()} // Prevent blur when clicking the format bar
+        onMouseDown={(e) => e.preventDefault()}
       >
         <Tooltip>
           <TooltipTrigger asChild>
@@ -154,44 +146,6 @@ const TextFormatBar: React.FC<TextFormatBarProps> = ({
             <TooltipContent>Align Right</TooltipContent>
           </Tooltip>
         </div>
-
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              size="sm"
-              onMouseDown={(e) => e.preventDefault()}
-            >
-              <Type className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            <DropdownMenuItem
-              onSelect={(e) => {
-                e.preventDefault();
-                onFormat({ type: "size", value: "sm" });
-              }}
-            >
-              Small
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onSelect={(e) => {
-                e.preventDefault();
-                onFormat({ type: "size", value: "base" });
-              }}
-            >
-              Normal
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onSelect={(e) => {
-                e.preventDefault();
-                onFormat({ type: "size", value: "lg" });
-              }}
-            >
-              Large
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
       </div>
     </TooltipProvider>
   );

@@ -82,7 +82,7 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
       italic: false,
       underline: false,
       alignment: "left",
-      fontSize: "base",
+      // fontSize: "base",
     },
   });
   const [formatBarAction, setFormatBarAction] =
