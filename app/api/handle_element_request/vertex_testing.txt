@@ -1,0 +1,139 @@
+// import { NextResponse } from 'next/server';
+// import { GoogleAuth } from 'google-auth-library';
+
+// export async function POST(request: Request) {
+//     try {
+//         const { elementCode, userRequest, creativity = 0.1 } = await request.json();
+
+//         // Google Cloud configuration
+//         const PROJECT_ID = process.env.GOOGLE_CLOUD_PROJECT_ID;
+//         // const LOCATION = 'us-east5';  // hardcoded for now
+//         // const MODEL = 'claude-3-5-sonnet-v2@20241022';  // updated model name
+
+//         // Get credentials from environment variable
+//         const credentialsJson = process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON;
+//         if (!credentialsJson) {
+//             throw new Error('GOOGLE_APPLICATION_CREDENTIALS_JSON is not set');
+//         }
+
+//         // Decode and parse credentials
+//         const credentials = JSON.parse(Buffer.from(credentialsJson, 'base64').toString());
+
+//         // Create auth client with explicit credentials
+//         const auth = new GoogleAuth({
+//             credentials,
+//             scopes: ['https://www.googleapis.com/auth/cloud-platform']
+//         });
+
+//         // Get client and token
+//         const client = await auth.getClient();
+//         const accessToken = await client.getAccessToken();
+
+//         if (!accessToken.token) {
+//             throw new Error('Failed to get access token');
+//         }
+
+//         const endpoint = `https://europe-west1-aiplatform.googleapis.com/v1/projects/${PROJECT_ID}/locations/europe-west1/publishers/anthropic/models/claude-3-5-sonnet-v2:streamRawPredict`;
+
+//         // const endpoint = `https://us-east5-aiplatform.googleapis.com/v1beta1/projects/${PROJECT_ID}/locations/us-east5/endpoints/openapi/chat/completions`;
+
+
+//         console.log('Making request to:', endpoint);
+//         console.log('With token:', accessToken.token.substring(0, 10) + '...');
+
+//         const response = await fetch(endpoint, {
+//             method: 'POST',
+//             headers: {
+//                 'Authorization': `Bearer ${accessToken.token}`,
+//                 'Content-Type': 'application/json',
+//             },
+//             body: JSON.stringify({
+
+//                 "anthropic_version": "vertex-2023-10-16",
+//                 "messages": [{
+//                     "role": "user",
+//                     "content": `As a web developer, modify the following HTML code section based on this request: "${userRequest}"
+
+//                     Current HTML section:
+//                     ${elementCode}
+
+//                     Requirements:
+//                     1. Provide ONLY the modified HTML code - no explanations
+//                     2. The new code must be a direct replacement for the current code, whether its a full page, a section, or a single element
+//                     3. You can modify anything including HTML structure, Tailwind classes, content, and styling, as per the users request.
+//                     4. The code should be complete and valid HTML
+//                     5. Feel free to add new elements, change layouts, modify colors, or restructure as requested
+//                     6. Use Tailwind CSS for styling
+//                     7. Remember this is part of a larger page, so consider the context of the page when making changes, and do not change things that arent requested and keep the original structure as much as possible, unless user aks otherwise.
+
+//                     Remember: Your response should be just the HTML code that will replace the current section.`
+//                 }]
+
+//             }),
+
+//             // body: JSON.stringify({
+
+//             //     "model": "google/claude-3-5-sonnet-20240620",
+//             //     "messages": [{
+//             //         "role": "user",
+//             //         "content": `As a web developer, modify the following HTML code section based on this request: "${userRequest}"
+
+//             //         Current HTML section:
+//             //         ${elementCode}`
+//             //     }]
+
+//             // }),
+//             // body: JSON.stringify({
+//             //     instances: [{
+//             //         content: `As a web developer, modify the following HTML code section based on this request: "${userRequest}"
+
+//             //         Current HTML section:
+//             //         ${elementCode}
+
+//             //         Requirements:
+//             //         1. Provide ONLY the modified HTML code - no explanations
+//             //         2. The new code must be a direct replacement for the current code, whether its a full page, a section, or a single element
+//             //         3. You can modify anything including HTML structure, Tailwind classes, content, and styling, as per the users request.
+//             //         4. The code should be complete and valid HTML
+//             //         5. Feel free to add new elements, change layouts, modify colors, or restructure as requested
+//             //         6. Use Tailwind CSS for styling
+//             //         7. Remember this is part of a larger page, so consider the context of the page when making changes, and do not change things that arent requested and keep the original structure as much as possible, unless user aks otherwise.
+
+//             //         Remember: Your response should be just the HTML code that will replace the current section.`
+//             //     }],
+//             //     parameters: {
+//             //         temperature: creativity,
+//             //         maxOutputTokens: 2000,
+//             //     }
+//             // }),
+//         });
+
+//         if (!response.ok) {
+//             const errorText = await response.text();
+//             console.error('API Error:', errorText);
+//             throw new Error(`Vertex API request failed: ${response.statusText} - ${errorText}`);
+//         }
+
+//         const data = await response.json();
+//         const updatedCode = data.predictions[0].content;
+//         // const updatedCode = data.choices[0].message.content.trim();
+//         // Basic validation
+//         if (!updatedCode.includes('<') || !updatedCode.includes('>')) {
+//             throw new Error('Invalid HTML received from AI');
+//         }
+
+//         return NextResponse.json({
+//             message: "Request processed",
+//             code: elementCode,
+//             updatedCode
+//         });
+
+//     } catch (error: unknown) {
+//         console.error('Error processing request:', error);
+//         const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+//         return NextResponse.json(
+//             { error: 'Failed to process request', details: errorMessage },
+//             { status: 500 }
+//         );
+//     }
+// }
