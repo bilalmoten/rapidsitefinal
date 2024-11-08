@@ -21,7 +21,16 @@ export async function POST(request: Request) {
 
     const { data, error } = await supabase
         .from("websites")
-        .insert({ user_id: userId, website_name: title, website_description: description, subdomain, thumbnail_url: "https://example.com/placeholder.jpg", pages: [] })
+        .insert({
+            user_id: userId,
+            website_name: title,
+            website_description: description,
+            subdomain,
+            thumbnail_url: "https://example.com/placeholder.jpg",
+            pages: [],
+            is_public: true,
+            seo_indexed: requestBody.seoIndexed || false,
+        })
         .select("id");
 
     if (error) {
