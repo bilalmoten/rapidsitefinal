@@ -14,8 +14,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // Get all public websites
     const { data: publicWebsites } = await supabase
         .from("websites")
-        .select("subdomain, updated_at")
-        .eq("isdeleted", "no")
+        .select("subdomain")
+        .neq("isdeleted", "yes")
         // Optionally keep these filters if you want users to control SEO
         .eq("is_public", true)
         .eq("seo_indexed", true)
@@ -65,7 +65,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // User website routes
     const websiteRoutes = (publicWebsites || []).map((site) => ({
         url: `https://${site.subdomain}.aiwebsitebuilder.tech`,
-        lastModified: new Date(site.updated_at),
+        // lastModified: new Date(site.updated_at),
         changeFrequency: 'daily' as const,
         priority: 0.5,
     }))
