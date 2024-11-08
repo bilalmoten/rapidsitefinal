@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import AddressBar from "./AddressBar";
 import { createClient } from "@/utils/supabase/client";
 import CodeView from "./CodeView";
+// import HoverPill from "./HoverPill";
 
 interface ClientEditorProps {
   initialContent: string;
@@ -49,6 +50,11 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
   const [isTextPopupOpen, setIsTextPopupOpen] = useState(false);
   const [undoStack, setUndoStack] = useState<string[]>([initialContent]); // Store HTML states
   const [currentStateIndex, setCurrentStateIndex] = useState(0);
+  const [editMode, setEditMode] = useState<"quick" | "quality" | null>(null);
+  const [pillPosition, setPillPosition] = useState<{
+    x: number;
+    y: number;
+  } | null>(null);
 
   const handlePageChange = async (newPage: string) => {
     setPageTitle(newPage);
@@ -143,6 +149,12 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
     const target = e.target as Element;
     setHoveredElement(target);
     target.classList.add("hovered-element");
+
+    // Set pill position
+    setPillPosition({
+      x: e.clientX,
+      y: e.clientY,
+    });
   };
 
   const handleMouseOut = (e: MouseEvent) => {
@@ -150,6 +162,7 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
     const target = e.target as Element;
     target.classList.remove("hovered-element");
     setHoveredElement(null);
+    setPillPosition(null);
   };
 
   const handleImageEdit = (target: Element) => {
@@ -376,7 +389,10 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
     setIsCodeViewActive(!isCodeViewActive);
   };
 
-  const handleUserRequest = async (request: string) => {
+  const handleUserRequest = async (
+    request: string,
+    mode: "quick" | "quality"
+  ) => {
     if (!selectedElement || !iframeRef.current?.contentDocument) return;
 
     const elementCode = selectedElement.outerHTML;
@@ -390,7 +406,7 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
         },
         body: JSON.stringify({
           fullPageCode: fullPageCode,
-          model: "o1-mini",
+          model: mode === "quick" ? "o1-mini" : "gpt-4o-mini",
           elementCode,
           userRequest: request,
         }),
@@ -572,6 +588,13 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
     };
   }, [currentStateIndex, undoStack]); // Dependencies ensure we have latest state
 
+  // Add handler for mode selection
+  const handleModeSelect = (mode: "quick" | "quality") => {
+    setEditMode(mode);
+    // Show text popup with the selected mode
+    setIsTextPopupOpen(true);
+  };
+
   return (
     <div className="flex h-[calc(100vh-110px)] bg-gray-100">
       <div className="flex-1 flex flex-col relative">
@@ -619,6 +642,13 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
             />
           </div>
         </div>
+        {/* {isPickMode && pillPosition && !isAnyElementSelected && (
+          <HoverPill
+            position={pillPosition}
+            onSelectMode={handleModeSelect}
+            hoveredElement={hoveredElement}
+          />
+        )} */}
         {isPickMode && selectedElement && clickPosition && isTextPopupOpen && (
           <TextPopup
             selectedElement={selectedElement}
@@ -635,7 +665,7 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
             }}
             screenHeight={window.innerHeight}
             screenWidth={window.innerWidth}
-            onSubmitRequest={handleUserRequest}
+            onSubmitRequest={(request) => handleUserRequest(request, "quick")}
           />
         )}
         <FloatingControls
