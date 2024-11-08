@@ -57,6 +57,9 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
   } | null>(null);
 
   const handlePageChange = async (newPage: string) => {
+    // Save current page before switching
+    await handleSave();
+
     setPageTitle(newPage);
     const supabase = await createClient();
     const { data: page, error } = await supabase
@@ -73,6 +76,9 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
       return;
     }
 
+    // Reset undo/redo stack when changing pages
+    setUndoStack([page?.content || ""]);
+    setCurrentStateIndex(0);
     setSiteContent(page?.content || "");
   };
 
