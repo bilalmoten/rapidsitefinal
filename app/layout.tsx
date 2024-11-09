@@ -1,12 +1,9 @@
 import { GeistSans } from "geist/font/sans";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
-import Navbar from "@/components/Navbar";
-import Navbar_new from "@/components/navbar-new";
 import { ThemeProvider } from "@/components/theme-provider";
 import "prismjs/themes/prism-tomorrow.css";
 import { Analytics } from "@vercel/analytics/react";
-
 import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const defaultUrl = process.env.VERCEL_URL
@@ -26,14 +23,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={GeistSans.className}>
+    <html lang="en" className={GeistSans.className} suppressHydrationWarning>
       <body>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="light"
-          enableSystem
-          disableTransitionOnChange
-        >
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
           <main className="min-h-screen">{children}</main>
           <Toaster richColors />
         </ThemeProvider>
