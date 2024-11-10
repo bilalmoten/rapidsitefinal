@@ -6,10 +6,10 @@ import MotionWrapper from "@/components/MotionWrapper";
 import AnimatedLoginContent from "@/components/AnimatedLoginContent";
 
 interface LoginPageProps {
-  searchParams: { message: string };
+  searchParams: { message?: string };
 }
 
-export default function Login({ searchParams }: LoginPageProps) {
+export default async function Login({ searchParams }: LoginPageProps) {
   const signIn = async (formData: FormData) => {
     "use server";
 
