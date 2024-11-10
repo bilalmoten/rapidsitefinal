@@ -6,10 +6,12 @@ import MotionWrapper from "@/components/MotionWrapper";
 import AnimatedLoginContent from "@/components/AnimatedLoginContent";
 
 interface LoginPageProps {
-  searchParams: { message?: string };
+  searchParams: Promise<{ message?: string }>;
 }
 
 export default async function Login({ searchParams }: LoginPageProps) {
+  const params = await searchParams;
+
   const signIn = async (formData: FormData) => {
     "use server";
 
@@ -32,7 +34,7 @@ export default async function Login({ searchParams }: LoginPageProps) {
   return (
     <MotionWrapper className="flex h-screen">
       <div className="w-2/5 bg-gradient-to-br from-indigo-500 to-purple-600 text-white flex flex-col justify-center items-center p-12 relative overflow-hidden">
-        <AnimatedLoginContent searchParams={searchParams} />
+        <AnimatedLoginContent searchParams={params} />
         <div className="absolute bottom-0 left-0 right-0">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320">
             <path
