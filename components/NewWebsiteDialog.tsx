@@ -153,7 +153,7 @@ export default function NewWebsiteDialog({
       }}
     >
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      {/* <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Create New Website</DialogTitle>
         </DialogHeader>
@@ -253,6 +253,124 @@ export default function NewWebsiteDialog({
             {isLoading ? "Creating..." : "Create Website"}
           </Button>
         </div>
+      </DialogContent> */}
+
+      <DialogContent className="sm:max-w-[600px] p-6">
+        <DialogHeader>
+          <DialogTitle className="text-2xl font-bold">
+            Create New Website
+          </DialogTitle>
+          <p className="text-muted-foreground mt-2">
+            Fill in the details below to create your new website. All fields are
+            required.
+          </p>
+        </DialogHeader>
+
+        <div className="space-y-6 py-6">
+          {/* Website Title */}
+          <div className="space-y-2">
+            <Label htmlFor="title" className="text-base font-semibold">
+              Website Title
+            </Label>
+            <Input
+              id="title"
+              value={websiteTitle}
+              onChange={(e) => setWebsiteTitle(e.target.value)}
+              className={`${errors.title ? "border-red-500" : ""}`}
+              placeholder="My Awesome Website"
+            />
+            {errors.title && (
+              <p className="text-sm text-red-500">{errors.title}</p>
+            )}
+          </div>
+
+          {/* Subdomain */}
+          <div className="space-y-2">
+            <Label htmlFor="subdomain" className="text-base font-semibold">
+              Subdomain
+            </Label>
+            <div className="space-y-2">
+              <div className="flex">
+                <span className="bg-muted px-4 py-2 border border-r-0 rounded-l-md text-muted-foreground flex items-center">
+                  https://
+                </span>
+                <Input
+                  id="subdomain"
+                  value={subdomain}
+                  onChange={(e) =>
+                    setSubdomain(sanitizeSubdomain(e.target.value))
+                  }
+                  className={`rounded-none ${
+                    errors.subdomain ? "border-red-500" : ""
+                  }`}
+                  placeholder="my-site"
+                />
+                <span className="bg-muted px-4 py-2 border border-l-0 rounded-r-md text-muted-foreground flex items-center">
+                  .aiwebsitebuilder.tech
+                </span>
+              </div>
+              {subdomain && (
+                <div className="flex items-center gap-2 text-sm">
+                  {(() => {
+                    const status = getSubdomainStatus(subdomain);
+                    const StatusIcon = status.icon;
+                    return (
+                      <>
+                        <StatusIcon
+                          className={`h-4 w-4 ${
+                            status.status === "success"
+                              ? "text-green-500"
+                              : status.status === "error"
+                              ? "text-red-500"
+                              : "text-gray-500"
+                          }`}
+                        />
+                        <span
+                          className={`${
+                            status.status === "success"
+                              ? "text-green-500"
+                              : status.status === "error"
+                              ? "text-red-500"
+                              : "text-gray-500"
+                          }`}
+                        >
+                          {status.message}
+                        </span>
+                      </>
+                    );
+                  })()}
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Description */}
+          <div className="space-y-2">
+            <Label htmlFor="description" className="text-base font-semibold">
+              Description
+            </Label>
+            <textarea
+              id="description"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              className={`w-full min-h-[100px] p-3 rounded-md border ${
+                errors.description ? "border-red-500" : "border-input"
+              } bg-background`}
+              placeholder="A brief description of your website"
+            />
+            {errors.description && (
+              <p className="text-sm text-red-500">{errors.description}</p>
+            )}
+          </div>
+        </div>
+
+        <Button
+          onClick={handleCreate}
+          disabled={isLoading}
+          className="w-full bg-black text-white hover:bg-gray-800"
+        >
+          {isLoading ? "Creating..." : "Create Website"}
+        </Button>
       </DialogContent>
     </Dialog>
   );
