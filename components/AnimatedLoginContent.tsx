@@ -6,9 +6,8 @@ interface AnimatedLoginContentProps {
   message?: string;
 }
 
-export default function AnimatedLoginContent({
-  message,
-}: AnimatedLoginContentProps) {
+export default function AnimatedLoginContent({}: // message,
+AnimatedLoginContentProps) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -18,9 +17,9 @@ export default function AnimatedLoginContent({
     >
       <h1 className="text-4xl font-bold">Welcome Back!</h1>
       <p className="text-xl">Sign in to continue your journey</p>
-      {message && (
+      {/* {message && (
         <p className="text-yellow-200 bg-red-500/20 p-2 rounded">{message}</p>
-      )}
+      )} */}
     </motion.div>
   );
 }

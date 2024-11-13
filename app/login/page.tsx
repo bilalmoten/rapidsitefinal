@@ -5,13 +5,15 @@ import { SubmitButton } from "./submit-button";
 import MotionWrapper from "@/components/MotionWrapper";
 import AnimatedLoginContent from "@/components/AnimatedLoginContent";
 
-interface LoginPageProps {
+// interface LoginPageProps {
+//   searchParams: { message?: string };
+// }
+
+export default async function Login({
+  searchParams,
+}: {
   searchParams: { message?: string };
-}
-
-export default function Login({ searchParams }: LoginPageProps) {
-  const message = searchParams.message;
-
+}) {
   const signIn = async (formData: FormData) => {
     "use server";
 
@@ -25,7 +27,7 @@ export default function Login({ searchParams }: LoginPageProps) {
     });
 
     if (error) {
-      return redirect("/login?message=Could not authenticate user");
+      return redirect("/login?message=Could not authenticate user ");
     }
 
     return redirect("/dashboard");
@@ -34,7 +36,7 @@ export default function Login({ searchParams }: LoginPageProps) {
   return (
     <MotionWrapper className="flex h-screen">
       <div className="w-2/5 bg-gradient-to-br from-indigo-500 to-purple-600 text-white flex flex-col justify-center items-center p-12 relative overflow-hidden">
-        <AnimatedLoginContent message={message} />
+        <AnimatedLoginContent />
         <div className="absolute bottom-0 left-0 right-0">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320">
             <path
