@@ -4,16 +4,12 @@ import { redirect } from "next/navigation";
 import { SubmitButton } from "./submit-button";
 import MotionWrapper from "@/components/MotionWrapper";
 import AnimatedLoginContent from "@/components/AnimatedLoginContent";
+import { FormMessage, Message } from "@/components/form-message";
 
-// interface LoginPageProps {
-//   searchParams: { message?: string };
-// }
+// export default async function Login(props: {searchParams: Promise<{ message?: string }>;}) {
+export default async function Login(props: { searchParams: Promise<Message> }) {
+  const searchParams = await props.searchParams;
 
-export default async function Login({
-  searchParams,
-}: {
-  searchParams: { message?: string };
-}) {
   const signIn = async (formData: FormData) => {
     "use server";
 
