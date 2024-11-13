@@ -115,6 +115,7 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
   };
 
   const updateEventListeners = (iframeDoc: Document) => {
+    if (!iframeDoc?.body) return; // Add this line
     iframeDoc.body.removeEventListener("mouseover", handleMouseOver);
     iframeDoc.body.removeEventListener("mouseout", handleMouseOut);
     iframeDoc.body.removeEventListener("click", handleClick);
@@ -150,82 +151,39 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
     const iframe = iframeRef.current;
     if (!iframe) return;
 
+    // Only set content if siteContent changes
+    if (!iframe.srcdoc) {
+      const completeContent = `
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+            <style>
+              /* Your custom styles here */
+              *[contenteditable="true"] { /* ... */ }
+              /* ... rest of your styles ... */
+            </style>
+          </head>
+          <body>
+            ${siteContent}
+          </body>
+        </html>
+      `;
+      iframe.srcdoc = completeContent;
+    }
+
     const handleLoad = () => {
       const iframeDoc = iframe.contentDocument;
       if (!iframeDoc) return;
-
-      iframeDoc.open();
-      iframeDoc.write(siteContent);
-      iframeDoc.close();
-
-      // Add Tailwind CSS
-      const tailwindLink = iframeDoc.createElement("link");
-      tailwindLink.rel = "stylesheet";
-      tailwindLink.href =
-        "https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css";
-      iframeDoc.head.appendChild(tailwindLink);
-
-      // Add your global styles with more specific selectors
-      const globalStyles = iframeDoc.createElement("style");
-      globalStyles.textContent = `
-          /* Selection styles */
-          *[contenteditable="true"] {
-              position: relative;
-              outline: none !important;
-              z-index: 1;
-          }
-
-          *[contenteditable="true"]::selection {
-              background: rgba(59, 130, 246, 0.3) !important;
-              color: inherit;
-          }
-
-          *[contenteditable="true"]::-moz-selection {
-              background: rgba(59, 130, 246, 0.3) !important;
-              color: inherit;
-          }
-
-          /* Active element styles */
-          .text-highlight-active {
-              position: relative;
-              background-color: rgba(59, 130, 246, 0.1) !important;
-              border-radius: 4px;
-          }
-
-          .text-highlight-active::after {
-              content: "";
-              position: absolute;
-              inset: -2px;
-              border: 2px solid rgba(59, 130, 246, 0.5);
-              box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
-              border-radius: 4px;
-              pointer-events: none;
-              z-index: -1;
-          }
-
-          /* Hover highlight styles */
-          .text-highlight {
-              position: relative;
-          }
-
-          .text-highlight::after {
-              content: "";
-              position: absolute;
-              inset: -2px;
-              background-color: rgba(59, 130, 246, 0.15);
-              border: 2px dashed rgba(59, 130, 246, 0.4);
-              border-radius: 4px;
-              pointer-events: none;
-              z-index: -1;
-          }
-      `;
-      iframeDoc.head.appendChild(globalStyles);
-
       updateEventListeners(iframeDoc);
     };
 
-    iframe.srcdoc = siteContent;
-    iframe.onload = handleLoad;
+    // If iframe is already loaded, just update event listeners
+    if (iframe.contentDocument?.body) {
+      updateEventListeners(iframe.contentDocument);
+    } else {
+      iframe.onload = handleLoad;
+    }
 
     document.addEventListener("keydown", handleKeyDown);
 
