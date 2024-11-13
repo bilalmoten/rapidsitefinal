@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, use } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
 import { User } from "@supabase/supabase-js";
@@ -13,17 +13,13 @@ import Sidebar from "@/components/Sidebar";
 import { useChat, Message } from "ai/react";
 import React from "react";
 
-// Add interface for params
 interface ChatPageProps {
-  params: Promise<{
-    website_id: string;
-  }>;
+  params: Promise<{ website_id: string }>;
 }
 
 export default function ChatPage(props: ChatPageProps) {
-  const params = use(props.params);
-  // Use React.use() to unwrap the params
-  const websiteId = React.use(Promise.resolve(params.website_id));
+  const params = React.use(props.params);
+  const websiteId = params.website_id;
 
   const supabase = createClient();
   const router = useRouter();
@@ -82,27 +78,33 @@ export default function ChatPage(props: ChatPageProps) {
   });
 
   useEffect(() => {
-    (async () => {
+    const checkUser = async () => {
       const {
         data: { user },
       } = await supabase.auth.getUser();
-      setUser(user);
+
       if (!user) {
         router.push("/login");
+      } else {
+        setUser(user);
       }
-    })();
+    };
+
+    checkUser();
   }, [router]);
 
-  useInterval(
-    async () => {
-      if (isGenerating) {
+  useEffect(() => {
+    let intervalId: NodeJS.Timeout;
+
+    if (isGenerating) {
+      intervalId = setInterval(async () => {
         const { data, error } = await supabase
           .from("websites")
           .select("status")
           .eq("id", websiteId)
           .single();
 
-        if (data && data.status === "completed") {
+        if (data?.status === "completed") {
           setIsGenerating(false);
           router.push(`/dashboard/editor/${websiteId}`);
         } else if (
@@ -115,10 +117,15 @@ export default function ChatPage(props: ChatPageProps) {
           );
           router.push("/dashboard");
         }
+      }, 10000);
+    }
+
+    return () => {
+      if (intervalId) {
+        clearInterval(intervalId);
       }
-    },
-    isGenerating ? 10000 : null
-  );
+    };
+  }, [isGenerating, generationStartTime, websiteId, router]);
 
   const [localIsLoading, setLocalIsLoading] = useState(false);
 
@@ -137,40 +144,46 @@ export default function ChatPage(props: ChatPageProps) {
   };
 
   const startWebsiteGeneration = async (newMessages?: Message[]) => {
-    setIsProcessing(true);
-    console.log("the messages are these " + messages);
-    await fetch("/api/save_chat", {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-      },
-      body: JSON.stringify({
-        userId: user?.id,
-        websiteID: websiteId,
-        chat_conversation: newMessages || messages,
-      }),
-    });
-    console.log("chat saved");
-    console.log(
-      `link: https://api2.azurewebsites.net/api/code_website?user_id=${user?.id}&website_id=${websiteId}&model=o1-mini`
-    );
+    try {
+      setIsProcessing(true);
 
-    const response = await fetch(
-      `https://api2.azurewebsites.net/api/code_website?user_id=${user?.id}&website_id=${websiteId}&model=o1-mini`,
-      // `http://localhost:7071/api/code_website?user_id=${user?.id}&website_id=${params.website_id}&model=o1-mini`,
-      {
+      // Save chat
+      const chatResponse = await fetch("/api/save_chat", {
         method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({
+          userId: user?.id,
+          websiteID: websiteId,
+          chat_conversation: newMessages || messages,
+        }),
+      });
+
+      if (!chatResponse.ok) {
+        throw new Error("Failed to save chat");
       }
-    );
 
-    console.log(response);
+      const response = await fetch(
+        // `https://api2.azurewebsites.net/api/code_website?user_id=${user?.id}&website_id=${websiteId}&model=o1-mini`,
+        `http://localhost:7071/api/code_website?user_id=${user?.id}&website_id=${params.website_id}&model=o1-mini`,
+        {
+          method: "POST",
+        }
+      );
 
-    // Check if the response is successful
-    if (response.ok) {
-      // Redirect the user to a new page after the fetch is complete
+      if (!response.ok) {
+        throw new Error("Failed to generate website");
+      }
+
       router.push(`/dashboard/editor/${websiteId}`);
-    } else {
-      console.error("Failed to generate website");
+    } catch (error) {
+      console.error("Error in website generation:", error);
+      setIsProcessing(false);
+      alert(
+        "An error occurred while generating your website. Please try again."
+      );
     }
   };
 
