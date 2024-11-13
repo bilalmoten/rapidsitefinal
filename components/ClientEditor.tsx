@@ -756,7 +756,7 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
   };
 
   return (
-    <div className="flex h-[calc(100vh-110px)] bg-gray-100">
+    <div className="flex h-screen bg-gray-100">
       <div className="flex-1 flex flex-col relative">
         <TopBar
           // zoom={zoom}
@@ -776,7 +776,7 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
           viewport={viewport}
           hasUnsavedChanges={hasUnsavedChanges}
         />
-        <div className="flex-1 flex items-center justify-center overflow-auto bg-gray-200 p-4">
+        <div className="flex-1 flex items-center justify-center bg-gray-200 p-2 m-2 rounded-lg">
           <div
             className={`relative bg-white shadow-lg ${
               viewport !== "desktop" ? "rounded-lg overflow-hidden" : ""
