@@ -1,25 +1,17 @@
-import NavbarNew from "@/components/navbar-new";
-import { createClient } from "@/utils/supabase/server";
-import React from "react";
-// import NavbarNew from './navbar_new';
+import { SidebarProvider } from "@/contexts/SidebarContext";
+import DashboardSidebar from "@/components/DashboardSidebar";
 
-const Layout: React.FC<{ children: React.ReactNode }> = async ({
+export default function DashboardLayout({
   children,
-}) => {
-  // Assuming you have a way to get the user id and email
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  const userId = user?.id;
-  const userEmail = user?.email;
-
+}: {
+  children: React.ReactNode;
+}) {
   return (
-    <div className="w-full h-full">
-      {/* <NavbarNew email={userEmail ?? ""} id={userId ?? ""} /> */}
-      {children}
-    </div>
+    <SidebarProvider>
+      <div className="flex">
+        <DashboardSidebar />
+        <main className="flex-1">{children}</main>
+      </div>
+    </SidebarProvider>
   );
-};
-
-export default Layout;
+}

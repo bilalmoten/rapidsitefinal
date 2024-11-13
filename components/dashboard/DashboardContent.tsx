@@ -1,13 +1,13 @@
 "use client";
 
 import React, { useState } from "react";
-import Sidebar from "./Sidebar";
 import Header from "./Header";
 import WelcomeSection from "./WelcomeSection";
 import QuickActions from "./QuickActions";
 import RecentProjects from "./RecentProjects";
 import Stats from "./Stats";
 import AIAssistantPopup from "./AIAssistantPopup";
+import { useSidebar } from "@/contexts/SidebarContext";
 
 interface DashboardContentProps {
   user: any;
@@ -26,12 +26,8 @@ const DashboardContent: React.FC<DashboardContentProps> = ({
   websites,
   projectCount,
 }) => {
-  const [darkMode, setDarkMode] = useState(false);
+  const { darkMode } = useSidebar();
   const [isAIAssistantOpen, setIsAIAssistantOpen] = useState(false);
-
-  const toggleDarkMode = () => {
-    setDarkMode(!darkMode);
-  };
 
   const toggleAIAssistant = () => {
     setIsAIAssistantOpen(!isAIAssistantOpen);
@@ -43,21 +39,18 @@ const DashboardContent: React.FC<DashboardContentProps> = ({
         darkMode ? "dark bg-gray-900 text-white" : "bg-white text-gray-900"
       }`}
     >
-      <div className="flex h-screen">
-        <Sidebar darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
-        <main className="flex-1 overflow-y-auto">
-          <Header user={user} />
-          <div className="container mx-auto px-4 py-8">
-            <WelcomeSection user={user} />
-            <QuickActions
-              userId={user.id}
-              toggleAIAssistant={toggleAIAssistant}
-            />
-            <RecentProjects websites={websites} />
-            <Stats projectCount={projectCount} />
-          </div>
-        </main>
-      </div>
+      <main className="flex-1 overflow-y-auto">
+        <Header user={user} />
+        <div className="container mx-auto px-4 py-8">
+          <WelcomeSection user={user} />
+          <QuickActions
+            userId={user.id}
+            toggleAIAssistant={toggleAIAssistant}
+          />
+          <RecentProjects websites={websites} />
+          <Stats projectCount={projectCount} />
+        </div>
+      </main>
       <AIAssistantPopup
         isOpen={isAIAssistantOpen}
         onClose={toggleAIAssistant}
