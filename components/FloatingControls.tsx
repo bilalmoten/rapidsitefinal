@@ -1,5 +1,15 @@
+"use client";
+
 import React from "react";
-import { Edit3, Undo, Redo } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+  TooltipProvider,
+} from "@/components/ui/tooltip";
+import { Pencil, Wand2, Undo, Redo } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface FloatingControlsProps {
   isPickMode: boolean;
@@ -23,50 +33,67 @@ const FloatingControls: React.FC<FloatingControlsProps> = ({
   canRedo,
 }) => {
   return (
-    <div className="bg-white p-4 flex justify-between items-center border-b border-gray-300">
-      <div className="flex space-x-2">
-        <button
-          className={`px-4 py-2 rounded flex items-center ${
-            isPickMode ? "bg-blue-500 text-white" : "bg-gray-200"
-          }`}
-          onClick={togglePickMode}
-        >
-          <Edit3 size={20} className="mr-2" />
-          {isPickMode ? "Exit Pick Mode" : "Pick and Edit"}
-        </button>
-        <button
-          className={`px-4 py-2 rounded flex items-center ${
-            isEditMode ? "bg-green-500 text-white" : "bg-gray-200"
-          }`}
+    <div className="mt-4 flex items-center justify-between bg-background p-2 rounded-lg shadow-sm mx-4">
+      <div className="flex items-center space-x-2">
+        <Button
+          variant={isEditMode ? "secondary" : "ghost"}
+          size="sm"
           onClick={toggleEditMode}
+          className="flex items-center gap-2"
         >
-          <Edit3 size={20} className="mr-2" />
-          {isEditMode ? "Exit Edit Mode" : "Edit Mode"}
-        </button>
-        <button
-          className={`px-4 py-2 rounded flex items-center ${
-            !canUndo ? "opacity-50 cursor-not-allowed" : ""
-          }`}
-          onClick={onUndo}
-          disabled={!canUndo}
+          <Pencil className="h-4 w-4" />
+          Manual Edit
+        </Button>
+        <Button
+          variant={isPickMode ? "secondary" : "ghost"}
+          size="sm"
+          onClick={togglePickMode}
+          className="flex items-center gap-2"
         >
-          <Undo size={20} className="mr-2" />
-          Undo
-        </button>
-        <button
-          className={`px-4 py-2 rounded flex items-center ${
-            !canRedo ? "opacity-50 cursor-not-allowed" : ""
-          }`}
-          onClick={onRedo}
-          disabled={!canRedo}
-        >
-          <Redo size={20} className="mr-2" />
-          Redo
-        </button>
+          <Wand2 className="h-4 w-4" />
+          AI Edit
+        </Button>
+
+        <TooltipProvider>
+          <div className="flex items-center space-x-1 ml-2">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className={cn(
+                    "h-8 w-8",
+                    !canUndo && "opacity-50 cursor-not-allowed"
+                  )}
+                  onClick={onUndo}
+                  disabled={!canUndo}
+                >
+                  <Undo className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Undo</TooltipContent>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className={cn(
+                    "h-8 w-8",
+                    !canRedo && "opacity-50 cursor-not-allowed"
+                  )}
+                  onClick={onRedo}
+                  disabled={!canRedo}
+                >
+                  <Redo className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Redo</TooltipContent>
+            </Tooltip>
+          </div>
+        </TooltipProvider>
       </div>
-      <button className="bg-blue-500 text-white px-4 py-2 rounded">
-        Control 2
-      </button>
     </div>
   );
 };
