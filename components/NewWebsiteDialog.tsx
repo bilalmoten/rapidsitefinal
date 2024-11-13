@@ -14,6 +14,17 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useRouter } from "next/navigation";
 
+const sanitizeSubdomain = (value: string) => {
+  // Replace spaces and special characters with hyphens, convert to lowercase
+  return (
+    value
+      .toLowerCase()
+      // .replace(/^-|-$/g, "") // Remove hyphens from start and end
+      .replace(/[^a-z0-9-]/g, "-") // Replace invalid chars with hyphen
+      .replace(/-+/g, "-")
+  ); // Replace multiple hyphens with single hyphen
+};
+
 export default function NewWebsiteDialog({
   children,
   userId,
@@ -81,18 +92,27 @@ export default function NewWebsiteDialog({
               value={websiteTitle}
               onChange={(e) => setWebsiteTitle(e.target.value)}
               className="col-span-3"
+              placeholder="My Awesome Website"
             />
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="subdomain" className="text-right">
               Subdomain
             </Label>
-            <Input
-              id="subdomain"
-              value={subdomain}
-              onChange={(e) => setSubdomain(e.target.value)}
-              className="col-span-3"
-            />
+            <div className="col-span-3 flex items-center">
+              <Input
+                id="subdomain"
+                value={subdomain}
+                onChange={(e) =>
+                  setSubdomain(sanitizeSubdomain(e.target.value))
+                }
+                className="rounded-r-none"
+                placeholder="my-site"
+              />
+              <span className="bg-muted px-3 py-2 border border-l-0 rounded-r-md text-muted-foreground">
+                .aiwebsitebuilder.tech
+              </span>
+            </div>
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="description" className="text-right">
@@ -103,6 +123,7 @@ export default function NewWebsiteDialog({
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               className="col-span-3"
+              placeholder="A brief description of your website"
             />
           </div>
         </div>
