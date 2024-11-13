@@ -87,6 +87,13 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
   });
   const [formatBarAction, setFormatBarAction] =
     useState<TextFormatAction | null>(null);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+
+  useEffect(() => {
+    if (currentStateIndex > 0) {
+      setHasUnsavedChanges(true);
+    }
+  }, [currentStateIndex]);
 
   const handlePageChange = async (newPage: string) => {
     // Save current page before switching
@@ -479,7 +486,10 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
 
       toast.promise(response, {
         loading: "Saving...",
-        success: "Site saved!",
+        success: () => {
+          setHasUnsavedChanges(false);
+          return "Site saved!";
+        },
         error: "Error saving site",
       });
     }
@@ -764,6 +774,7 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
           // onCodeViewToggle={handleCodeViewToggle}
           iframeRef={iframeRef}
           viewport={viewport}
+          hasUnsavedChanges={hasUnsavedChanges}
         />
         <div className="flex-1 flex items-center justify-center overflow-auto bg-gray-200 p-4">
           <div
