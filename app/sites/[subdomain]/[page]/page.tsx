@@ -15,14 +15,14 @@ interface SitePageProps {
 export default async function SitePage(props: SitePageProps) {
   const params = await props.params;
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  // const {
+  //   data: { user },
+  // } = await supabase.auth.getUser();
 
-  if (!user) {
-    console.log("No user found, redirecting to login");
-    return redirect("/login");
-  }
+  // if (!user) {
+  //   console.log("No user found, redirecting to login");
+  //   return redirect("/login");
+  // }
 
   console.log("Fetching website data for subdomain:", params.subdomain);
   const { data: website, error: websiteError } = await supabase
@@ -50,7 +50,7 @@ export default async function SitePage(props: SitePageProps) {
   const { data: page, error: pageError } = await supabase
     .from("pages")
     .select("content")
-    .eq("user_id", user.id)
+    // .eq("user_id", user.id)
     .eq("website_id", website.id)
     .eq("title", `${params.page}.html`)
     .single();
@@ -110,11 +110,9 @@ export default async function SitePage(props: SitePageProps) {
   );
 }
 
-export async function generateMetadata(
-  props: {
-    params: Promise<{ subdomain: string }>;
-  }
-): Promise<Metadata> {
+export async function generateMetadata(props: {
+  params: Promise<{ subdomain: string }>;
+}): Promise<Metadata> {
   const params = await props.params;
   const supabase = await createClient();
   const { data: website } = await supabase
