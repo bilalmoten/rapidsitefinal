@@ -166,8 +166,8 @@ export default function ChatPage(props: ChatPageProps) {
       }
 
       const response = await fetch(
-        // `https://api2.azurewebsites.net/api/code_website?user_id=${user?.id}&website_id=${websiteId}&model=o1-mini`,
-        `http://localhost:7071/api/code_website?user_id=${user?.id}&website_id=${params.website_id}&model=o1-mini`,
+        `https://api2.azurewebsites.net/api/code_website?user_id=${user?.id}&website_id=${websiteId}&model=o1-mini`,
+        // `http://localhost:7071/api/code_website?user_id=${user?.id}&website_id=${params.website_id}&model=o1-mini`,
         {
           method: "POST",
         }
