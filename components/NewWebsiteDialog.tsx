@@ -13,6 +13,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useRouter } from "next/navigation";
+import { createClient } from "@/utils/supabase/server";
+import { CheckCircle2, XCircle, AlertCircle } from "lucide-react";
 
 const sanitizeSubdomain = (value: string) => {
   // Replace spaces and special characters with hyphens, convert to lowercase
@@ -39,6 +41,7 @@ export default function NewWebsiteDialog({
   const [description, setDescription] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [existingSubdomains, setExistingSubdomains] = useState<string[]>([]);
   const [errors, setErrors] = useState({
     title: "",
     subdomain: "",
@@ -46,15 +49,61 @@ export default function NewWebsiteDialog({
   });
   const router = useRouter();
 
+  const loadExistingSubdomains = async () => {
+    const response = await fetch("/api/check-subdomains", {
+      method: "GET",
+    });
+    const data = await response.json();
+    if (data.subdomains) {
+      setExistingSubdomains(data.subdomains);
+    }
+  };
+
+  const getSubdomainStatus = (value: string) => {
+    if (!value)
+      return {
+        message: "Enter a subdomain",
+        status: "neutral",
+        icon: AlertCircle,
+      };
+    if (value.length < 3)
+      return {
+        message: "Too short (min 3 characters)",
+        status: "error",
+        icon: XCircle,
+      };
+    if (existingSubdomains.includes(value))
+      return { message: "Already taken", status: "error", icon: XCircle };
+    return { message: "Available", status: "success", icon: CheckCircle2 };
+  };
+
+  const validateSubdomain = (value: string) => {
+    if (!value) return "Subdomain is required";
+    if (value.length < 3) return "Subdomain must be at least 3 characters";
+    if (existingSubdomains.includes(value))
+      return "This subdomain is already taken";
+    return "";
+  };
+
   const handleCreate = async () => {
     // Reset errors
     setErrors({ title: "", subdomain: "", description: "" });
 
     // Validate fields
     const newErrors = {
-      title: websiteTitle.trim() === "" ? "Title is required" : "",
-      subdomain: subdomain.trim() === "" ? "Subdomain is required" : "",
-      description: description.trim() === "" ? "Description is required" : "",
+      title:
+        websiteTitle.trim() === ""
+          ? "Title is required"
+          : websiteTitle.trim().length <= 3
+          ? "Title must be more than 3 characters"
+          : "",
+      subdomain: validateSubdomain(subdomain),
+      description:
+        description.trim() === ""
+          ? "Description is required"
+          : description.trim().length <= 10
+          ? "Description must be more than 10 characters"
+          : "",
     };
 
     // If any errors exist, set them and return
@@ -94,14 +143,22 @@ export default function NewWebsiteDialog({
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+    <Dialog
+      open={isOpen}
+      onOpenChange={(open) => {
+        setIsOpen(open);
+        if (open) {
+          loadExistingSubdomains();
+        }
+      }}
+    >
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Create New Website</DialogTitle>
         </DialogHeader>
         <div className="grid gap-4 py-4">
-          <div className="grid grid-cols-4 items-center gap-4">
+          <div className="grid grid-rows-2 items-start gap-2">
             <Label htmlFor="title" className="text-right">
               Title
             </Label>
@@ -139,12 +196,41 @@ export default function NewWebsiteDialog({
                   .vercel.app
                 </span>
               </div>
-              {errors.subdomain && (
-                <p className="text-sm text-red-500">{errors.subdomain}</p>
+              {subdomain && (
+                <div className="flex items-center gap-2 text-sm">
+                  {(() => {
+                    const status = getSubdomainStatus(subdomain);
+                    const StatusIcon = status.icon;
+                    return (
+                      <>
+                        <StatusIcon
+                          className={`h-4 w-4 ${
+                            status.status === "success"
+                              ? "text-green-500"
+                              : status.status === "error"
+                              ? "text-red-500"
+                              : "text-gray-500"
+                          }`}
+                        />
+                        <span
+                          className={`${
+                            status.status === "success"
+                              ? "text-green-500"
+                              : status.status === "error"
+                              ? "text-red-500"
+                              : "text-gray-500"
+                          }`}
+                        >
+                          {status.message}
+                        </span>
+                      </>
+                    );
+                  })()}
+                </div>
               )}
             </div>
           </div>
-          <div className="grid grid-cols-4 items-center gap-4">
+          <div className="grid grid-rows-2 items-start gap-2">
             <Label htmlFor="description" className="text-right">
               Description
             </Label>
