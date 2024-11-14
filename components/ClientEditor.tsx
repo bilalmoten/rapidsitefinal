@@ -6,7 +6,7 @@ import ChatWindow from "./ChatWindow";
 import MainEditingPanel from "./MainEditingPanel";
 import FloatingControls from "./FloatingControls";
 import TopBar from "./TopBar";
-import PagesPanel from "./PagesPanel";
+// import PagesPanel from "./PagesPanel";
 import TextPopup from "./textpopup2";
 import useUndoRedo from "@/hooks/useUndoRedo"; // Adjust the path as necessary
 import { toast } from "sonner";
@@ -104,77 +104,6 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
   const [isSwitchingPage, setIsSwitchingPage] = useState(false);
   const [isLoadingPage, setIsLoadingPage] = useState(false);
 
-  // Function to inject a <base> tag and sanitize HTML
-  // const injectBaseTag = useCallback(
-  //   (htmlContent: string): string => {
-  //     const parser = new DOMParser();
-  //     const doc = parser.parseFromString(htmlContent, "text/html");
-
-  //     // Check if a base tag already exists
-  //     if (!doc.querySelector("base")) {
-  //       const base = doc.createElement("base");
-  //       base.href = `https://${subdomain}.yourdomain.com/`; // Replace with your actual base URL
-  //       doc.head.insertBefore(base, doc.head.firstChild);
-  //     }
-
-  //     // Sanitize the HTML content, allowing the <base> tag
-  //     const sanitizedContent = DOMPurify.sanitize(
-  //       doc.documentElement.outerHTML,
-  //       {
-  //         ADD_TAGS: ["base"],
-  //       }
-  //     );
-
-  //     return sanitizedContent;
-  //   },
-  //   [subdomain]
-  // );
-
-  // // Push new state to undo stack
-  // const pushNewState = useCallback(
-  //   (newContent: string) => {
-  //     setUndoStack((currentStack) => {
-  //       const newStack = currentStack.slice(0, currentStateIndex + 1);
-  //       newStack.push(newContent);
-  //       if (newStack.length > 100) newStack.shift();
-  //       return newStack;
-  //     });
-  //     setCurrentStateIndex((currentIndex) => {
-  //       const newIndex = Math.min(currentIndex + 1, 99); // Prevent overflow
-  //       return newIndex;
-  //     });
-  //   },
-  //   [currentStateIndex]
-  // );
-
-  // // Handle state changes to push to undo stack
-  // useEffect(() => {
-  //   // Avoid initial push
-  //   if (currentStateIndex === 0 && undoStack[0] === siteContent) return;
-  //   pushNewState(siteContent);
-  //   if (currentStateIndex > 0) {
-  //     setHasUnsavedChanges(true);
-  //   }
-  // }, [siteContent]);
-
-  // // Handle Undo
-  // const handleUndo = useCallback(() => {
-  //   if (currentStateIndex > 0) {
-  //     const newIndex = currentStateIndex - 1;
-  //     setCurrentStateIndex(newIndex);
-  //     setSiteContent(undoStack[newIndex]);
-  //   }
-  // }, [currentStateIndex, undoStack]);
-
-  // // Handle Redo
-  // const handleRedo = useCallback(() => {
-  //   if (currentStateIndex < undoStack.length - 1) {
-  //     const newIndex = currentStateIndex + 1;
-  //     setCurrentStateIndex(newIndex);
-  //     setSiteContent(undoStack[newIndex]);
-  //   }
-  // }, [currentStateIndex, undoStack]);
-
   const handleUndo = useCallback(() => {
     undo();
   }, [undo]);
@@ -182,14 +111,6 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
   const handleRedo = useCallback(() => {
     redo();
   }, [redo]);
-
-  // // Debounce Undo/Redo to prevent rapid triggers
-  // const debouncedHandleUndo = useCallback(debounce(handleUndo, 300), [
-  //   handleUndo,
-  // ]);
-  // const debouncedHandleRedo = useCallback(debounce(handleRedo, 300), [
-  //   handleRedo,
-  // ]);
 
   const handlePageChange = async (newPage: string) => {
     if (isSwitchingPage || isLoadingPage) return;
@@ -334,25 +255,6 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
       // Optional: You can decide whether saving should clear the undo stack or not
     }
   };
-
-  // const updateEventListeners = (iframeDoc: Document) => {
-  //   if (!iframeDoc?.body) return;
-
-  //   // Remove existing listeners to prevent duplicates
-  //   iframeDoc.body.removeEventListener("mouseover", handleMouseOver);
-  //   iframeDoc.body.removeEventListener("mouseout", handleMouseOut);
-  //   iframeDoc.body.removeEventListener("click", handleClick);
-
-  //   // Attach listeners based on modes
-  //   if (isPickMode) {
-  //     iframeDoc.body.addEventListener("mouseover", handleMouseOver);
-  //     iframeDoc.body.addEventListener("mouseout", handleMouseOut);
-  //   }
-
-  //   if (isPickMode || isEditMode) {
-  //     iframeDoc.body.addEventListener("click", handleClick);
-  //   }
-  // };
 
   const handleMouseOver = (e: MouseEvent) => {
     if (!isPickMode || isAnyElementSelected || isTextPopupOpen) return;
@@ -909,15 +811,6 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
         {showImagePill && (
           <ImageEditPill
             position={imagePillPosition}
-            // onUpload={() => {
-            //   handleImageUpload(selectedImage!);
-            //   setShowImagePill(false);
-            // }}
-            // onAddLink={() => {
-            //   handleAddImageLink(selectedImage!);
-            //   setShowImagePill(false);
-            // }}
-            // onAIGenerate={handleAIGenerateImage}
             onUpload={handleImageUpload}
             onAddLink={handleAddImageLink}
             onAIGenerate={handleAIGenerate}
