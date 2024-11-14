@@ -164,7 +164,8 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
         <!DOCTYPE html>
         <html>
           <head>
-            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+             <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://kit.fontawesome.com/037776171a.js" crossorigin="anonymous"></script>
             <style>
               /* Your custom styles here */
               *[contenteditable="true"] { /* ... */ }

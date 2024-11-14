@@ -42,7 +42,7 @@ interface TopBarProps {
   subdomain: string;
   pageTitle: string;
   pages: string[];
-  onPageChange: (page: string) => void;
+  onPageChange: (newPage: string) => void;
   onViewportChange: (viewport: string) => void;
   onThemeChange: () => void;
   iframeRef: React.RefObject<HTMLIFrameElement>;
@@ -95,10 +95,12 @@ const TopBar: React.FC<TopBarProps> = ({
           </Button>
 
           <div className="flex items-center space-x-2 bg-muted px-2 py-1 rounded-md">
-            <span className="text-sm text-muted-foreground">https://</span>
+            <span className="text-sm text-muted-foreground">
+              https://{subdomain}.aiwebsitebuilder.tech/
+            </span>
             <Input
               className="h-7 w-[200px] bg-transparent border-none focus-visible:ring-0 focus-visible:ring-offset-0"
-              value={subdomain}
+              value={pageTitle}
               readOnly
             />
             <DropdownMenu>
@@ -119,9 +121,9 @@ const TopBar: React.FC<TopBarProps> = ({
                 ))}
               </DropdownMenuContent>
             </DropdownMenu>
-            <span className="text-sm text-muted-foreground">
+            {/* <span className="text-sm text-muted-foreground">
               .aiwebsitebuilder.tech
-            </span>
+            </span> */}
           </div>
         </div>
 
