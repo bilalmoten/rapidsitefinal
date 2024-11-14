@@ -53,6 +53,7 @@
     "google-auth-library": "^9.14.2",
     "gsap": "^3.12.5",
     "jsdom": "^25.0.1",
+    "lodash.debounce": "^4.0.8",
     "lucide-react": "^0.399.0",
     "next": "latest",
     "next-themes": "^0.3.0",

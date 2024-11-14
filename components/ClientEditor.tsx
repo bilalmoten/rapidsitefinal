@@ -10,9 +10,8 @@ import PagesPanel from "./PagesPanel";
 import TextPopup from "./textpopup2";
 import { toast } from "sonner";
 import AddressBar from "./AddressBar";
-import { createClient } from "@/utils/supabase/client";
+// import { supabaseClient } from "@/utils/supabase/client";
 import CodeView from "./CodeView";
-// import HoverPill from "./HoverPill";
 import ImageEditPill from "./ImageEditPill";
 import TextFormatBar from "./TextFormatBar";
 import {
@@ -24,6 +23,9 @@ import {
   applyFormattingToSelection,
 } from "@/lib/editor/textFormatting";
 import { TextFormatAction, TextFormats } from "@/types/editor";
+import { createClient } from "@/utils/supabase/client";
+// import debounce from "lodash.debounce";
+// import DOMPurify from "dompurify";
 
 interface ClientEditorProps {
   initialContent: string;
@@ -88,118 +90,255 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
   const [formatBarAction, setFormatBarAction] =
     useState<TextFormatAction | null>(null);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [pageCache, setPageCache] = useState<{ [key: string]: string }>({});
+  const [isSwitchingPage, setIsSwitchingPage] = useState(false);
+  const [isLoadingPage, setIsLoadingPage] = useState(false);
 
+  // Function to inject a <base> tag and sanitize HTML
+  // const injectBaseTag = useCallback(
+  //   (htmlContent: string): string => {
+  //     const parser = new DOMParser();
+  //     const doc = parser.parseFromString(htmlContent, "text/html");
+
+  //     // Check if a base tag already exists
+  //     if (!doc.querySelector("base")) {
+  //       const base = doc.createElement("base");
+  //       base.href = `https://${subdomain}.yourdomain.com/`; // Replace with your actual base URL
+  //       doc.head.insertBefore(base, doc.head.firstChild);
+  //     }
+
+  //     // Sanitize the HTML content, allowing the <base> tag
+  //     const sanitizedContent = DOMPurify.sanitize(
+  //       doc.documentElement.outerHTML,
+  //       {
+  //         ADD_TAGS: ["base"],
+  //       }
+  //     );
+
+  //     return sanitizedContent;
+  //   },
+  //   [subdomain]
+  // );
+
+  // Push new state to undo stack
+  const pushNewState = useCallback(
+    (newContent: string) => {
+      setUndoStack((currentStack) => {
+        const newStack = currentStack.slice(0, currentStateIndex + 1);
+        newStack.push(newContent);
+        if (newStack.length > 100) newStack.shift();
+        return newStack;
+      });
+      setCurrentStateIndex((currentIndex) => {
+        const newIndex = Math.min(currentIndex + 1, 99); // Prevent overflow
+        return newIndex;
+      });
+    },
+    [currentStateIndex]
+  );
+
+  // Handle state changes to push to undo stack
   useEffect(() => {
+    // Avoid initial push
+    if (currentStateIndex === 0 && undoStack[0] === siteContent) return;
+    pushNewState(siteContent);
     if (currentStateIndex > 0) {
       setHasUnsavedChanges(true);
     }
-  }, [currentStateIndex]);
+  }, [siteContent]);
+
+  // Handle Undo
+  const handleUndo = useCallback(() => {
+    if (currentStateIndex > 0) {
+      const newIndex = currentStateIndex - 1;
+      setCurrentStateIndex(newIndex);
+      setSiteContent(undoStack[newIndex]);
+    }
+  }, [currentStateIndex, undoStack]);
+
+  // Handle Redo
+  const handleRedo = useCallback(() => {
+    if (currentStateIndex < undoStack.length - 1) {
+      const newIndex = currentStateIndex + 1;
+      setCurrentStateIndex(newIndex);
+      setSiteContent(undoStack[newIndex]);
+    }
+  }, [currentStateIndex, undoStack]);
+
+  // // Debounce Undo/Redo to prevent rapid triggers
+  // const debouncedHandleUndo = useCallback(debounce(handleUndo, 300), [
+  //   handleUndo,
+  // ]);
+  // const debouncedHandleRedo = useCallback(debounce(handleRedo, 300), [
+  //   handleRedo,
+  // ]);
 
   const handlePageChange = async (newPage: string) => {
-    // Save current page before switching
-    await handleSave();
+    if (isSwitchingPage || isLoadingPage) return;
+    setIsSwitchingPage(true);
+    setIsLoadingPage(true);
 
-    setPageTitle(newPage);
-    const supabase = await createClient();
-    const { data: page, error } = await supabase
-      .from("pages")
-      .select("content")
-      .eq("user_id", userId)
-      .eq("website_id", websiteId)
-      .eq("title", newPage)
-      .single();
+    try {
+      // Save current page before switching
+      await handleSave();
 
-    if (error) {
-      console.error("Error fetching page content:", error);
-      toast.error("Error loading page content");
-      return;
-    }
+      console.log("=== Current Site Content Details ===");
+      console.log("Content length:", siteContent.length);
+      console.log("Content preview:", siteContent.substring(0, 100) + "...");
 
-    // Reset undo/redo stack when changing pages
-    setUndoStack([page?.content || ""]);
-    setCurrentStateIndex(0);
-    setSiteContent(page?.content || "");
-  };
+      setPageTitle(newPage);
+      console.log("Switching to new page:", newPage);
 
-  const updateEventListeners = (iframeDoc: Document) => {
-    if (!iframeDoc?.body) return; // Add this line
-    iframeDoc.body.removeEventListener("mouseover", handleMouseOver);
-    iframeDoc.body.removeEventListener("mouseout", handleMouseOut);
-    iframeDoc.body.removeEventListener("click", handleClick);
+      if (pageCache[newPage]) {
+        const cachedContent = pageCache[newPage];
+        setUndoStack([cachedContent]);
+        setCurrentStateIndex(0);
+        setSiteContent(cachedContent);
+        toast.success(`Loaded cached page: ${newPage}`);
+      } else {
+        const supabaseClient = await createClient();
+        const { data: page, error } = await supabaseClient
+          .from("pages")
+          .select("content")
+          .eq("user_id", userId)
+          .eq("website_id", websiteId)
+          .eq("title", newPage)
+          .single();
 
-    if (isPickMode) {
-      iframeDoc.body.addEventListener("mouseover", handleMouseOver);
-      iframeDoc.body.addEventListener("mouseout", handleMouseOut);
-    }
+        if (error || !page) {
+          console.error(
+            "Error fetching page content or page not found:",
+            error
+          );
+          toast.error("Error loading page content");
+          return;
+        }
 
-    if (isPickMode || isEditMode) {
-      iframeDoc.body.addEventListener("click", handleClick);
-    }
-  };
+        let newContent = page.content;
 
-  const handleKeyDown = useCallback(
-    (e: KeyboardEvent) => {
-      if (e.key === "Escape" && (isAnyElementSelected || isTextPopupOpen)) {
-        e.preventDefault(); // Prevent default Escape key behavior
-        setSelectedElement(null);
-        setClickPosition(null);
-        setIsAnyElementSelected(false);
-        setIsTextPopupOpen(false);
-        const selectedElements = document.querySelectorAll(".selected-element");
-        selectedElements.forEach((el) =>
-          el.classList.remove("selected-element")
-        );
+        // Inject the base tag to handle relative URLs and sanitize
+        // newContent = injectBaseTag(newContent);
+
+        console.log("Fetched new page content of length:", newContent.length);
+
+        // Reset undo/redo stack when changing pages
+        setUndoStack([newContent]);
+        setCurrentStateIndex(0);
+        setSiteContent(newContent); // Triggers useEffect to update the iframe
+
+        console.log("=== New Site Content Details ===");
+        console.log("Content length:", newContent.length);
+        console.log("Content preview:", newContent.substring(0, 100) + "...");
+
+        // Cache the new page content
+        setPageCache((prevCache) => ({ ...prevCache, [newPage]: newContent }));
+
+        // Notify the user of successful page load
+        toast.success(`Successfully loaded page: ${newPage}`);
       }
-    },
-    [isAnyElementSelected, isTextPopupOpen]
-  );
+    } catch (err) {
+      console.error("Unexpected error during page change:", err);
+      toast.error("An unexpected error occurred while changing the page.");
+    } finally {
+      setIsSwitchingPage(false);
+      setIsLoadingPage(false);
+    }
+  };
 
   useEffect(() => {
     const iframe = iframeRef.current;
     if (!iframe) return;
 
-    // Only set content if siteContent changes
-    if (!iframe.srcdoc) {
-      const completeContent = `
-        <!DOCTYPE html>
-        <html>
-          <head>
-             <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://kit.fontawesome.com/037776171a.js" crossorigin="anonymous"></script>
-            <style>
-              /* Your custom styles here */
-              *[contenteditable="true"] { /* ... */ }
-              /* ... rest of your styles ... */
-            </style>
-          </head>
-          <body>
-            ${siteContent}
-          </body>
-        </html>
-      `;
-      iframe.srcdoc = completeContent;
-    }
+    const updateIframeContent = () => {
+      if (!iframe.contentDocument) return;
 
-    const handleLoad = () => {
-      const iframeDoc = iframe.contentDocument;
-      if (!iframeDoc) return;
-      updateEventListeners(iframeDoc);
+      // Set the entire HTML content, including head and body
+      iframe.srcdoc = siteContent;
+
+      // Re-attach event listeners after content is loaded
+      iframe.onload = () => {
+        const iframeDoc = iframe.contentDocument;
+        if (iframeDoc) {
+          updateEventListeners(iframeDoc);
+        }
+      };
     };
 
-    // If iframe is already loaded, just update event listeners
-    if (iframe.contentDocument?.body) {
-      updateEventListeners(iframe.contentDocument);
-    } else {
-      iframe.onload = handleLoad;
-    }
+    updateIframeContent();
 
+    // Attach global keydown listener
     document.addEventListener("keydown", handleKeyDown);
 
+    // Cleanup function
     return () => {
       iframe.onload = null;
       document.removeEventListener("keydown", handleKeyDown);
     };
   }, [siteContent, isPickMode, isEditMode]);
+
+  const handleSave = async () => {
+    const iframeDoc = iframeRef.current?.contentDocument;
+    if (iframeDoc) {
+      // Remove all contenteditable attributes before saving
+      const editableElements = iframeDoc.querySelectorAll(
+        '[contenteditable="true"]'
+      );
+      editableElements.forEach((el) => el.removeAttribute("contenteditable"));
+
+      // Get the entire HTML content
+      const updatedContent = iframeDoc.documentElement.outerHTML;
+      setSiteContent(updatedContent);
+
+      console.log("Saving with websiteId:", websiteId);
+
+      const response = fetch("/api/save_website", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({
+          userId,
+          content: updatedContent,
+          title: pageTitle,
+          website_id: websiteId,
+        }),
+      });
+
+      console.log("Title:", pageTitle);
+
+      toast.promise(response, {
+        loading: "Saving...",
+        success: () => {
+          setHasUnsavedChanges(false);
+          return "Site saved!";
+        },
+        error: "Error saving site",
+      });
+
+      // Update the undo stack with the saved state
+      // Optional: You can decide whether saving should clear the undo stack or not
+    }
+  };
+
+  // const updateEventListeners = (iframeDoc: Document) => {
+  //   if (!iframeDoc?.body) return;
+
+  //   // Remove existing listeners to prevent duplicates
+  //   iframeDoc.body.removeEventListener("mouseover", handleMouseOver);
+  //   iframeDoc.body.removeEventListener("mouseout", handleMouseOut);
+  //   iframeDoc.body.removeEventListener("click", handleClick);
+
+  //   // Attach listeners based on modes
+  //   if (isPickMode) {
+  //     iframeDoc.body.addEventListener("mouseover", handleMouseOver);
+  //     iframeDoc.body.addEventListener("mouseout", handleMouseOut);
+  //   }
+
+  //   if (isPickMode || isEditMode) {
+  //     iframeDoc.body.addEventListener("click", handleClick);
+  //   }
+  // };
 
   const handleMouseOver = (e: MouseEvent) => {
     if (!isPickMode || isAnyElementSelected || isTextPopupOpen) return;
@@ -208,13 +347,41 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
     setHoveredElement(target);
     target.classList.add("hovered-element");
 
-    // Set pill position
-    setPillPosition({
-      x: e.clientX,
-      y: e.clientY,
-    });
+    // Get the position relative to the viewport
+    const rect = target.getBoundingClientRect();
+
+    // Convert iframe coordinates to screen coordinates
+    const iframeRect = iframeRef.current?.getBoundingClientRect();
+    if (iframeRect) {
+      setPillPosition({
+        x: iframeRect.left + rect.left + rect.width / 2,
+        y: iframeRect.top + rect.top + rect.height / 2,
+      });
+    }
+  };
+  const handleImageUpload = () => {
+    if (selectedImage) {
+      handleImageEdit(selectedImage);
+    }
+    setShowImagePill(false);
   };
 
+  const handleAddImageLink = () => {
+    if (selectedImage) {
+      const link = prompt("Enter image URL:");
+      if (link) {
+        (selectedImage as HTMLImageElement).src = link;
+        updateElementAttribute(selectedImage, "src", link);
+      }
+    }
+    setShowImagePill(false);
+  };
+
+  const handleAIGenerate = () => {
+    // To be implemented later
+    toast.info("AI Image Generation coming soon!");
+    setShowImagePill(false);
+  };
   const handleMouseOut = (e: MouseEvent) => {
     if (!isPickMode || isAnyElementSelected || isTextPopupOpen) return;
     const target = e.target as Element;
@@ -223,39 +390,56 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
     setPillPosition(null);
   };
 
-  const handleImageEdit = (target: Element) => {
-    const input = document.createElement("input");
-    input.type = "file";
-    input.accept = "image/*";
-    input.onchange = async (event) => {
-      const file = (event.target as HTMLInputElement).files?.[0];
-      if (file) {
-        const formData = new FormData();
-        formData.append("file", file);
-        formData.append("website_id", websiteId);
-        formData.append("user_id", userId);
+  const handleClick = (e: MouseEvent) => {
+    if (!isPickMode && !isEditMode) return;
+    e.preventDefault();
+    e.stopPropagation();
+    const target = e.target as Element;
 
-        const response = await fetch("/api/upload_image", {
-          method: "POST",
-          body: formData,
-        });
-
-        if (!response.ok) {
-          toast.error("Error uploading image");
-          toast.error("error: " + response.statusText);
-          return;
-        }
-
-        const { imageUrl } = await response.json();
-        if (imageUrl) {
-          // Directly update the src attribute of the target image element
-          (target as HTMLImageElement).src = imageUrl;
-          // Then update the src attribute in the cloned document
-          updateElementAttribute(target, "src", imageUrl);
-        }
+    if (isPickMode) {
+      // Handle pick mode behavior
+      if (isAnyElementSelected) {
+        // Deselect element
+        setSelectedElement(null);
+        setClickPosition(null);
+        setIsAnyElementSelected(false);
+        setIsTextPopupOpen(false);
+        const selectedElements =
+          iframeRef.current?.contentDocument?.querySelectorAll(
+            ".selected-element"
+          );
+        selectedElements?.forEach((el) =>
+          el.classList.remove("selected-element")
+        );
+      } else {
+        // Select element and show text popup
+        setSelectedElement(target);
+        setClickPosition({ x: e.clientX, y: e.clientY });
+        setIsAnyElementSelected(true);
+        setIsTextPopupOpen(true);
+        target.classList.add("selected-element");
       }
-    };
-    input.click();
+    } else if (isEditMode) {
+      // Remove any existing contenteditable attributes first
+      const editableElements =
+        iframeRef.current?.contentDocument?.querySelectorAll(
+          '[contenteditable="true"]'
+        );
+      editableElements?.forEach((el) => el.removeAttribute("contenteditable"));
+
+      // Handle edit mode behavior
+      if (target.tagName.toLowerCase() === "img") {
+        setSelectedImage(target);
+        setImagePillPosition({ x: e.clientX, y: e.clientY });
+        setShowImagePill(true);
+      } else if (
+        ["p", "h1", "h2", "h3", "h4", "h5", "h6", "span", "div"].includes(
+          target.tagName.toLowerCase()
+        )
+      ) {
+        handleTextEdit(target);
+      }
+    }
   };
 
   const handleTextEdit = (target: Element) => {
@@ -275,7 +459,14 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
     setShowFormatBar(true);
 
     // Get position considering iframe offset
-    const position = getFormatBarPosition(target);
+    const iframeRect = iframeRef.current?.getBoundingClientRect();
+    const rect = target.getBoundingClientRect();
+    const position = {
+      x: iframeRect
+        ? iframeRect.left + rect.left + rect.width / 2
+        : rect.left + rect.width / 2,
+      y: iframeRect ? iframeRect.top + rect.top - 45 : rect.top - 45,
+    };
 
     setFormatBarState({
       isActive: true,
@@ -344,18 +535,6 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
     target.addEventListener("blur", handleBlur as EventListener);
   };
 
-  const updateElementAttribute = (
-    element: Element,
-    attribute: string,
-    value: string
-  ) => {
-    const updatedContent = updateElementInHTML(element, (el) => {
-      el.setAttribute(attribute, value);
-      return el.outerHTML;
-    });
-    setSiteContent(updatedContent);
-  };
-
   const updateElementContent = (element: Element) => {
     const updatedContent = updateElementInHTML(element, (el) => {
       el.innerHTML = element.innerHTML;
@@ -422,9 +601,6 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
     }
     return "";
   };
-
-  const handleZoomIn = () => setZoom((prev) => Math.min(prev + 10, 200));
-  const handleZoomOut = () => setZoom((prev) => Math.max(prev - 10, 50));
   const togglePickMode = () => {
     setIsPickMode(!isPickMode);
     if (isEditMode) setIsEditMode(false);
@@ -454,74 +630,99 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
     selectedElements.forEach((el) => el.classList.remove("selected-element"));
   };
 
-  const handleSave = async () => {
-    const iframeDoc = iframeRef.current?.contentDocument;
-    if (iframeDoc) {
-      // Remove all contenteditable attributes before saving
-      const editableElements = iframeDoc.querySelectorAll(
-        '[contenteditable="true"]'
-      );
-      editableElements.forEach((el) => el.removeAttribute("contenteditable"));
+  const updateEventListeners = (iframeDoc: Document) => {
+    if (!iframeDoc?.body) return;
 
-      // Get the cleaned HTML content
-      const updatedContent = iframeDoc.body.innerHTML;
-      setSiteContent(updatedContent);
+    // Remove existing listeners to prevent duplicates
+    iframeDoc.body.removeEventListener("mouseover", handleMouseOver);
+    iframeDoc.body.removeEventListener("mouseout", handleMouseOut);
+    iframeDoc.body.removeEventListener("click", handleClick);
 
-      console.log("Saving with websiteId:", websiteId);
+    // Attach listeners based on modes
+    if (isPickMode) {
+      iframeDoc.body.addEventListener("mouseover", handleMouseOver);
+      iframeDoc.body.addEventListener("mouseout", handleMouseOut);
+    }
 
-      const response = fetch("/api/save_website", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        body: JSON.stringify({
-          userId,
-          content: updatedContent,
-          title: pageTitle,
-          website_id: websiteId,
-        }),
-      });
-
-      console.log("Title:", pageTitle);
-
-      toast.promise(response, {
-        loading: "Saving...",
-        success: () => {
-          setHasUnsavedChanges(false);
-          return "Site saved!";
-        },
-        error: "Error saving site",
-      });
+    if (isPickMode || isEditMode) {
+      iframeDoc.body.addEventListener("click", handleClick);
     }
   };
 
-  const handleViewportChange = (newViewport: string) => {
-    setViewport(newViewport);
-    if (iframeRef.current) {
-      switch (newViewport) {
-        case "desktop":
-          iframeRef.current.style.width = "100%";
-          iframeRef.current.style.height = "100%";
-          break;
-        case "tablet":
-          iframeRef.current.style.width = "768px";
-          iframeRef.current.style.height = "780px";
-          break;
-        case "mobile":
-          iframeRef.current.style.width = "375px";
-          iframeRef.current.style.height = "667px";
-          break;
+  const handleKeyDown = useCallback(
+    (e: KeyboardEvent) => {
+      // Check for Undo/Redo shortcuts
+      if ((e.ctrlKey || e.metaKey) && !e.shiftKey) {
+        if (e.key === "z") {
+          e.preventDefault();
+          // debouncedHandleUndo();
+        } else if (e.key === "y") {
+          e.preventDefault();
+          // debouncedHandleRedo();
+        }
       }
-    }
+
+      // Handle global Escape key
+      if (e.key === "Escape" && (isAnyElementSelected || isTextPopupOpen)) {
+        e.preventDefault(); // Prevent default Escape key behavior
+        setSelectedElement(null);
+        setClickPosition(null);
+        setIsAnyElementSelected(false);
+        setIsTextPopupOpen(false);
+        const selectedElements = document.querySelectorAll(".selected-element");
+        selectedElements.forEach((el) =>
+          el.classList.remove("selected-element")
+        );
+      }
+    },
+    [isAnyElementSelected, isTextPopupOpen, handleUndo, handleRedo]
+  );
+
+  const handleImageEdit = (target: Element) => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
+    input.onchange = async (event) => {
+      const file = (event.target as HTMLInputElement).files?.[0];
+      if (file) {
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("website_id", websiteId);
+        formData.append("user_id", userId);
+
+        const response = await fetch("/api/upload_image", {
+          method: "POST",
+          body: formData,
+        });
+
+        if (!response.ok) {
+          toast.error("Error uploading image");
+          toast.error("error: " + response.statusText);
+          return;
+        }
+
+        const { imageUrl } = await response.json();
+        if (imageUrl) {
+          // Directly update the src attribute of the target image element
+          (target as HTMLImageElement).src = imageUrl;
+          // Update the saved content
+          updateElementAttribute(target, "src", imageUrl);
+        }
+      }
+    };
+    input.click();
   };
 
-  const handleThemeChange = () => {
-    // Implement theme change logic
-  };
-
-  const toggleCodeView = () => {
-    setIsCodeViewActive(!isCodeViewActive);
+  const updateElementAttribute = (
+    element: Element,
+    attribute: string,
+    value: string
+  ) => {
+    const updatedContent = updateElementInHTML(element, (el) => {
+      el.setAttribute(attribute, value);
+      return el.outerHTML;
+    });
+    setSiteContent(updatedContent);
   };
 
   const handleUserRequest = async (
@@ -573,19 +774,9 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
           if (iframeDoc) {
             const updatedContent = iframeDoc.documentElement.outerHTML;
 
-            toast.success("Element updated successfully", {
-              action: {
-                label: "Undo",
-                onClick: () => handleUndo(),
-              },
-            });
-
             // Store the new state
             pushNewState(updatedContent);
             setSiteContent(updatedContent);
-
-            // Force a re-render of the iframe
-            iframeRef.current.srcdoc = updatedContent;
 
             // Reset selection state
             setSelectedElement(null);
@@ -599,6 +790,14 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
 
             // Re-enable hover effects
             updateEventListeners(iframeDoc);
+
+            // Optional: Notify user
+            toast.success("Element updated successfully", {
+              action: {
+                label: "Undo",
+                onClick: () => handleUndo(),
+              },
+            });
           } else {
             toast.error("Failed to access iframe document");
           }
@@ -617,162 +816,20 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
     }
   };
 
-  const handleClick = (e: MouseEvent) => {
-    if (!isPickMode && !isEditMode) return;
-    e.preventDefault();
-    e.stopPropagation();
-    const target = e.target as Element;
-
-    if (isPickMode) {
-      // Handle pick mode behavior
-      if (isAnyElementSelected) {
-        // Deselect element
-        setSelectedElement(null);
-        setClickPosition(null);
-        setIsAnyElementSelected(false);
-        setIsTextPopupOpen(false);
-        const selectedElements = document.querySelectorAll(".selected-element");
-        selectedElements.forEach((el) =>
-          el.classList.remove("selected-element")
-        );
-      } else {
-        // Select element and show text popup
-        setSelectedElement(target);
-        setClickPosition({ x: e.clientX, y: e.clientY });
-        setIsAnyElementSelected(true);
-        setIsTextPopupOpen(true);
-        target.classList.add("selected-element");
-      }
-    } else if (isEditMode) {
-      // Remove any existing contenteditable attributes first
-      const editableElements =
-        iframeRef.current?.contentDocument?.querySelectorAll(
-          '[contenteditable="true"]'
-        );
-      editableElements?.forEach((el) => el.removeAttribute("contenteditable"));
-
-      // Handle edit mode behavior
-      if (target.tagName.toLowerCase() === "img") {
-        setSelectedImage(target);
-        setImagePillPosition({ x: e.clientX, y: e.clientY });
-        setShowImagePill(true);
-      } else if (
-        ["P", "H1", "H2", "H3", "H4", "H5", "H6", "SPAN", "DIV"].includes(
-          target.tagName
-        )
-      ) {
-        handleTextEdit(target);
-      }
-    }
-  };
-
-  const pushNewState = (newContent: string) => {
-    // Remove any states after current index (for when we're undoing and then making new changes)
-    const newStack = undoStack.slice(0, currentStateIndex + 1);
-    // Add new state
-    newStack.push(newContent);
-    // If we exceed 100 states, remove oldest
-    if (newStack.length > 100) {
-      newStack.shift();
-    }
-    setUndoStack(newStack);
-    setCurrentStateIndex(newStack.length - 1);
-  };
-
-  const handleUndo = () => {
-    if (currentStateIndex > 0) {
-      setCurrentStateIndex(currentStateIndex - 1);
-      setSiteContent(undoStack[currentStateIndex - 1]);
-      // Update iframe content
-      if (iframeRef.current) {
-        iframeRef.current.srcdoc = undoStack[currentStateIndex - 1];
-      }
-    }
-  };
-
-  const handleRedo = () => {
-    if (currentStateIndex < undoStack.length - 1) {
-      setCurrentStateIndex(currentStateIndex + 1);
-      setSiteContent(undoStack[currentStateIndex + 1]);
-      // Update iframe content
-      if (iframeRef.current) {
-        iframeRef.current.srcdoc = undoStack[currentStateIndex + 1];
-      }
-    }
-  };
-
-  // Add this near your other useEffect hooks
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      // Check if Ctrl (or Cmd on Mac) is pressed
-      if ((e.ctrlKey || e.metaKey) && !e.shiftKey) {
-        if (e.key === "z") {
-          e.preventDefault(); // Prevent browser's default undo
-          handleUndo();
-        } else if (e.key === "y") {
-          e.preventDefault(); // Prevent browser's default redo
-          handleRedo();
-        }
-      }
-    };
-
-    // Add the event listener
-    document.addEventListener("keydown", handleKeyDown);
-
-    // Cleanup
-    return () => {
-      document.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [currentStateIndex, undoStack]); // Dependencies ensure we have latest state
-
-  // Add handler for mode selection
-  const handleModeSelect = (mode: "quick" | "quality") => {
-    setEditMode(mode);
-    // Show text popup with the selected mode
-    setIsTextPopupOpen(true);
-  };
-
-  const handleImageUpload = () => {
-    if (selectedImage) {
-      handleImageEdit(selectedImage);
-    }
-    setShowImagePill(false);
-  };
-
-  const handleAddImageLink = () => {
-    if (selectedImage) {
-      const link = prompt("Enter image URL:");
-      if (link) {
-        (selectedImage as HTMLImageElement).src = link;
-        updateElementAttribute(selectedImage, "src", link);
-      }
-    }
-    setShowImagePill(false);
-  };
-
-  const handleAIGenerate = () => {
-    // To be implemented later
-    toast.info("AI Image Generation coming soon!");
-    setShowImagePill(false);
-  };
-
   return (
     <div className="flex h-screen bg-gray-100">
       <div className="flex-1 flex flex-col relative">
         <TopBar
-          // zoom={zoom}
-          // onZoomIn={handleZoomIn}
-          // onZoomOut={handleZoomOut}
           isCodeViewActive={isCodeViewActive}
-          onCodeViewToggle={toggleCodeView}
+          onCodeViewToggle={() => setIsCodeViewActive(!isCodeViewActive)}
           onSave={handleSave}
           subdomain={subdomain}
           pageTitle={pageTitle}
           pages={pages}
           onPageChange={handlePageChange}
-          onViewportChange={handleViewportChange}
-          onThemeChange={handleThemeChange}
-          // onCodeViewToggle={handleCodeViewToggle}
+          onViewportChange={setViewport}
+          onThemeChange={() => {}}
+          // {handleThemeChange}
           iframeRef={iframeRef}
           viewport={viewport}
           hasUnsavedChanges={hasUnsavedChanges}
@@ -804,13 +861,6 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
             />
           </div>
         </div>
-        {/* {isPickMode && pillPosition && !isAnyElementSelected && (
-          <HoverPill
-            position={pillPosition}
-            onSelectMode={handleModeSelect}
-            hoveredElement={hoveredElement}
-          />
-        )} */}
         {isPickMode && selectedElement && clickPosition && isTextPopupOpen && (
           <TextPopup
             selectedElement={selectedElement}
@@ -820,14 +870,16 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
               setIsAnyElementSelected(false);
               setIsTextPopupOpen(false);
               const selectedElements =
-                document.querySelectorAll(".selected-element");
-              selectedElements.forEach((el) =>
+                iframeRef.current?.contentDocument?.querySelectorAll(
+                  ".selected-element"
+                );
+              selectedElements?.forEach((el) =>
                 el.classList.remove("selected-element")
               );
             }}
             screenHeight={window.innerHeight}
             screenWidth={window.innerWidth}
-            onSubmitRequest={(request) => handleUserRequest(request, "quick")}
+            onSubmitRequest={(req) => handleUserRequest(req, "quick")}
           />
         )}
         <FloatingControls
@@ -843,6 +895,15 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
         {showImagePill && (
           <ImageEditPill
             position={imagePillPosition}
+            // onUpload={() => {
+            //   handleImageUpload(selectedImage!);
+            //   setShowImagePill(false);
+            // }}
+            // onAddLink={() => {
+            //   handleAddImageLink(selectedImage!);
+            //   setShowImagePill(false);
+            // }}
+            // onAIGenerate={handleAIGenerateImage}
             onUpload={handleImageUpload}
             onAddLink={handleAddImageLink}
             onAIGenerate={handleAIGenerate}
@@ -867,6 +928,12 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
               }
             }}
           />
+        )}
+        {isLoadingPage && (
+          <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center bg-white bg-opacity-50 z-50">
+            <div className="loader">Loading...</div>{" "}
+            {/* Ensure you have CSS for .loader */}
+          </div>
         )}
       </div>
       <ChatWindow />
