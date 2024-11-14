@@ -1,11 +1,19 @@
+"use client";
+
 import React, { KeyboardEvent } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Send, Loader2, Mic } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Message } from "ai";
 import ReactMarkdown from "react-markdown";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+  TooltipProvider,
+} from "@/components/ui/tooltip";
 
 interface ChatInterfaceProps {
   messages: Message[];
@@ -28,10 +36,6 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
   onSubmit,
   onVoiceInput,
 }) => {
-  const getInitials = (role: string) => {
-    return role === "assistant" ? "AI" : "ME";
-  };
-
   const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
@@ -40,82 +44,135 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
   };
 
   return (
-    <div className="flex-1 overflow-hidden container mx-auto p-4 flex flex-col">
-      <div className="flex-1 overflow-y-auto mb-4 space-y-4">
-        {messages.map((message, index) => (
-          <motion.div
-            key={message.id || index}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className={`flex ${
-              message.role === "user" ? "justify-end" : "justify-start"
-            }`}
-          >
-            <div
-              className={`flex items-start space-x-2 max-w-[80%] ${
-                message.role === "user"
-                  ? "flex-row-reverse space-x-reverse"
-                  : ""
+    <div className="flex-1 overflow-hidden flex flex-col max-w-5xl mx-auto w-full">
+      {/* Messages Area */}
+      <div className="flex-1 overflow-y-auto px-4 py-6 space-y-6">
+        <AnimatePresence initial={false}>
+          {messages.map((message, index) => (
+            <motion.div
+              key={message.id || index}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+              className={`flex ${
+                message.role === "user" ? "justify-end" : "justify-start"
               }`}
             >
-              <Avatar
-                className={`${
-                  message.role === "user" ? "bg-primary" : "bg-secondary"
-                }`}
-              >
-                <AvatarFallback>{getInitials(message.role)}</AvatarFallback>
-              </Avatar>
               <div
-                className={`rounded-lg p-3 ${
-                  message.role === "user"
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-secondary"
+                className={`flex items-start gap-3 max-w-[85%] ${
+                  message.role === "user" ? "flex-row-reverse" : ""
                 }`}
               >
-                {message.role === "assistant" ? (
-                  <ReactMarkdown className="prose dark:prose-invert max-w-none">
-                    {message.content}
-                  </ReactMarkdown>
-                ) : (
-                  <p>{message.content}</p>
-                )}
+                <Avatar
+                  className={`${
+                    message.role === "user"
+                      ? "bg-blue-600"
+                      : "bg-secondary border-2 border-primary/10"
+                  } h-8 w-8`}
+                >
+                  <AvatarFallback>
+                    {message.role === "assistant" ? "AI" : "ME"}
+                  </AvatarFallback>
+                </Avatar>
+
+                <div
+                  className={`rounded-2xl px-4 py-3 shadow-sm ${
+                    message.role === "user"
+                      ? "bg-blue-600 text-white"
+                      : "bg-secondary/50 border border-primary/10"
+                  }`}
+                >
+                  {message.role === "assistant" ? (
+                    <ReactMarkdown className="prose dark:prose-invert max-w-none text-sm">
+                      {message.content}
+                    </ReactMarkdown>
+                  ) : (
+                    <p className="text-sm">{message.content}</p>
+                  )}
+                </div>
               </div>
-            </div>
+            </motion.div>
+          ))}
+        </AnimatePresence>
+
+        {isLoading && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="flex items-center gap-2 text-sm text-muted-foreground"
+          >
+            <Loader2 className="h-4 w-4 animate-spin" />
+            Hmm, Let me think about that...
           </motion.div>
-        ))}
+        )}
       </div>
 
-      <form onSubmit={onSubmit} className="flex space-x-2">
-        <Textarea
-          placeholder="Type your message here..."
-          value={input}
-          onChange={onInputChange}
-          onKeyDown={handleKeyDown}
-          className="flex-1 resize-none"
-          rows={3}
-          disabled={!isChatActive || isLoading}
-        />
-        <div className="flex flex-col space-y-2">
-          <Button type="submit" disabled={isLoading || !isChatActive}>
-            {isLoading ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <Send className="h-4 w-4" />
-            )}
-            <span className="sr-only">Send message</span>
-          </Button>
-          <Button
-            type="button"
-            variant="outline"
-            onClick={onVoiceInput}
-            disabled={!isChatActive || isLoading}
-          >
-            <Mic className={`h-4 w-4 ${isListening ? "text-red-500" : ""}`} />
-            <span className="sr-only">Voice input</span>
-          </Button>
-        </div>
-      </form>
+      {/* Input Area */}
+      <div className="border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <form
+          onSubmit={onSubmit}
+          className="container flex gap-3 p-4 max-w-5xl mx-auto"
+        >
+          <div className="flex-1 relative">
+            <Textarea
+              placeholder={
+                isChatActive
+                  ? "Type your message here..."
+                  : "Chat session completed"
+              }
+              value={input}
+              onChange={onInputChange}
+              onKeyDown={handleKeyDown}
+              className="min-h-[56px] w-full resize-none bg-secondary/50 border-primary/10 focus-visible:ring-1 focus-visible:ring-offset-1"
+              rows={1}
+              disabled={!isChatActive || isLoading}
+            />
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <Button
+              type="submit"
+              size="icon"
+              disabled={isLoading || !isChatActive || !input.trim()}
+              className="h-[56px] w-[56px] bg-blue-600 hover:bg-blue-700"
+            >
+              {isLoading ? (
+                <Loader2 className="h-5 w-5 animate-spin" />
+              ) : (
+                <Send className="h-5 w-5" />
+              )}
+              <span className="sr-only">Send message</span>
+            </Button>
+
+            {/* <TooltipProvider delayDuration={30}>
+              <Tooltip>
+                <TooltipTrigger asChild> */}
+            <div className="relative inline-block cursor-not-allowed">
+              <Button
+                type="button"
+                variant="outline"
+                size="icon"
+                className="h-[56px] w-[56px] opacity-50 pointer-events-none"
+                disabled={true}
+              >
+                <Mic className="h-5 w-5" />
+                <div className="absolute -top-1 -right-1">
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
+                  </span>
+                </div>
+              </Button>
+            </div>
+            {/* </TooltipTrigger>
+                <TooltipContent side="left">
+                  <p className="text-sm">Voice input coming soon!</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider> */}
+          </div>
+        </form>
+      </div>
     </div>
   );
 };
