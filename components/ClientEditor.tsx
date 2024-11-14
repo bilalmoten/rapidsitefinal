@@ -8,6 +8,7 @@ import FloatingControls from "./FloatingControls";
 import TopBar from "./TopBar";
 import PagesPanel from "./PagesPanel";
 import TextPopup from "./textpopup2";
+import useUndoRedo from "@/hooks/useUndoRedo"; // Adjust the path as necessary
 import { toast } from "sonner";
 import AddressBar from "./AddressBar";
 // import { supabaseClient } from "@/utils/supabase/client";
@@ -44,7 +45,7 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
   subdomain,
   pages,
 }) => {
-  const [siteContent, setSiteContent] = useState<string>(initialContent);
+  // const [siteContent, setSiteContent] = useState<string>(initialContent);
   const [zoom, setZoom] = useState(100);
   const [isPickMode, setIsPickMode] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false); // Ensure this is false by default
@@ -61,8 +62,17 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
   const [isCodeViewActive, setIsCodeViewActive] = useState(false);
   const [userRequest, setUserRequest] = useState("");
   const [isTextPopupOpen, setIsTextPopupOpen] = useState(false);
-  const [undoStack, setUndoStack] = useState<string[]>([initialContent]); // Store HTML states
-  const [currentStateIndex, setCurrentStateIndex] = useState(0);
+  // const [undoStack, setUndoStack] = useState<string[]>([initialContent]); // Store HTML states
+  // const [currentStateIndex, setCurrentStateIndex] = useState(0);
+  const {
+    present: siteContent,
+    set: setSiteContent,
+    undo,
+    redo,
+    canUndo,
+    canRedo,
+    reset,
+  } = useUndoRedo<string>(initialContent, 100);
   const [editMode, setEditMode] = useState<"quick" | "quality" | null>(null);
   const [pillPosition, setPillPosition] = useState<{
     x: number;
@@ -120,50 +130,58 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
   //   [subdomain]
   // );
 
-  // Push new state to undo stack
-  const pushNewState = useCallback(
-    (newContent: string) => {
-      setUndoStack((currentStack) => {
-        const newStack = currentStack.slice(0, currentStateIndex + 1);
-        newStack.push(newContent);
-        if (newStack.length > 100) newStack.shift();
-        return newStack;
-      });
-      setCurrentStateIndex((currentIndex) => {
-        const newIndex = Math.min(currentIndex + 1, 99); // Prevent overflow
-        return newIndex;
-      });
-    },
-    [currentStateIndex]
-  );
+  // // Push new state to undo stack
+  // const pushNewState = useCallback(
+  //   (newContent: string) => {
+  //     setUndoStack((currentStack) => {
+  //       const newStack = currentStack.slice(0, currentStateIndex + 1);
+  //       newStack.push(newContent);
+  //       if (newStack.length > 100) newStack.shift();
+  //       return newStack;
+  //     });
+  //     setCurrentStateIndex((currentIndex) => {
+  //       const newIndex = Math.min(currentIndex + 1, 99); // Prevent overflow
+  //       return newIndex;
+  //     });
+  //   },
+  //   [currentStateIndex]
+  // );
 
-  // Handle state changes to push to undo stack
-  useEffect(() => {
-    // Avoid initial push
-    if (currentStateIndex === 0 && undoStack[0] === siteContent) return;
-    pushNewState(siteContent);
-    if (currentStateIndex > 0) {
-      setHasUnsavedChanges(true);
-    }
-  }, [siteContent]);
+  // // Handle state changes to push to undo stack
+  // useEffect(() => {
+  //   // Avoid initial push
+  //   if (currentStateIndex === 0 && undoStack[0] === siteContent) return;
+  //   pushNewState(siteContent);
+  //   if (currentStateIndex > 0) {
+  //     setHasUnsavedChanges(true);
+  //   }
+  // }, [siteContent]);
 
-  // Handle Undo
+  // // Handle Undo
+  // const handleUndo = useCallback(() => {
+  //   if (currentStateIndex > 0) {
+  //     const newIndex = currentStateIndex - 1;
+  //     setCurrentStateIndex(newIndex);
+  //     setSiteContent(undoStack[newIndex]);
+  //   }
+  // }, [currentStateIndex, undoStack]);
+
+  // // Handle Redo
+  // const handleRedo = useCallback(() => {
+  //   if (currentStateIndex < undoStack.length - 1) {
+  //     const newIndex = currentStateIndex + 1;
+  //     setCurrentStateIndex(newIndex);
+  //     setSiteContent(undoStack[newIndex]);
+  //   }
+  // }, [currentStateIndex, undoStack]);
+
   const handleUndo = useCallback(() => {
-    if (currentStateIndex > 0) {
-      const newIndex = currentStateIndex - 1;
-      setCurrentStateIndex(newIndex);
-      setSiteContent(undoStack[newIndex]);
-    }
-  }, [currentStateIndex, undoStack]);
+    undo();
+  }, [undo]);
 
-  // Handle Redo
   const handleRedo = useCallback(() => {
-    if (currentStateIndex < undoStack.length - 1) {
-      const newIndex = currentStateIndex + 1;
-      setCurrentStateIndex(newIndex);
-      setSiteContent(undoStack[newIndex]);
-    }
-  }, [currentStateIndex, undoStack]);
+    redo();
+  }, [redo]);
 
   // // Debounce Undo/Redo to prevent rapid triggers
   // const debouncedHandleUndo = useCallback(debounce(handleUndo, 300), [
@@ -191,8 +209,8 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
 
       if (pageCache[newPage]) {
         const cachedContent = pageCache[newPage];
-        setUndoStack([cachedContent]);
-        setCurrentStateIndex(0);
+        reset(cachedContent); // Reset the undo/redo history with the new content
+        // setSiteContent(cachedContent);
         setSiteContent(cachedContent);
         toast.success(`Loaded cached page: ${newPage}`);
       } else {
@@ -216,15 +234,11 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
 
         let newContent = page.content;
 
-        // Inject the base tag to handle relative URLs and sanitize
-        // newContent = injectBaseTag(newContent);
-
         console.log("Fetched new page content of length:", newContent.length);
 
         // Reset undo/redo stack when changing pages
-        setUndoStack([newContent]);
-        setCurrentStateIndex(0);
-        setSiteContent(newContent); // Triggers useEffect to update the iframe
+        reset(newContent); // Resets the history with the new content
+        setSiteContent(newContent); // Pushes the new content to history
 
         console.log("=== New Site Content Details ===");
         console.log("Content length:", newContent.length);
@@ -544,7 +558,7 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
     });
 
     // Push to undo stack
-    pushNewState(updatedContent);
+    // pushNewState(updatedContent);
     setSiteContent(updatedContent);
   };
 
@@ -655,10 +669,10 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
       if ((e.ctrlKey || e.metaKey) && !e.shiftKey) {
         if (e.key === "z") {
           e.preventDefault();
-          // debouncedHandleUndo();
+          handleUndo();
         } else if (e.key === "y") {
           e.preventDefault();
-          // debouncedHandleRedo();
+          handleRedo();
         }
       }
 
@@ -775,7 +789,7 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
             const updatedContent = iframeDoc.documentElement.outerHTML;
 
             // Store the new state
-            pushNewState(updatedContent);
+            // pushNewState(updatedContent);
             setSiteContent(updatedContent);
 
             // Reset selection state
@@ -889,8 +903,8 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
           toggleEditMode={toggleEditMode}
           onUndo={handleUndo}
           onRedo={handleRedo}
-          canUndo={currentStateIndex > 0}
-          canRedo={currentStateIndex < undoStack.length - 1}
+          canUndo={canUndo}
+          canRedo={canRedo}
         />
         {showImagePill && (
           <ImageEditPill
