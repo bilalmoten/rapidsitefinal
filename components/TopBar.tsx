@@ -12,6 +12,8 @@ import {
   MoreHorizontal,
   ChevronDown,
   ChevronLeft,
+  Copy,
+  ExternalLink,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import {
@@ -36,6 +38,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { toast } from "sonner";
 
 interface TopBarProps {
   onSave: () => void;
@@ -80,6 +83,26 @@ const TopBar: React.FC<TopBarProps> = ({
     router.push("/dashboard");
   };
 
+  const handleCopyUrl = () => {
+    const url = `https://${subdomain}.aiwebsitebuilder.tech/${pageTitle.replace(
+      ".html",
+      ""
+    )}`;
+    navigator.clipboard.writeText(url).then(() => {
+      toast.success("URL copied to clipboard", {
+        duration: 2000,
+      });
+    });
+  };
+
+  const handlePreview = () => {
+    const url = `https://${subdomain}.aiwebsitebuilder.tech/${pageTitle.replace(
+      ".html",
+      ""
+    )}`;
+    window.open(url, "_blank");
+  };
+
   return (
     <header className="border-b bg-white">
       <div className="flex h-14 items-center px-4">
@@ -100,9 +123,17 @@ const TopBar: React.FC<TopBarProps> = ({
             </span>
             <Input
               className="h-7 w-[200px] bg-transparent border-none focus-visible:ring-0 focus-visible:ring-offset-0"
-              value={pageTitle}
+              value={pageTitle.replace(".html", "")}
               readOnly
             />
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleCopyUrl}
+              className="h-7 w-7 transition-all active:scale-95"
+            >
+              <Copy className="h-4 w-4" />
+            </Button>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="sm" className="h-7 px-2">
@@ -121,9 +152,6 @@ const TopBar: React.FC<TopBarProps> = ({
                 ))}
               </DropdownMenuContent>
             </DropdownMenu>
-            {/* <span className="text-sm text-muted-foreground">
-              .aiwebsitebuilder.tech
-            </span> */}
           </div>
         </div>
 
@@ -178,6 +206,10 @@ const TopBar: React.FC<TopBarProps> = ({
 
         {/* Right Section - Actions */}
         <div className="flex items-center space-x-2">
+          <Button variant="outline" size="sm" onClick={handlePreview}>
+            <ExternalLink className="mr-2 h-4 w-4" />
+            Preview
+          </Button>
           <Button
             variant={isCodeViewActive ? "secondary" : "outline"}
             size="sm"
