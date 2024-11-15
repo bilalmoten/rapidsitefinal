@@ -121,18 +121,13 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
       // Save current page before switching
       await handleSave();
 
-      console.log("=== Current Site Content Details ===");
-      console.log("Content length:", siteContent.length);
-      console.log("Content preview:", siteContent.substring(0, 100) + "...");
-
       setPageTitle(newPage);
       console.log("Switching to new page:", newPage);
 
       if (pageCache[newPage]) {
         const cachedContent = pageCache[newPage];
-        reset(cachedContent); // Reset the undo/redo history with the new content
-        // setSiteContent(cachedContent);
-        setSiteContent(cachedContent);
+        reset(cachedContent); // Reset the history with the new content
+        setSiteContent(cachedContent); // Set the content, pushing it to history
         toast.success(`Loaded cached page: ${newPage}`);
       } else {
         const supabaseClient = await createClient();
@@ -160,10 +155,6 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
         // Reset undo/redo stack when changing pages
         reset(newContent); // Resets the history with the new content
         setSiteContent(newContent); // Pushes the new content to history
-
-        console.log("=== New Site Content Details ===");
-        console.log("Content length:", newContent.length);
-        console.log("Content preview:", newContent.substring(0, 100) + "...");
 
         // Cache the new page content
         setPageCache((prevCache) => ({ ...prevCache, [newPage]: newContent }));
