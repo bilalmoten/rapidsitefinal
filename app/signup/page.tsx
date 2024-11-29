@@ -4,11 +4,9 @@ import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
 import { SubmitButton } from "../login/submit-button";
 
-export default async function Signup(
-  props: {
-    searchParams: Promise<{ message: string }>;
-  }
-) {
+export default async function Signup(props: {
+  searchParams: Promise<{ message: string }>;
+}) {
   const searchParams = await props.searchParams;
   const signUp = async (formData: FormData) => {
     "use server";
@@ -26,8 +24,12 @@ export default async function Signup(
       },
     });
 
+    console.log();
+
     if (error) {
-      return redirect("/signup?message=Could not create user");
+      return redirect(
+        "/signup?message=Sorry, we couldn't create your account, please try again later."
+      );
     }
 
     return redirect("/signup?message=Check your email to verify your account");
