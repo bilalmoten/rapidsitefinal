@@ -93,8 +93,9 @@ const TestimonialCard = ({
         <Image
           src={testimonial.image}
           alt={testimonial.name}
-          layout="fill"
-          objectFit="cover"
+          fill
+          className="object-cover"
+          sizes="(max-width: 48px) 100vw, 48px"
         />
       </div>
       <div>
@@ -139,14 +140,20 @@ export default function Testimonials() {
           {/* First row - moving right */}
           <Marquee className="mb-8" pauseOnHover>
             {testimonials.map((testimonial, index) => (
-              <TestimonialCard key={index} testimonial={testimonial} />
+              <TestimonialCard
+                key={`row1-${testimonial.name}`}
+                testimonial={testimonial}
+              />
             ))}
           </Marquee>
 
           {/* Second row - moving left */}
           <Marquee reverse pauseOnHover>
-            {testimonials.reverse().map((testimonial, index) => (
-              <TestimonialCard key={index} testimonial={testimonial} />
+            {[...testimonials].reverse().map((testimonial, index) => (
+              <TestimonialCard
+                key={`row2-${testimonial.name}`}
+                testimonial={testimonial}
+              />
             ))}
           </Marquee>
 
