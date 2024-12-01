@@ -21,6 +21,7 @@ import { createClient } from "@/utils/supabase/client";
 import { UsageBar } from "@/components/ui/usage-bar";
 import { PLAN_LIMITS } from "@/lib/constants/plans";
 import SettingsModal from "./dashboard/SettingsModal";
+import { CircularProgress } from "@/components/ui/circular-progress";
 
 const DashboardSidebar = () => {
   const { isExpanded, darkMode, toggleSidebar, toggleDarkMode } = useSidebar();
@@ -83,6 +84,37 @@ const DashboardSidebar = () => {
     }
   };
 
+  const UsageIndicator = ({
+    current,
+    limit,
+    color = "primary",
+  }: {
+    current: number;
+    limit: number;
+    color?: string;
+  }) => {
+    const percentage = (current / limit) * 100;
+    const isNearLimit = percentage >= 80;
+    const isAtLimit = percentage >= 100;
+
+    return (
+      <div className="relative w-8 h-8 rounded-full bg-secondary/20">
+        <div
+          className={`absolute inset-1 rounded-full flex items-center justify-center text-xs font-medium
+            ${
+              isAtLimit
+                ? "bg-red-500"
+                : isNearLimit
+                ? "bg-yellow-500"
+                : `bg-${color}`
+            }`}
+        >
+          {current}
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div
       className={cn(
@@ -129,31 +161,57 @@ const DashboardSidebar = () => {
         </div>
       </div>
 
-      {isExpanded && (
-        <div
-          className={cn(
-            "mt-auto p-3 space-y-3",
-            darkMode ? "text-gray-200" : "text-gray-700"
-          )}
-        >
-          <div className="text-sm font-medium">Usage</div>
-          <UsageBar
-            label="Active Websites"
-            current={usage.websitesActive}
-            limit={PLAN_LIMITS[usage.plan].websites}
-          />
-          <UsageBar
-            label="Websites Generated"
-            current={usage.websitesGenerated}
-            limit={PLAN_LIMITS[usage.plan].websitesGenerated}
-          />
-          <UsageBar
-            label="AI Edits"
-            current={usage.aiEditsCount}
-            limit={PLAN_LIMITS[usage.plan].aiEdits}
-          />
-        </div>
-      )}
+      <div
+        className={cn(
+          "mt-auto p-3 space-y-3",
+          darkMode ? "text-gray-200" : "text-gray-700"
+        )}
+      >
+        {isExpanded ? (
+          <>
+            <div className="text-sm font-medium">Usage</div>
+            <UsageBar
+              icon="website"
+              label="Active Websites"
+              current={usage.websitesActive}
+              limit={PLAN_LIMITS[usage.plan].websites}
+            />
+            <UsageBar
+              icon="generated"
+              label="Websites Generated"
+              current={usage.websitesGenerated}
+              limit={PLAN_LIMITS[usage.plan].websitesGenerated}
+            />
+            <UsageBar
+              icon="ai"
+              label="AI Edits"
+              current={usage.aiEditsCount}
+              limit={PLAN_LIMITS[usage.plan].aiEdits}
+            />
+          </>
+        ) : (
+          <div className="flex flex-col items-center gap-3">
+            <CircularProgress
+              icon="website"
+              current={usage.websitesActive}
+              limit={PLAN_LIMITS[usage.plan].websites}
+              label="Active Websites"
+            />
+            <CircularProgress
+              icon="generated"
+              current={usage.websitesGenerated}
+              limit={PLAN_LIMITS[usage.plan].websitesGenerated}
+              label="Websites Generated"
+            />
+            <CircularProgress
+              icon="ai"
+              current={usage.aiEditsCount}
+              limit={PLAN_LIMITS[usage.plan].aiEdits}
+              label="AI Edits"
+            />
+          </div>
+        )}
+      </div>
 
       <div className="border-t p-3 space-y-3">
         <Button
