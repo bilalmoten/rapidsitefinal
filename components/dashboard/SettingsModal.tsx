@@ -332,7 +332,11 @@ export default function SettingsModal({
                       className="w-full"
                       onClick={async () => {
                         const supabase = createClient();
-                        const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
+                        const siteUrl =
+                          process.env.NEXT_PUBLIC_SITE_URL ||
+                          "https://aiwebsitebuilder.tech";
+                        console.log("Using site URL:", siteUrl); // Debug log
+
                         await supabase.auth.resetPasswordForEmail(
                           user?.email || "",
                           {

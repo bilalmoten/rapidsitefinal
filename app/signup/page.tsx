@@ -11,10 +11,15 @@ export default async function Signup(props: {
   const signUp = async (formData: FormData) => {
     "use server";
 
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
+    const siteUrl =
+      process.env.SITE_URL ||
+      process.env.NEXT_PUBLIC_SITE_URL ||
+      "https://aiwebsitebuilder.tech";
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
     const supabase = await createClient();
+
+    console.log("Using site URL:", siteUrl);
 
     const { error } = await supabase.auth.signUp({
       email,
