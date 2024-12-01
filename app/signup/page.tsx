@@ -4,6 +4,14 @@ import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
 import { SubmitButton } from "../login/submit-button";
 
+// Add password requirements
+const PASSWORD_REGEX = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
+const PASSWORD_REQUIREMENTS =
+  "Password must be at least 8 characters long and contain at least one letter and one number";
+
+// Add this validation regex near the top with other constants
+const EMAIL_REGEX = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+
 export default async function Signup(props: {
   searchParams: Promise<{ message: string }>;
 }) {
@@ -14,6 +22,9 @@ export default async function Signup(props: {
     const siteUrl = "https://aiwebsitebuilder.tech";
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
+
+    // Create a service role client for checking users
+    // const supabaseAdmin = await createClient();
     const supabase = await createClient();
 
     console.log("Signup attempt with:", {
@@ -71,6 +82,8 @@ export default async function Signup(props: {
                 id="email"
                 name="email"
                 type="email"
+                pattern={EMAIL_REGEX.source}
+                title="Please enter a valid email address"
                 autoComplete="email"
                 required
                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
@@ -87,9 +100,14 @@ export default async function Signup(props: {
                 type="password"
                 autoComplete="new-password"
                 required
+                pattern={PASSWORD_REGEX.source}
+                title={PASSWORD_REQUIREMENTS}
                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                 placeholder="Password"
               />
+              <p className="mt-1 text-xs text-gray-500">
+                {PASSWORD_REQUIREMENTS}
+              </p>
             </div>
           </div>
 
@@ -97,6 +115,7 @@ export default async function Signup(props: {
             <SubmitButton
               formAction={signUp}
               className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              pendingText="Creating account..."
             >
               Sign up
             </SubmitButton>
