@@ -34,24 +34,46 @@ const DashboardSidebar = () => {
     aiEditsCount: 0,
     plan: "free" as const,
   });
+  const [user, setUser] = useState<{
+    email: string;
+    first_name?: string;
+    last_name?: string;
+    avatar_url?: string;
+  } | null>(null);
 
   useEffect(() => {
-    fetchUsageData();
+    fetchData();
   }, []);
 
-  const fetchUsageData = async () => {
+  const fetchData = async () => {
     const supabase = createClient();
-    const { data, error } = await supabase
+
+    const {
+      data: { user: authUser },
+    } = await supabase.auth.getUser();
+    if (authUser) {
+      const { data: userData, error: userError } = await supabase
+        .from("users")
+        .select("email, first_name, last_name, avatar_url")
+        .eq("id", authUser.id)
+        .single();
+
+      if (!userError && userData) {
+        setUser(userData);
+      }
+    }
+
+    const { data: usageData, error: usageError } = await supabase
       .from("user_usage")
       .select("*")
       .single();
 
-    if (!error && data) {
+    if (!usageError && usageData) {
       setUsage({
-        websitesActive: data.websites_active,
-        websitesGenerated: data.websites_generated,
-        aiEditsCount: data.ai_edits_count,
-        plan: data.plan,
+        websitesActive: usageData.websites_active,
+        websitesGenerated: usageData.websites_generated,
+        aiEditsCount: usageData.ai_edits_count,
+        plan: usageData.plan,
       });
     }
   };
@@ -276,6 +298,8 @@ const DashboardSidebar = () => {
         isOpen={showSettings}
         onClose={() => setShowSettings(false)}
         usage={usage}
+        user={user || undefined}
+        onProfileUpdate={fetchData}
       />
     </div>
   );

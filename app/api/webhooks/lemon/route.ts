@@ -1,15 +1,15 @@
 import { createClient } from '@/utils/supabase/server';
 import { NextResponse } from 'next/server';
-import { LEMON_VARIANT_IDS, PlanType } from '@/lib/constants/plans';
+import { LEMON_VARIANT_IDS, PlanType, VariantId } from '@/lib/constants/plans';
 
 function getPlanFromVariantId(variantId: string): PlanType {
     const variantMap = {
         [LEMON_VARIANT_IDS.pro_monthly]: 'pro',
         [LEMON_VARIANT_IDS.pro_yearly]: 'pro',
-        [LEMON_VARIANT_IDS.enterprise_monthly]: 'enterprise',
-        [LEMON_VARIANT_IDS.enterprise_yearly]: 'enterprise'
-    };
-    return (variantMap[variantId] || 'free') as PlanType;
+        [LEMON_VARIANT_IDS.pro_max_monthly]: 'enterprise',
+        [LEMON_VARIANT_IDS.pro_max_yearly]: 'enterprise'
+    } as const;
+    return (variantMap[variantId as VariantId] || 'free') as PlanType;
 }
 
 async function handleSubscriptionUpdate(supabase: any, payload: any) {
