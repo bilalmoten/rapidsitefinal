@@ -11,30 +11,33 @@ export default async function Signup(props: {
   const signUp = async (formData: FormData) => {
     "use server";
 
-    const siteUrl =
-      process.env.SITE_URL ||
-      process.env.NEXT_PUBLIC_SITE_URL ||
-      "https://aiwebsitebuilder.tech";
+    const siteUrl = "https://aiwebsitebuilder.tech";
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
     const supabase = await createClient();
 
-    console.log("Using site URL:", siteUrl);
+    console.log("Signup attempt with:", {
+      email,
+      redirectUrl: `${siteUrl}/auth/callback`,
+    });
 
     const { error } = await supabase.auth.signUp({
       email,
       password,
       options: {
         emailRedirectTo: `${siteUrl}/auth/callback`,
+        data: {
+          redirect_url: `${siteUrl}/auth/callback`,
+        },
       },
     });
 
-    console.log();
-
     if (error) {
-      console.error(error);
+      console.error("Signup error:", error);
       return redirect(
-        "/signup?message=Sorry, we couldn't create your account, please try again later."
+        `/signup?message=${encodeURIComponent(
+          error.message || "Sorry, we couldn't create your account"
+        )}`
       );
     }
 
