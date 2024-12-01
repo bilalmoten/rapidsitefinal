@@ -11,7 +11,8 @@ export default async function Signup(props: {
   const signUp = async (formData: FormData) => {
     "use server";
 
-    const origin = (await headers()).get("origin");
+    const origin =
+      process.env.NEXT_PUBLIC_SITE_URL || (await headers()).get("origin");
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
     const supabase = await createClient();
@@ -27,6 +28,7 @@ export default async function Signup(props: {
     console.log();
 
     if (error) {
+      console.error(error);
       return redirect(
         "/signup?message=Sorry, we couldn't create your account, please try again later."
       );
