@@ -330,9 +330,15 @@ export default function SettingsModal({
                     <Button
                       variant="outline"
                       className="w-full"
-                      onClick={() => {
+                      onClick={async () => {
                         const supabase = createClient();
-                        supabase.auth.resetPasswordForEmail(user?.email || "");
+                        const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
+                        await supabase.auth.resetPasswordForEmail(
+                          user?.email || "",
+                          {
+                            redirectTo: `${siteUrl}/auth/callback`,
+                          }
+                        );
                         toast.success("Password reset email sent");
                       }}
                     >

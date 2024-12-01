@@ -11,8 +11,7 @@ export default async function Signup(props: {
   const signUp = async (formData: FormData) => {
     "use server";
 
-    const origin =
-      process.env.NEXT_PUBLIC_SITE_URL || (await headers()).get("origin");
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
     const supabase = await createClient();
@@ -21,7 +20,7 @@ export default async function Signup(props: {
       email,
       password,
       options: {
-        emailRedirectTo: `${origin}/auth/callback`,
+        emailRedirectTo: `${siteUrl}/auth/callback`,
       },
     });
 
