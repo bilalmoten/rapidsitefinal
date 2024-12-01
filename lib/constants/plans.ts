@@ -19,8 +19,10 @@ export const PLAN_LIMITS = {
 export type PlanType = keyof typeof PLAN_LIMITS;
 
 export const LEMON_VARIANT_IDS = {
-    pro_monthly: 'your_variant_id_here',
-    pro_yearly: 'your_variant_id_here',
-    enterprise_monthly: 'your_variant_id_here',
-    enterprise_yearly: 'your_variant_id_here'
-}; 
+    pro_monthly: '617721',
+    pro_yearly: '617722',
+    pro_max_monthly: '617723',
+    pro_max_yearly: '617725'
+};
+
+export type VariantId = keyof typeof LEMON_VARIANT_IDS; 
