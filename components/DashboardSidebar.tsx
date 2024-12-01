@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { useSidebar } from "@/contexts/SidebarContext";
@@ -18,11 +18,42 @@ import {
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
+import { UsageBar } from "@/components/ui/usage-bar";
+import { PLAN_LIMITS } from "@/lib/constants/plans";
+import SettingsModal from "./dashboard/SettingsModal";
 
 const DashboardSidebar = () => {
   const { isExpanded, darkMode, toggleSidebar, toggleDarkMode } = useSidebar();
   const pathname = usePathname();
   const router = useRouter();
+  const [showSettings, setShowSettings] = useState(false);
+  const [usage, setUsage] = useState({
+    websitesActive: 0,
+    websitesGenerated: 0,
+    aiEditsCount: 0,
+    plan: "free" as const,
+  });
+
+  useEffect(() => {
+    fetchUsageData();
+  }, []);
+
+  const fetchUsageData = async () => {
+    const supabase = createClient();
+    const { data, error } = await supabase
+      .from("user_usage")
+      .select("*")
+      .single();
+
+    if (!error && data) {
+      setUsage({
+        websitesActive: data.websites_active,
+        websitesGenerated: data.websites_generated,
+        aiEditsCount: data.ai_edits_count,
+        plan: data.plan,
+      });
+    }
+  };
 
   const navItems = [
     {
@@ -98,7 +129,44 @@ const DashboardSidebar = () => {
         </div>
       </div>
 
+      {isExpanded && (
+        <div
+          className={cn(
+            "mt-auto p-3 space-y-3",
+            darkMode ? "text-gray-200" : "text-gray-700"
+          )}
+        >
+          <div className="text-sm font-medium">Usage</div>
+          <UsageBar
+            label="Active Websites"
+            current={usage.websitesActive}
+            limit={PLAN_LIMITS[usage.plan].websites}
+          />
+          <UsageBar
+            label="Websites Generated"
+            current={usage.websitesGenerated}
+            limit={PLAN_LIMITS[usage.plan].websitesGenerated}
+          />
+          <UsageBar
+            label="AI Edits"
+            current={usage.aiEditsCount}
+            limit={PLAN_LIMITS[usage.plan].aiEdits}
+          />
+        </div>
+      )}
+
       <div className="border-t p-3 space-y-3">
+        <Button
+          variant="ghost"
+          className={cn(
+            "w-full",
+            isExpanded ? "justify-start px-3" : "justify-center px-0"
+          )}
+          onClick={() => setShowSettings(true)}
+        >
+          <Settings className="h-6 w-6" />
+          {isExpanded && <span className="ml-3">Settings</span>}
+        </Button>
         <Button
           variant="ghost"
           className={cn(
@@ -115,7 +183,6 @@ const DashboardSidebar = () => {
             </div>
           )}
         </Button>
-
         <Button
           variant="ghost"
           className={cn(
@@ -146,6 +213,12 @@ const DashboardSidebar = () => {
           )}
         </Button>
       </div>
+
+      <SettingsModal
+        isOpen={showSettings}
+        onClose={() => setShowSettings(false)}
+        usage={usage}
+      />
     </div>
   );
 };

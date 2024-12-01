@@ -25,6 +25,12 @@ import {
 } from "@/lib/editor/textFormatting";
 import { TextFormatAction, TextFormats } from "@/types/editor";
 import { createClient } from "@/utils/supabase/client";
+import {
+  checkAndUpdateAIEdits,
+  checkWebsiteGenerationLimit,
+  checkAIEditsLimit,
+  incrementAIEdits,
+} from "@/utils/usage-tracker";
 // import debounce from "lodash.debounce";
 // import DOMPurify from "dompurify";
 
@@ -638,22 +644,37 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
   ) => {
     if (!selectedElement || !iframeRef.current?.contentDocument) return;
 
-    const elementCode = selectedElement.outerHTML;
-    const fullPageCode = initialContent;
-
     try {
+      // First check if user can make edits
+      const { canEdit, remaining } = await checkAIEditsLimit(userId);
+
+      if (!canEdit) {
+        toast.error("AI edit limit reached. Please upgrade your plan.");
+        return;
+      }
+
+      if (remaining <= 3) {
+        toast.warning(`Only ${remaining} AI edits remaining`);
+      }
+
+      // Proceed with the edit request
       const response = await fetch("/api/handle_element_request", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          fullPageCode: fullPageCode,
+          fullPageCode: initialContent,
           model: mode === "quick" ? "o1-mini" : "gpt-4o-mini",
-          elementCode,
+          elementCode: selectedElement.outerHTML,
           userRequest: request,
         }),
       });
+
+      if (response.ok) {
+        // If edit was successful, increment the count
+        await incrementAIEdits(userId);
+      }
 
       if (!response.ok) {
         throw new Error("Failed to process request");
@@ -684,6 +705,7 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
             // Store the new state
             // pushNewState(updatedContent);
             setSiteContent(updatedContent);
+            await handleSave();
 
             // Reset selection state
             setSelectedElement(null);
