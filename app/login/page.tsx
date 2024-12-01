@@ -4,10 +4,11 @@ import { redirect } from "next/navigation";
 import { SubmitButton } from "./submit-button";
 import MotionWrapper from "@/components/MotionWrapper";
 import AnimatedLoginContent from "@/components/AnimatedLoginContent";
-import { FormMessage, Message } from "@/components/form-message";
+import { FormMessage } from "@/components/form-message";
 
-// export default async function Login(props: {searchParams: Promise<{ message?: string }>;}) {
-export default async function Login(props: { searchParams: Promise<Message> }) {
+export default async function Login(props: {
+  searchParams: Promise<{ message: string }>;
+}) {
   const searchParams = await props.searchParams;
 
   const signIn = async (formData: FormData) => {
@@ -23,7 +24,18 @@ export default async function Login(props: { searchParams: Promise<Message> }) {
     });
 
     if (error) {
-      return redirect("/login?message=Could not authenticate user ");
+      let errorMessage = "Could not authenticate user";
+
+      if (error.message.includes("Invalid login credentials")) {
+        errorMessage = "Invalid email or password";
+      } else if (error.message.includes("Email not confirmed")) {
+        errorMessage = "Please verify your email before logging in";
+      } else if (error.message.includes("Too many requests")) {
+        errorMessage = "Too many login attempts. Please try again later";
+      }
+
+      console.error("Login error:", error.message);
+      return redirect(`/login?message=${encodeURIComponent(errorMessage)}`);
     }
 
     return redirect("/dashboard");
@@ -53,6 +65,20 @@ export default async function Login(props: { searchParams: Promise<Message> }) {
               Please sign in to your account
             </p>
           </div>
+
+          {searchParams?.message && (
+            <div
+              className={`p-4 ${
+                searchParams.message.toLowerCase().includes("success")
+                  ? "bg-green-100 border-green-400 text-green-700"
+                  : "bg-red-100 border-red-400 text-red-700"
+              } border rounded-md`}
+              role="alert"
+            >
+              <p className="text-sm">{searchParams.message}</p>
+            </div>
+          )}
+
           <form className="mt-8 space-y-6" action={signIn}>
             <div className="rounded-md shadow-sm -space-y-px">
               <div>
@@ -103,7 +129,7 @@ export default async function Login(props: { searchParams: Promise<Message> }) {
 
               <div className="text-sm">
                 <Link
-                  href="/forgot-password"
+                  href="/reset-password"
                   className="font-medium text-indigo-600 hover:text-indigo-500"
                 >
                   Forgot your password?
