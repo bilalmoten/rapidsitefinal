@@ -34,7 +34,7 @@ const DashboardContent: React.FC<DashboardContentProps> = ({
   return (
     <div className="min-h-screen bg-background">
       <main className="flex-1 overflow-y-auto">
-        <Header user={user} />
+        {/* <Header user={user} /> */}
         <div className="container mx-auto px-4 py-8 space-y-8">
           <div className="rounded-lg bg-card p-6 shadow-sm">
             <WelcomeSection user={user} />
