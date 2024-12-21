@@ -28,9 +28,9 @@ export default function RootLayout({
       <body className={`${GeistSans.className} antialiased`}>
         <ThemeProvider
           attribute="class"
-          defaultTheme="light"
-          enableSystem={false}
-          storageKey="rapidsite-theme"
+          defaultTheme="dark"
+          enableSystem
+          // storageKey="rapidsite-theme"
           disableTransitionOnChange
         >
           <div className="min-h-screen bg-background">{children}</div>

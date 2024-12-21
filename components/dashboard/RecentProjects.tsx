@@ -91,15 +91,15 @@ const RecentProjects: React.FC<RecentProjectsProps> = ({ websites }) => {
           {[...Array(4)].map((_, index) => (
             <div
               key={index}
-              className="bg-white rounded-lg shadow-md p-4 animate-pulse"
+              className="bg-card rounded-lg border border-border shadow-sm p-4 animate-pulse"
             >
-              <div className="h-32 bg-gray-200 rounded-md mb-4"></div>
-              <div className="h-6 bg-gray-200 rounded mb-2"></div>
-              <div className="h-4 bg-gray-200 rounded mb-4"></div>
-              <div className="flex justify-between">
-                <div className="h-8 w-20 bg-gray-200 rounded"></div>
-                <div className="h-8 w-20 bg-gray-200 rounded"></div>
-                <div className="h-8 w-20 bg-gray-200 rounded"></div>
+              <div className="h-32 bg-muted rounded-md border border-border mb-4"></div>
+              <div className="h-6 bg-muted rounded mb-2"></div>
+              <div className="h-4 bg-muted rounded mb-4"></div>
+              <div className="flex justify-between pt-4 border-t border-border">
+                <div className="h-8 w-20 bg-muted rounded"></div>
+                <div className="h-8 w-20 bg-muted rounded"></div>
+                <div className="h-8 w-20 bg-muted rounded"></div>
               </div>
             </div>
           ))}
@@ -117,10 +117,10 @@ const RecentProjects: React.FC<RecentProjectsProps> = ({ websites }) => {
             {displayedWebsites.map((website) => (
               <div
                 key={website.id}
-                className="bg-white rounded-lg shadow-md p-4"
+                className="bg-card hover:bg-accent/50 rounded-lg border border-border shadow-sm p-4 transition-colors"
               >
                 <div className="flex flex-col h-full">
-                  <div className="mb-4 relative h-32">
+                  <div className="mb-4 relative h-32 rounded-md overflow-hidden border border-border">
                     <Image
                       src={website.thumbnail_url || "/placeholder-website.jpg"}
                       alt={website.website_name}
@@ -129,7 +129,7 @@ const RecentProjects: React.FC<RecentProjectsProps> = ({ websites }) => {
                              (max-width: 768px) 50vw, 
                              (max-width: 1024px) 33vw, 
                              25vw"
-                      className="rounded-md object-cover"
+                      className="object-cover"
                       onError={(e) => {
                         const img = e.target as HTMLImageElement;
                         img.src = "/placeholder-website.jpg";
@@ -137,14 +137,14 @@ const RecentProjects: React.FC<RecentProjectsProps> = ({ websites }) => {
                     />
                   </div>
                   <div className="flex-grow">
-                    <h3 className="text-lg font-semibold mb-2">
+                    <h3 className="text-lg font-semibold mb-2 text-foreground">
                       {website.website_name}
                     </h3>
-                    <p className="text-gray-600 text-sm mb-4">
+                    <p className="text-muted-foreground text-sm mb-4">
                       {website.website_description}
                     </p>
                   </div>
-                  <div className="flex justify-between items-center">
+                  <div className="flex justify-between items-center pt-4 border-t border-border">
                     <Link href={`/dashboard/editor/${website.id}`}>
                       <Button variant="outline" size="sm">
                         <Edit className="w-4 h-4 mr-2" />

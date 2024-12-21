@@ -2,15 +2,13 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Star, Menu, Sun, Moon } from "lucide-react";
+import { Star, Menu } from "lucide-react";
 import Link from "next/link";
 import ShinyButton from "@/components/ui/shiny-button";
-import { useTheme } from "next-themes";
 import { useRouter } from "next/navigation";
 
 export default function Header() {
   const router = useRouter();
-  const { theme, setTheme } = useTheme();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const menuItems = [
@@ -64,18 +62,6 @@ export default function Header() {
                   </Link>
                 </motion.div>
               ))}
-              <motion.button
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-                className="p-2 rounded-full hover:bg-muted transition-colors"
-                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              >
-                {theme === "dark" ? (
-                  <Sun className="h-4 w-4" />
-                ) : (
-                  <Moon className="h-4 w-4" />
-                )}
-              </motion.button>
             </div>
           </div>
 
@@ -117,17 +103,6 @@ export default function Header() {
                 </motion.div>
               ))}
               <div className="flex items-center justify-between pt-4 border-t border-border">
-                <motion.button
-                  whileTap={{ scale: 0.95 }}
-                  className="p-2 rounded-lg bg-muted"
-                  onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                >
-                  {theme === "dark" ? (
-                    <Sun className="h-5 w-5" />
-                  ) : (
-                    <Moon className="h-5 w-5" />
-                  )}
-                </motion.button>
                 <ShinyButton onClick={handleGetStarted}>
                   Get Started
                 </ShinyButton>
