@@ -71,7 +71,8 @@ const plans = [
   },
   {
     name: "Pro",
-    price: "$19/month",
+    price: "$9.99/month",
+    yearlyPrice: "$89.99/year",
     features: [
       "5 websites",
       "100 AI edits",
@@ -80,10 +81,12 @@ const plans = [
     ],
     current: false,
     variantId: LEMON_VARIANT_IDS.pro_monthly,
+    yearlyVariantId: LEMON_VARIANT_IDS.pro_yearly,
   },
   {
     name: "Enterprise",
-    price: "$49/month",
+    price: "$39.99/month",
+    yearlyPrice: "$359.99/year",
     features: [
       "Unlimited websites",
       "Unlimited AI edits",
@@ -93,6 +96,7 @@ const plans = [
     ],
     current: false,
     variantId: LEMON_VARIANT_IDS.pro_max_monthly,
+    yearlyVariantId: LEMON_VARIANT_IDS.pro_max_yearly,
   },
 ];
 
@@ -105,9 +109,9 @@ export default function SettingsModal({
 }: SettingsModalProps) {
   const [activeTab, setActiveTab] = useState("usage");
   const [isUpdating, setIsUpdating] = useState(false);
-  const [isLoadingPortal2, setIsLoadingPortal2] = useState(false);
-
   const [isLoadingPortal, setIsLoadingPortal] = useState(false);
+  const [isYearly, setIsYearly] = useState(false);
+
   const [formData, setFormData] = useState({
     firstName: user?.first_name || "",
     lastName: user?.last_name || "",
@@ -273,47 +277,87 @@ export default function SettingsModal({
                       : "Inactive"}
                   </Badge>
                 </div>
-                {usage.subscription_id && (
-                  <Button
-                    variant="outline"
-                    className="w-full mt-2"
-                    disabled={isLoadingPortal}
-                    onClick={async () => {
-                      try {
-                        setIsLoadingPortal(true);
-                        const response = await fetch(
-                          "/api/subscription/get-portal-url"
-                        );
-                        if (!response.ok)
-                          throw new Error("Failed to get portal URL");
-                        const { url } = await response.json();
-                        window.open(url, "_blank");
-                      } catch (error) {
-                        console.error("Error getting portal URL:", error);
-                        toast.error("Failed to open billing portal");
-                      } finally {
-                        setIsLoadingPortal(false);
-                      }
-                    }}
-                  >
-                    <CreditCard
-                      className={cn(
-                        "h-4 w-4 mr-2",
-                        isLoadingPortal && "animate-pulse"
-                      )}
-                    />
-                    {isLoadingPortal
-                      ? "Opening Portal..."
-                      : "Manage Subscription"}
-                  </Button>
-                )}
+                {usage.subscription_id &&
+                  usage.subscription_status === "active" && (
+                    <Button
+                      variant="outline"
+                      className="w-full mt-2"
+                      disabled={isLoadingPortal}
+                      onClick={async () => {
+                        try {
+                          setIsLoadingPortal(true);
+                          const response = await fetch(
+                            "/api/subscription/get-portal-url"
+                          );
+                          if (!response.ok)
+                            throw new Error("Failed to get portal URL");
+                          const { url } = await response.json();
+                          window.open(url, "_blank");
+                        } catch (error) {
+                          console.error("Error getting portal URL:", error);
+                          toast.error("Failed to open billing portal");
+                        } finally {
+                          setIsLoadingPortal(false);
+                        }
+                      }}
+                    >
+                      <CreditCard
+                        className={cn(
+                          "h-4 w-4 mr-2",
+                          isLoadingPortal && "animate-pulse"
+                        )}
+                      />
+                      {isLoadingPortal
+                        ? "Opening Portal..."
+                        : "Manage Subscription"}
+                    </Button>
+                  )}
+              </div>
+
+              {/* Billing Period Toggle */}
+              <div className="flex items-center justify-center gap-2 mb-6">
+                <span
+                  className={cn(
+                    "text-sm",
+                    !isYearly && "text-primary font-medium"
+                  )}
+                >
+                  Monthly
+                </span>
+                <button
+                  onClick={() => setIsYearly(!isYearly)}
+                  className={cn(
+                    "relative inline-flex h-5 w-9 items-center rounded-full transition-colors",
+                    isYearly ? "bg-primary" : "bg-muted"
+                  )}
+                >
+                  <span
+                    className={cn(
+                      "inline-block h-4 w-4 transform rounded-full bg-white transition-transform",
+                      isYearly ? "translate-x-5" : "translate-x-0.5"
+                    )}
+                  />
+                </button>
+                <span
+                  className={cn(
+                    "text-sm",
+                    isYearly && "text-primary font-medium"
+                  )}
+                >
+                  Yearly
+                </span>
+                <span className="text-sm text-green-500 font-medium ml-1">
+                  (Save 25%)
+                </span>
               </div>
 
               {/* Available Plans */}
               <div
                 className={cn(
-                  "grid gap-4",
-                  usage.plan === "free" ? "md:grid-cols-3" : "md:grid-cols-2"
+                  "grid gap-6",
+                  usage.plan === "free"
+                    ? "md:grid-cols-3"
+                    : "md:grid-cols-2 max-w-3xl mx-auto"
                 )}
               >
                 {plans
@@ -333,7 +377,9 @@ export default function SettingsModal({
                         <div>
                           <h4 className="font-medium">{plan.name}</h4>
                           <p className="text-sm text-muted-foreground">
-                            {plan.price}
+                            {isYearly
+                              ? plan.yearlyPrice || plan.price
+                              : plan.price}
                           </p>
                         </div>
                         {usage.plan === plan.name.toLowerCase() ? (
@@ -341,11 +387,15 @@ export default function SettingsModal({
                         ) : (
                           <Button
                             variant="outline"
-                            onClick={() =>
-                              plan.variantId && handleUpgrade(plan.variantId)
-                            }
+                            onClick={() => {
+                              const variantId = isYearly
+                                ? plan.yearlyVariantId
+                                : plan.variantId;
+                              variantId && handleUpgrade(variantId);
+                            }}
                             disabled={
-                              !plan.variantId ||
+                              (!isYearly && !plan.variantId) ||
+                              (isYearly && !plan.yearlyVariantId) ||
                               (usage.plan !== "free" && plan.name === "Free")
                             }
                           >
@@ -378,10 +428,10 @@ export default function SettingsModal({
                   <Button
                     variant="outline"
                     className="w-full"
-                    disabled={isLoadingPortal2}
+                    disabled={isLoadingPortal}
                     onClick={async () => {
                       try {
-                        setIsLoadingPortal2(true);
+                        setIsLoadingPortal(true);
                         const response = await fetch(
                           "/api/subscription/get-portal-url"
                         );
@@ -393,17 +443,17 @@ export default function SettingsModal({
                         console.error("Error getting portal URL:", error);
                         toast.error("Failed to open billing portal");
                       } finally {
-                        setIsLoadingPortal2(false);
+                        setIsLoadingPortal(false);
                       }
                     }}
                   >
                     <CreditCard
                       className={cn(
                         "h-4 w-4 mr-2",
-                        isLoadingPortal2 && "animate-pulse"
+                        isLoadingPortal && "animate-pulse"
                       )}
                     />
-                    {isLoadingPortal2
+                    {isLoadingPortal
                       ? "Opening Portal..."
                       : "View Billing History"}
                   </Button>
