@@ -101,9 +101,9 @@ export async function POST(request: Request) {
                     // }
 
                     // Live mode variants (uncomment in production)
-                    if (variant_id === "617721" || variant_id === "617722") { // pro monthly/yearly
+                    if (variant_id === 617721 || variant_id === 617722) { // pro monthly/yearly
                         plan = "pro";
-                    } else if (variant_id === "617723" || variant_id === "617725") { // enterprise monthly/yearly
+                    } else if (variant_id === 617723 || variant_id === 617725) { // enterprise monthly/yearly
                         plan = "enterprise";
                     }
                 }
