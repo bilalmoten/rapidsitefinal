@@ -57,17 +57,19 @@ const DashboardSidebar = () => {
         .select("email, first_name, last_name, avatar_url")
         .eq("id", authUser.id)
         .single();
-
+      console.log("logging user");
       if (!userError && userData) {
         setUser(userData);
       }
     }
+    console.log("logging user done");
 
     const { data: usageData, error: usageError } = await supabase
       .from("user_usage")
       .select("*")
       .single();
 
+    console.log("logging usage");
     if (!usageError && usageData) {
       setUsage({
         websitesActive: usageData.websites_active,
@@ -247,7 +249,7 @@ const DashboardSidebar = () => {
           <Settings className="h-6 w-6" />
           {isExpanded && <span className="ml-3">Settings</span>}
         </Button>
-        <Button
+        {/* <Button
           variant="ghost"
           className={cn(
             "w-full",
@@ -262,7 +264,7 @@ const DashboardSidebar = () => {
               <Switch checked={darkMode} />
             </div>
           )}
-        </Button>
+        </Button> */}
         <Button
           variant="ghost"
           className={cn(

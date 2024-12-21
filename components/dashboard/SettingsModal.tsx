@@ -10,7 +10,12 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
 import { UsageBar } from "@/components/ui/usage-bar";
-import { PLAN_LIMITS, PlanType } from "@/lib/constants/plans";
+import {
+  PLAN_LIMITS,
+  PlanType,
+  LEMON_VARIANT_IDS,
+  VariantId,
+} from "@/lib/constants/plans";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -29,6 +34,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { uploadAvatar } from "@/utils/profile-manager";
+import { cn } from "@/lib/utils";
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -50,6 +56,18 @@ interface SettingsModalProps {
 
 const plans = [
   {
+    name: "Free",
+    price: "$0/month",
+    features: [
+      "1 website",
+      "10 AI edits",
+      "3 website generations",
+      "Email support",
+    ],
+    current: true,
+    variantId: null,
+  },
+  {
     name: "Pro",
     price: "$19/month",
     features: [
@@ -59,6 +77,7 @@ const plans = [
       "Priority support",
     ],
     current: false,
+    variantId: LEMON_VARIANT_IDS.pro_monthly,
   },
   {
     name: "Enterprise",
@@ -71,6 +90,7 @@ const plans = [
       "Custom domain support",
     ],
     current: false,
+    variantId: LEMON_VARIANT_IDS.pro_max_monthly,
   },
 ];
 
@@ -142,6 +162,28 @@ export default function SettingsModal({
     }
   };
 
+  const handleUpgrade = async (variantId: string) => {
+    try {
+      const response = await fetch("/api/subscription/create-checkout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ variantId }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to create checkout");
+      }
+
+      const { url } = await response.json();
+      window.location.href = url;
+    } catch (error) {
+      console.error("Error upgrading plan:", error);
+      toast.error("Failed to start upgrade process");
+    }
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[600px]">
@@ -204,11 +246,15 @@ export default function SettingsModal({
                 <Crown className="h-5 w-5 text-yellow-500" />
                 <h3 className="font-semibold">Available Plans</h3>
               </div>
-              <div className="grid gap-4 md:grid-cols-2">
+              <div className="grid gap-4 md:grid-cols-3">
                 {plans.map((plan) => (
                   <div
                     key={plan.name}
-                    className="border rounded-lg p-4 space-y-4"
+                    className={cn(
+                      "border rounded-lg p-4 space-y-4",
+                      usage.plan === plan.name.toLowerCase() &&
+                        "ring-2 ring-blue-500"
+                    )}
                   >
                     <div className="flex justify-between items-center">
                       <div>
@@ -217,10 +263,18 @@ export default function SettingsModal({
                           {plan.price}
                         </p>
                       </div>
-                      {plan.current ? (
+                      {usage.plan === plan.name.toLowerCase() ? (
                         <Badge>Current Plan</Badge>
                       ) : (
-                        <Button variant="outline">Select</Button>
+                        <Button
+                          variant="outline"
+                          onClick={() =>
+                            plan.variantId && handleUpgrade(plan.variantId)
+                          }
+                          disabled={!plan.variantId}
+                        >
+                          {plan.name === "Free" ? "Downgrade" : "Upgrade"}
+                        </Button>
                       )}
                     </div>
                     <ul className="space-y-2">
@@ -243,7 +297,16 @@ export default function SettingsModal({
                   <p className="text-sm text-muted-foreground">
                     View and download your billing history
                   </p>
-                  <Button variant="outline" className="mt-2">
+                  <Button
+                    variant="outline"
+                    className="mt-2"
+                    onClick={() =>
+                      window.open(
+                        "https://app.lemonsqueezy.com/billing",
+                        "_blank"
+                      )
+                    }
+                  >
                     <CreditCard className="h-4 w-4 mr-2" />
                     Manage Billing
                   </Button>

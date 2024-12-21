@@ -22,7 +22,8 @@ export const LEMON_VARIANT_IDS = {
     pro_monthly: '617721',
     pro_yearly: '617722',
     pro_max_monthly: '617723',
-    pro_max_yearly: '617725'
+    pro_max_yearly: '617725',
+    starter: '393389'
 };
 
 export type VariantId = keyof typeof LEMON_VARIANT_IDS; 
