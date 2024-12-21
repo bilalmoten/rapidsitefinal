@@ -51,9 +51,9 @@ export async function POST(request: Request) {
                         },
                         product_options: {
                             redirect_url: `${process.env.NEXT_PUBLIC_SITE_URL}/dashboard?subscription=success`,
-                            // enabled_variants: [variantId]
+                            enabled_variants: [variantId]
 
-                            enabled_variants: ["393389"]
+                            // enabled_variants: ["393389"]
                         },
                         // checkout_options: {
                         //     dark: true,
