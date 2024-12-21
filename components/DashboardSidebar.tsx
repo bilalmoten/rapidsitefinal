@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { useSidebar } from "@/contexts/SidebarContext";
+import { useTheme } from "next-themes";
 import { cn } from "@/lib/utils";
 import {
   Home,
@@ -24,7 +25,8 @@ import SettingsModal from "./dashboard/SettingsModal";
 import { CircularProgress } from "@/components/ui/circular-progress";
 
 const DashboardSidebar = () => {
-  const { isExpanded, darkMode, toggleSidebar, toggleDarkMode } = useSidebar();
+  const { isExpanded, toggleSidebar } = useSidebar();
+  const { theme, setTheme } = useTheme();
   const pathname = usePathname();
   const router = useRouter();
   const [showSettings, setShowSettings] = useState(false);
@@ -151,7 +153,7 @@ const DashboardSidebar = () => {
   return (
     <div
       className={cn(
-        "border-r bg-muted/30 transition-all duration-300 flex flex-col h-screen",
+        "border-r bg-background/95 transition-all duration-300 flex flex-col h-screen",
         isExpanded ? "w-64" : "w-16"
       )}
     >
@@ -197,7 +199,7 @@ const DashboardSidebar = () => {
       <div
         className={cn(
           "mt-auto p-3 space-y-3",
-          darkMode ? "text-gray-200" : "text-gray-700"
+          theme === "dark" ? "text-gray-200" : "text-gray-700"
         )}
       >
         {isExpanded ? (
@@ -258,22 +260,18 @@ const DashboardSidebar = () => {
           <Settings className="h-6 w-6" />
           {isExpanded && <span className="ml-3">Settings</span>}
         </Button>
-        {/* <Button
-          variant="ghost"
-          className={cn(
-            "w-full",
-            isExpanded ? "justify-start px-3" : "justify-center px-0"
-          )}
-          onClick={toggleDarkMode}
-        >
-          <Moon className={cn("h-6 w-6", darkMode && "text-blue-600")} />
-          {isExpanded && (
-            <div className="flex items-center justify-between flex-1 ml-3">
-              <span>Dark Mode</span>
-              <Switch checked={darkMode} />
-            </div>
-          )}
-        </Button> */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Moon className="h-4 w-4" />
+            {isExpanded && <span>Dark Mode</span>}
+          </div>
+          <Switch
+            checked={theme === "dark"}
+            onCheckedChange={() =>
+              setTheme(theme === "dark" ? "light" : "dark")
+            }
+          />
+        </div>
         <Button
           variant="ghost"
           className={cn(

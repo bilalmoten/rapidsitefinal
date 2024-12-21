@@ -8,21 +8,21 @@ import Link from "next/link";
 import Footer from "./Footer";
 import { Button } from "@/components/ui/button";
 import { User } from "@supabase/supabase-js";
+import { useTheme } from "next-themes";
 
 interface LayoutProps {
   children: ReactNode;
-  darkMode: boolean;
-  toggleDarkMode: () => void;
   user: User | null;
 }
 
-export default function Layout({
-  children,
-  darkMode,
-  toggleDarkMode,
-  user,
-}: LayoutProps) {
+export default function Layout({ children, user }: LayoutProps) {
   const [isScrolled, setIsScrolled] = useState(false);
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -32,20 +32,14 @@ export default function Layout({
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  if (!mounted) {
+    return null;
+  }
+
   return (
-    <div
-      className={`min-h-screen relative overflow-hidden ${
-        darkMode ? "dark bg-gray-950 text-gray-100" : "bg-white text-gray-900"
-      }`}
-    >
+    <div className="min-h-screen relative overflow-hidden bg-background">
       <div className="absolute inset-0 z-0">
-        <div
-          className={`absolute inset-0 ${
-            darkMode
-              ? "bg-gradient-to-br from-gray-900 to-indigo-950"
-              : "bg-gradient-to-br from-indigo-50 to-purple-50"
-          }`}
-        />
+        <div className="absolute inset-0 bg-gradient-to-br from-background to-background/80" />
         <svg
           className="absolute inset-0 w-full h-full"
           xmlns="http://www.w3.org/2000/svg"
@@ -60,24 +54,19 @@ export default function Layout({
               <path
                 d="M 40 0 L 0 0 0 40"
                 fill="none"
-                stroke={
-                  darkMode ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.03)"
-                }
+                stroke="currentColor"
+                strokeOpacity="0.03"
                 strokeWidth="1"
               />
             </pattern>
           </defs>
           <rect width="100%" height="100%" fill="url(#grid)" />
         </svg>
-        {/* <FluidGradient darkMode={darkMode} /> */}
       </div>
       <div className="relative z-10">
         <header
           className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-            isScrolled
-              ? (darkMode ? "bg-gray-900/80" : "bg-white/80") +
-                " backdrop-blur-md shadow-md"
-              : ""
+            isScrolled ? "bg-background/80 backdrop-blur-md shadow-md" : ""
           }`}
         >
           <div className="container mx-auto px-4 py-4 flex justify-between items-center">
@@ -92,25 +81,25 @@ export default function Layout({
             <nav className="flex items-center space-x-6">
               <Link
                 href="#features"
-                className="hover:text-indigo-500 transition-colors text-sm font-medium"
+                className="hover:text-primary transition-colors text-sm font-medium"
               >
                 Features
               </Link>
               <Link
                 href="#how-it-works"
-                className="hover:text-indigo-500 transition-colors text-sm font-medium"
+                className="hover:text-primary transition-colors text-sm font-medium"
               >
                 How It Works
               </Link>
               <Link
                 href="#pricing"
-                className="hover:text-indigo-500 transition-colors text-sm font-medium"
+                className="hover:text-primary transition-colors text-sm font-medium"
               >
                 Pricing
               </Link>
               <Link
                 href="/blog"
-                className="hover:text-indigo-500 transition-colors text-sm font-medium"
+                className="hover:text-primary transition-colors text-sm font-medium"
               >
                 Blog
               </Link>
@@ -118,7 +107,7 @@ export default function Layout({
                 <Link href="/dashboard">
                   <Button
                     size="sm"
-                    className="bg-indigo-600 hover:bg-indigo-700 text-white"
+                    className="bg-primary hover:bg-primary/90 text-primary-foreground"
                   >
                     Dashboard
                   </Button>
@@ -127,22 +116,27 @@ export default function Layout({
                 <Link href="/login">
                   <Button
                     size="sm"
-                    className="bg-indigo-600 hover:bg-indigo-700 text-white"
+                    className="bg-primary hover:bg-primary/90 text-primary-foreground"
                   >
                     Login
                   </Button>
                 </Link>
               )}
-              <Switch checked={darkMode} onCheckedChange={toggleDarkMode} />
+              <Switch
+                checked={theme === "dark"}
+                onCheckedChange={() =>
+                  setTheme(theme === "dark" ? "light" : "dark")
+                }
+              />
               <AnimatePresence mode="wait" initial={false}>
                 <motion.div
-                  key={darkMode ? "dark" : "light"}
+                  key={theme}
                   initial={{ y: -20, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
                   exit={{ y: 20, opacity: 0 }}
                   transition={{ duration: 0.2 }}
                 >
-                  {darkMode ? (
+                  {theme === "dark" ? (
                     <Moon className="h-5 w-5" />
                   ) : (
                     <Sun className="h-5 w-5" />

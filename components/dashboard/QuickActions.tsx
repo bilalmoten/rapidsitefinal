@@ -46,17 +46,17 @@ const QuickActions: React.FC<QuickActionsProps> = ({
             {index === 0 ? (
               <NewWebsiteDialog userId={userId}>
                 <motion.div
-                  className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm flex items-start space-x-4 cursor-pointer hover:shadow-md transition-shadow"
+                  className="bg-card text-card-foreground p-4 rounded-lg shadow-sm flex items-start space-x-4 cursor-pointer hover:shadow-md transition-shadow border"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5, delay: index * 0.1 }}
                 >
-                  <div className="bg-primary text-primary-foreground p-2 rounded-full">
+                  <div className="bg-primary/10 text-primary p-2 rounded-full">
                     {action.icon}
                   </div>
                   <div>
                     <h3 className="font-semibold">{action.title}</h3>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                    <p className="text-sm text-muted-foreground">
                       {action.description}
                     </p>
                   </div>
@@ -64,18 +64,18 @@ const QuickActions: React.FC<QuickActionsProps> = ({
               </NewWebsiteDialog>
             ) : (
               <motion.div
-                className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm flex items-start space-x-4 cursor-pointer hover:shadow-md transition-shadow"
+                className="bg-card text-card-foreground p-4 rounded-lg shadow-sm flex items-start space-x-4 cursor-pointer hover:shadow-md transition-shadow border"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
                 onClick={action.onClick}
               >
-                <div className="bg-primary text-primary-foreground p-2 rounded-full">
+                <div className="bg-primary/10 text-primary p-2 rounded-full">
                   {action.icon}
                 </div>
                 <div>
                   <h3 className="font-semibold">{action.title}</h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                  <p className="text-sm text-muted-foreground">
                     {action.description}
                   </p>
                 </div>

@@ -23,10 +23,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={GeistSans.className} suppressHydrationWarning>
-      <body>
-        <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
-          <main className="min-h-screen">{children}</main>
+    <html lang="en" suppressHydrationWarning>
+      <head />
+      <body className={`${GeistSans.className} antialiased`}>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="light"
+          enableSystem={false}
+          storageKey="rapidsite-theme"
+          disableTransitionOnChange
+        >
+          <div className="min-h-screen bg-background">{children}</div>
           <Toaster richColors />
         </ThemeProvider>
         <Analytics />

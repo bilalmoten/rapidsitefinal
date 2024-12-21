@@ -7,7 +7,6 @@ import QuickActions from "./QuickActions";
 import RecentProjects from "./RecentProjects";
 import Stats from "./Stats";
 import AIAssistantPopup from "./AIAssistantPopup";
-import { useSidebar } from "@/contexts/SidebarContext";
 
 interface DashboardContentProps {
   user: any;
@@ -26,7 +25,6 @@ const DashboardContent: React.FC<DashboardContentProps> = ({
   websites,
   projectCount,
 }) => {
-  const { darkMode } = useSidebar();
   const [isAIAssistantOpen, setIsAIAssistantOpen] = useState(false);
 
   const toggleAIAssistant = () => {
@@ -34,15 +32,13 @@ const DashboardContent: React.FC<DashboardContentProps> = ({
   };
 
   return (
-    <div
-      className={`min-h-screen ${
-        darkMode ? "dark bg-gray-900 text-white" : "bg-white text-gray-900"
-      }`}
-    >
+    <div className="min-h-screen bg-background">
       <main className="flex-1 overflow-y-auto">
         <Header user={user} />
-        <div className="container mx-auto px-4 py-8">
-          <WelcomeSection user={user} />
+        <div className="container mx-auto px-4 py-8 space-y-8">
+          <div className="rounded-lg bg-card p-6 shadow-sm">
+            <WelcomeSection user={user} />
+          </div>
           <QuickActions
             userId={user.id}
             toggleAIAssistant={toggleAIAssistant}
