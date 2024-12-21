@@ -33,6 +33,8 @@ const DashboardSidebar = () => {
     websitesGenerated: 0,
     aiEditsCount: 0,
     plan: "free" as const,
+    subscription_status: "inactive" as string | undefined,
+    subscription_id: undefined as string | undefined,
   });
   const [user, setUser] = useState<{
     email: string;
@@ -51,32 +53,39 @@ const DashboardSidebar = () => {
     const {
       data: { user: authUser },
     } = await supabase.auth.getUser();
-    if (authUser) {
-      const { data: userData, error: userError } = await supabase
-        .from("users")
-        .select("email, first_name, last_name, avatar_url")
-        .eq("id", authUser.id)
-        .single();
-      console.log("logging user");
-      if (!userError && userData) {
-        setUser(userData);
-      }
-    }
-    console.log("logging user done");
+    if (!authUser) return;
 
+    // Get user profile data
+    const { data: userData, error: userError } = await supabase
+      .from("users")
+      .select("email, first_name, last_name, avatar_url")
+      .eq("id", authUser.id)
+      .single();
+
+    if (!userError && userData) {
+      setUser(userData);
+    }
+
+    // Get user usage data with user ID
     const { data: usageData, error: usageError } = await supabase
       .from("user_usage")
       .select("*")
+      .eq("user_id", authUser.id)
       .single();
 
-    console.log("logging usage");
+    console.log("User usage data:", usageData); // Debug log
+
     if (!usageError && usageData) {
       setUsage({
-        websitesActive: usageData.websites_active,
-        websitesGenerated: usageData.websites_generated,
-        aiEditsCount: usageData.ai_edits_count,
-        plan: usageData.plan,
+        websitesActive: usageData.websites_active || 55,
+        websitesGenerated: usageData.websites_generated || 0,
+        aiEditsCount: usageData.ai_edits_count || 0,
+        plan: usageData.plan || "free",
+        subscription_status: usageData.subscription_status || "inactive",
+        subscription_id: usageData.subscription_id,
       });
+    } else {
+      console.error("Error fetching usage:", usageError);
     }
   };
 

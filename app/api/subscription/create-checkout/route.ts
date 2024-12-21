@@ -72,10 +72,10 @@ export async function POST(request: Request) {
                             data: {
                                 type: "variants",
                                 // Test mode variant IDs
-                                id: "393389" // pro test
+                                // id: "393389" // pro test
 
                                 // Live mode variant IDs (uncomment in production)
-                                // id: variantId
+                                id: variantId
                             }
                         }
                     }

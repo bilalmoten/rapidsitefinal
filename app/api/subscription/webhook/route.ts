@@ -93,19 +93,19 @@ export async function POST(request: Request) {
                 // Map variant_id to plan
                 if (status === "active") {
                     // Test mode variants
-                    if (variant_id === 393389) {
-                        plan = "pro";
-                    }
+                    // if (variant_id === 393389) {
+                    //     plan = "pro";
+                    // }
                     // } else if (variant_id === "393390") {
                     //     plan = "enterprise";
                     // }
 
                     // Live mode variants (uncomment in production)
-                    // if (variant_id === "617721" || variant_id === "617722") { // pro monthly/yearly
-                    //     plan = "pro";
-                    // } else if (variant_id === "617723" || variant_id === "617725") { // enterprise monthly/yearly
-                    //     plan = "enterprise";
-                    // }
+                    if (variant_id === "617721" || variant_id === "617722") { // pro monthly/yearly
+                        plan = "pro";
+                    } else if (variant_id === "617723" || variant_id === "617725") { // enterprise monthly/yearly
+                        plan = "enterprise";
+                    }
                 }
 
                 console.log('Updating subscription:', { userId, plan, status });

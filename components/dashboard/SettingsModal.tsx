@@ -44,6 +44,8 @@ interface SettingsModalProps {
     websitesGenerated: number;
     aiEditsCount: number;
     plan: PlanType;
+    subscription_status?: string;
+    subscription_id?: string;
   };
   user?: {
     email: string;
@@ -103,6 +105,9 @@ export default function SettingsModal({
 }: SettingsModalProps) {
   const [activeTab, setActiveTab] = useState("usage");
   const [isUpdating, setIsUpdating] = useState(false);
+  const [isLoadingPortal2, setIsLoadingPortal2] = useState(false);
+
+  const [isLoadingPortal, setIsLoadingPortal] = useState(false);
   const [formData, setFormData] = useState({
     firstName: user?.first_name || "",
     lastName: user?.last_name || "",
@@ -244,71 +249,163 @@ export default function SettingsModal({
             <Card className="p-4">
               <div className="flex items-center gap-2 mb-4">
                 <Crown className="h-5 w-5 text-yellow-500" />
-                <h3 className="font-semibold">Available Plans</h3>
+                <h3 className="font-semibold">Subscription Details</h3>
               </div>
-              <div className="grid gap-4 md:grid-cols-3">
-                {plans.map((plan) => (
-                  <div
-                    key={plan.name}
-                    className={cn(
-                      "border rounded-lg p-4 space-y-4",
-                      usage.plan === plan.name.toLowerCase() &&
-                        "ring-2 ring-blue-500"
-                    )}
-                  >
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <h4 className="font-medium">{plan.name}</h4>
-                        <p className="text-sm text-muted-foreground">
-                          {plan.price}
-                        </p>
-                      </div>
-                      {usage.plan === plan.name.toLowerCase() ? (
-                        <Badge>Current Plan</Badge>
-                      ) : (
-                        <Button
-                          variant="outline"
-                          onClick={() =>
-                            plan.variantId && handleUpgrade(plan.variantId)
-                          }
-                          disabled={!plan.variantId}
-                        >
-                          {plan.name === "Free" ? "Downgrade" : "Upgrade"}
-                        </Button>
-                      )}
-                    </div>
-                    <ul className="space-y-2">
-                      {plan.features.map((feature) => (
-                        <li
-                          key={feature}
-                          className="flex items-center gap-2 text-sm"
-                        >
-                          <CheckCircle2 className="h-4 w-4 text-green-500" />
-                          {feature}
-                        </li>
-                      ))}
-                    </ul>
+
+              {/* Current Plan Status */}
+              <div className="mb-6 p-4 border rounded-lg">
+                <div className="flex justify-between items-center mb-4">
+                  <div>
+                    <h4 className="font-medium">Current Plan</h4>
+                    <p className="text-sm text-muted-foreground capitalize">
+                      {usage.plan}
+                    </p>
                   </div>
-                ))}
+                  <Badge
+                    variant={
+                      usage.subscription_status === "active"
+                        ? "default"
+                        : "secondary"
+                    }
+                  >
+                    {usage.subscription_status === "active"
+                      ? "Active"
+                      : "Inactive"}
+                  </Badge>
+                </div>
+                {usage.subscription_id && (
+                  <Button
+                    variant="outline"
+                    className="w-full mt-2"
+                    disabled={isLoadingPortal}
+                    onClick={async () => {
+                      try {
+                        setIsLoadingPortal(true);
+                        const response = await fetch(
+                          "/api/subscription/get-portal-url"
+                        );
+                        if (!response.ok)
+                          throw new Error("Failed to get portal URL");
+                        const { url } = await response.json();
+                        window.open(url, "_blank");
+                      } catch (error) {
+                        console.error("Error getting portal URL:", error);
+                        toast.error("Failed to open billing portal");
+                      } finally {
+                        setIsLoadingPortal(false);
+                      }
+                    }}
+                  >
+                    <CreditCard
+                      className={cn(
+                        "h-4 w-4 mr-2",
+                        isLoadingPortal && "animate-pulse"
+                      )}
+                    />
+                    {isLoadingPortal
+                      ? "Opening Portal..."
+                      : "Manage Subscription"}
+                  </Button>
+                )}
               </div>
+
+              {/* Available Plans */}
+              <div
+                className={cn(
+                  "grid gap-4",
+                  usage.plan === "free" ? "md:grid-cols-3" : "md:grid-cols-2"
+                )}
+              >
+                {plans
+                  .filter(
+                    (plan) => usage.plan === "free" || plan.name !== "Free"
+                  )
+                  .map((plan) => (
+                    <div
+                      key={plan.name}
+                      className={cn(
+                        "border rounded-lg p-4 space-y-4",
+                        usage.plan === plan.name.toLowerCase() &&
+                          "ring-2 ring-blue-500"
+                      )}
+                    >
+                      <div className="flex justify-between items-center">
+                        <div>
+                          <h4 className="font-medium">{plan.name}</h4>
+                          <p className="text-sm text-muted-foreground">
+                            {plan.price}
+                          </p>
+                        </div>
+                        {usage.plan === plan.name.toLowerCase() ? (
+                          <Badge>Current Plan</Badge>
+                        ) : (
+                          <Button
+                            variant="outline"
+                            onClick={() =>
+                              plan.variantId && handleUpgrade(plan.variantId)
+                            }
+                            disabled={
+                              !plan.variantId ||
+                              (usage.plan !== "free" && plan.name === "Free")
+                            }
+                          >
+                            {plan.name === "Free" ? "Downgrade" : "Upgrade"}
+                          </Button>
+                        )}
+                      </div>
+                      <ul className="space-y-2">
+                        {plan.features.map((feature) => (
+                          <li
+                            key={feature}
+                            className="flex items-center gap-2 text-sm"
+                          >
+                            <CheckCircle2 className="h-4 w-4 text-green-500" />
+                            {feature}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
+              </div>
+
+              {/* Billing History */}
               {usage.plan !== "free" && (
                 <div className="mt-6 border-t pt-4">
-                  <h4 className="font-medium mb-2">Billing History</h4>
-                  <p className="text-sm text-muted-foreground">
-                    View and download your billing history
+                  <h4 className="font-medium mb-2">Billing & Invoices</h4>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    View your billing history and download invoices
                   </p>
                   <Button
                     variant="outline"
-                    className="mt-2"
-                    onClick={() =>
-                      window.open(
-                        "https://app.lemonsqueezy.com/billing",
-                        "_blank"
-                      )
-                    }
+                    className="w-full"
+                    disabled={isLoadingPortal2}
+                    onClick={async () => {
+                      try {
+                        setIsLoadingPortal2(true);
+                        const response = await fetch(
+                          "/api/subscription/get-portal-url"
+                        );
+                        if (!response.ok)
+                          throw new Error("Failed to get portal URL");
+                        const { url } = await response.json();
+                        window.open(url, "_blank");
+                      } catch (error) {
+                        console.error("Error getting portal URL:", error);
+                        toast.error("Failed to open billing portal");
+                      } finally {
+                        setIsLoadingPortal2(false);
+                      }
+                    }}
                   >
-                    <CreditCard className="h-4 w-4 mr-2" />
-                    Manage Billing
+                    <CreditCard
+                      className={cn(
+                        "h-4 w-4 mr-2",
+                        isLoadingPortal2 && "animate-pulse"
+                      )}
+                    />
+                    {isLoadingPortal2
+                      ? "Opening Portal..."
+                      : "View Billing History"}
                   </Button>
                 </div>
               )}
