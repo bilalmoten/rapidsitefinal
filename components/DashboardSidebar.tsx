@@ -97,16 +97,12 @@ const DashboardSidebar = () => {
       label: "Dashboard",
       href: "/dashboard",
     },
-    {
-      icon: Settings,
-      label: "Settings",
-      href: "/dashboard/settings",
-    },
-    {
-      icon: HelpCircle,
-      label: "Help",
-      href: "/dashboard/help",
-    },
+
+    // {
+    //   icon: HelpCircle,
+    //   label: "Help",
+    //   href: "/dashboard/help",
+    // },
   ];
 
   const handleLogout = async () => {
