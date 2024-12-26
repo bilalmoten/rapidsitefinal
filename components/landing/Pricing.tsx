@@ -47,7 +47,7 @@ export default function Pricing() {
     },
     {
       name: "Pro",
-      price: isYearly ? "15" : "19",
+      price: isYearly ? "7.5" : "10",
       period: "billed monthly",
       saveText: "Save $38 annually",
       description: "For serious creators ready to build amazing websites",
@@ -74,7 +74,7 @@ export default function Pricing() {
     },
     {
       name: "Enterprise",
-      price: isYearly ? "39" : "49",
+      price: isYearly ? "29" : "39",
       period: "billed monthly",
       description:
         "Custom solutions for growing businesses" + " and enterprises",
