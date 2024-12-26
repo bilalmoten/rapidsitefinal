@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import Sidebar from "@/components/Sidebar";
 import { useChat, Message } from "ai/react";
 import React from "react";
+import { toast } from "react-hot-toast";
 
 interface ChatPageProps {
   params: Promise<{ website_id: string }>;
@@ -208,21 +209,146 @@ export default function ChatPage(props: ChatPageProps) {
     );
   };
 
-  const handleLogoUpload = (file: File) => {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      if (e.target && e.target.result) {
-        setLogo(e.target.result as string);
+  const handleLogoUpload = async (file: File) => {
+    try {
+      // Log file details
+      console.log("Starting logo upload with file:", {
+        name: file.name,
+        size: file.size,
+        type: file.type,
+      });
+
+      if (!user?.id || !websiteId) {
+        console.error("Missing IDs:", { userId: user?.id, websiteId });
+        throw new Error("User ID or Website ID is missing");
       }
-    };
-    reader.readAsDataURL(file);
+
+      // Check file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        throw new Error("File size too large. Maximum size is 5MB");
+      }
+
+      // Check file type
+      if (!file.type.startsWith("image/")) {
+        throw new Error("Only image files are allowed");
+      }
+
+      // Create a blob from the file to ensure it's valid
+      const blob = new Blob([file], { type: file.type });
+      if (!blob.size) {
+        throw new Error("Invalid file data");
+      }
+
+      const fileExt = file.name.split(".").pop();
+      const fileName = `${user.id}/${websiteId}/logo-${Date.now()}.${fileExt}`;
+
+      console.log("Attempting to upload file:", fileName);
+
+      // Check if bucket exists
+      const { data: buckets, error: bucketsError } =
+        await supabase.storage.listBuckets();
+      console.log("Available buckets:", buckets);
+      if (bucketsError) {
+        console.error("Error listing buckets:", bucketsError);
+      }
+
+      // Upload file
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from("user_website_data")
+        .upload(fileName, blob, {
+          cacheControl: "3600",
+          upsert: true,
+        });
+
+      if (uploadError) {
+        console.error("Storage upload error:", {
+          error: uploadError,
+          // code: uploadError.code,
+          message: uploadError.message,
+          // details: uploadError.details,
+          // hint: uploadError.hint,
+          // status: uploadError.status,
+        });
+        throw uploadError;
+      }
+
+      console.log("File uploaded successfully:", uploadData);
+
+      // Get public URL
+      const {
+        data: { publicUrl },
+      } = supabase.storage.from("user_website_data").getPublicUrl(fileName);
+
+      console.log("Generated public URL:", publicUrl);
+      setLogo(publicUrl);
+      toast.success("Logo uploaded successfully!");
+    } catch (error: any) {
+      console.error("Error in logo upload:", error);
+      toast.error(
+        error instanceof Error ? error.message : "Failed to upload logo"
+      );
+    }
   };
 
-  const handleInspirationUpload = (file: File) => {
-    const reader = new FileReader();
-    reader.onload = (e) =>
-      setInspirationImages((prev) => [...prev, e.target?.result as string]);
-    reader.readAsDataURL(file);
+  const handleInspirationUpload = async (file: File) => {
+    try {
+      // Log file details
+      console.log("Starting image upload with file:", {
+        name: file.name,
+        size: file.size,
+        type: file.type,
+      });
+
+      if (!user?.id || !websiteId) {
+        throw new Error("User ID or Website ID is missing");
+      }
+
+      // Check file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        throw new Error("File size too large. Maximum size is 5MB");
+      }
+
+      // Check file type
+      if (!file.type.startsWith("image/")) {
+        throw new Error("Only image files are allowed");
+      }
+
+      const fileExt = file.name.split(".").pop();
+      const fileName = `${
+        user.id
+      }/${websiteId}/images/img-${Date.now()}-${Math.random()}.${fileExt}`;
+
+      console.log("Attempting to upload file:", fileName);
+
+      // Upload file
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from("user_website_data")
+        .upload(fileName, file, {
+          cacheControl: "3600",
+          upsert: false, // Set to false to avoid overwriting
+        });
+
+      if (uploadError) {
+        console.error("Storage upload error:", uploadError);
+        throw uploadError;
+      }
+
+      console.log("File uploaded successfully:", uploadData);
+
+      // Get public URL
+      const {
+        data: { publicUrl },
+      } = supabase.storage.from("user_website_data").getPublicUrl(fileName);
+
+      console.log("Generated public URL:", publicUrl);
+      setInspirationImages((prev) => [...prev, publicUrl]);
+      toast.success("Image uploaded successfully!");
+    } catch (error: any) {
+      console.error("Error in image upload:", error);
+      toast.error(
+        error instanceof Error ? error.message : "Failed to upload image"
+      );
+    }
   };
 
   const handleAddLink = (link: string) => {
@@ -262,6 +388,9 @@ export default function ChatPage(props: ChatPageProps) {
 
     setIsProcessing(true);
     try {
+      // Add preferences message first
+      addPreferencesMessage();
+
       console.log(
         "Sending request to /api/prompt_chat with prompt:",
         promptInput
@@ -334,6 +463,75 @@ export default function ChatPage(props: ChatPageProps) {
     }
   };
 
+  const handleColorSchemeChange = (colors: string[]) => {
+    setColorScheme(colors);
+  };
+
+  // Add this new function to create the preferences message
+  const addPreferencesMessage = () => {
+    const preferences = {
+      colorScheme,
+      logo,
+      inspirationImages,
+      inspirationLinks,
+      industry,
+    };
+
+    const formatPreferences = () => {
+      const parts = [];
+
+      if (colorScheme.length > 0) {
+        parts.push(`Color Scheme: ${colorScheme.join(", ")}`);
+      }
+
+      if (logo) {
+        parts.push(`Logo URL: ${logo}`);
+      }
+
+      if (inspirationImages.length > 0) {
+        parts.push(
+          `Reference Images:\n${inspirationImages
+            .map((url) => `- ${url}`)
+            .join("\n")}`
+        );
+      }
+
+      if (inspirationLinks.length > 0) {
+        parts.push(
+          `Reference Links:\n${inspirationLinks
+            .map((url) => `- ${url}`)
+            .join("\n")}`
+        );
+      }
+
+      if (industry) {
+        parts.push(`Industry: ${industry}`);
+      }
+
+      return parts.join("\n\n");
+    };
+
+    const newMessage: Message = {
+      id: String(Date.now()),
+      role: "user",
+      content: `My website preferences:\n${formatPreferences()}`,
+    };
+
+    // Find and update existing preferences message or add new one
+    const prefIndex = messages.findIndex(
+      (m) =>
+        m.role === "user" && m.content.startsWith("My website preferences:")
+    );
+
+    if (prefIndex !== -1) {
+      const newMessages = [...messages];
+      newMessages[prefIndex] = newMessage;
+      setMessages(newMessages);
+    } else {
+      setMessages((prev) => [newMessage, ...prev]);
+    }
+  };
+
   if (isProcessing || isGenerating) {
     return (
       <div className="flex flex-col justify-center items-center min-h-screen w-full px-4">
@@ -390,6 +588,15 @@ export default function ChatPage(props: ChatPageProps) {
           </div>
         ) : (
           <>
+            <div className="p-4 bg-white dark:bg-gray-800 border-b">
+              <Button
+                onClick={() => setChatMode("prompt")}
+                variant="outline"
+                className="w-full"
+              >
+                Switch to Quick Prompt Mode
+              </Button>
+            </div>
             <ChatInterface
               messages={messages}
               input={input}
@@ -420,6 +627,7 @@ export default function ChatPage(props: ChatPageProps) {
         onInspirationUpload={handleInspirationUpload}
         onAddLink={handleAddLink}
         onIndustryChange={setIndustry}
+        onColorSchemeChange={handleColorSchemeChange}
       />
     </div>
   );
