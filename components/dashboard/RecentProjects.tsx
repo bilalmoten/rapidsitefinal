@@ -7,6 +7,9 @@ import { Eye, Trash2, Edit, ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import DeleteWebsiteDialog from "@/components/DeleteWebsiteDialog";
 
+import { createClient } from "@/utils/supabase/client";
+import { User } from "@supabase/supabase-js";
+
 interface RecentProjectsProps {
   websites: {
     id: string;
@@ -16,14 +19,62 @@ interface RecentProjectsProps {
     subdomain: string;
   }[];
 }
+import { MoreHorizontal, RefreshCw } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { RegenerateWebsiteDialog } from "@/components/dashboard/RegenerateWebsiteDialog";
 
 const RecentProjects: React.FC<RecentProjectsProps> = ({ websites }) => {
+  const supabase = createClient();
   const [currentPage, setCurrentPage] = useState(0);
   const [websitesWithThumbnails, setWebsitesWithThumbnails] =
     useState(websites);
   const [isLoading, setIsLoading] = useState(true);
+  const [regenerateDialogOpen, setRegenerateDialogOpen] = useState(false);
+  const [selectedWebsiteId, setSelectedWebsiteId] = useState<string>("");
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
   const projectsPerPage = 4;
   const totalPages = Math.ceil(websitesWithThumbnails.length / projectsPerPage);
+
+  useEffect(() => {
+    const checkUser = async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      setUser(user);
+    };
+    checkUser();
+  }, []);
+
+  const handleRegenerate = async (websiteId: string) => {
+    setIsProcessing(true);
+    try {
+      const response = await fetch(
+        `https://api2.azurewebsites.net/api/code_website?website_id=${websiteId}&user_id=${user?.id}&model=o1-mini`,
+        {
+          method: "POST",
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to regenerate website");
+      }
+
+      // Redirect to editor
+      window.location.href = `/dashboard/editor/${websiteId}`;
+    } catch (error) {
+      console.error("Error regenerating website:", error);
+      alert(
+        "An error occurred while regenerating your website. Please try again."
+      );
+      setIsProcessing(false);
+    }
+  };
 
   const nextPage = () => {
     setCurrentPage((prev) => (prev + 1) % totalPages);
@@ -82,6 +133,17 @@ const RecentProjects: React.FC<RecentProjectsProps> = ({ websites }) => {
     currentPage * projectsPerPage,
     (currentPage + 1) * projectsPerPage
   );
+  if (isProcessing) {
+    return (
+      <div className="flex flex-col justify-center items-center min-h-screen w-full px-4">
+        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-blue-500"></div>
+        <p className="mt-4">Regenerating your website...</p>
+        <p className="mt-2 text-sm text-gray-500">
+          This may take a few minutes. You'll be redirected when it's ready.
+        </p>
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (
@@ -170,6 +232,24 @@ const RecentProjects: React.FC<RecentProjectsProps> = ({ websites }) => {
                         Delete
                       </Button>
                     </DeleteWebsiteDialog>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="outline" size="sm">
+                          <MoreHorizontal className="w-4 h-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent>
+                        <DropdownMenuItem
+                          onClick={() => {
+                            setSelectedWebsiteId(website.id);
+                            setRegenerateDialogOpen(true);
+                          }}
+                        >
+                          <RefreshCw className="w-4 h-4 mr-2" />
+                          Regenerate
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
                 </div>
               </div>
@@ -196,6 +276,14 @@ const RecentProjects: React.FC<RecentProjectsProps> = ({ websites }) => {
               >
                 <ChevronRight className="w-4 h-4" />
               </Button>
+              <RegenerateWebsiteDialog
+                open={regenerateDialogOpen}
+                onOpenChange={setRegenerateDialogOpen}
+                onConfirm={() => {
+                  setRegenerateDialogOpen(false);
+                  handleRegenerate(selectedWebsiteId);
+                }}
+              />
             </div>
           )}
         </>
