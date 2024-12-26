@@ -109,6 +109,34 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
   const [pageCache, setPageCache] = useState<{ [key: string]: string }>({});
   const [isSwitchingPage, setIsSwitchingPage] = useState(false);
   const [isLoadingPage, setIsLoadingPage] = useState(false);
+  const [viewportDimensions, setViewportDimensions] = useState({
+    width: 0,
+    height: 0,
+  });
+  const viewportRef = useRef<HTMLDivElement>(null);
+
+  // Add resize observer
+  useEffect(() => {
+    if (!viewportRef.current || viewport === "desktop") return;
+
+    const resizeObserver = new ResizeObserver((entries) => {
+      const { width, height } = entries[0].contentRect;
+      setViewportDimensions({
+        width: Math.round(width),
+        height: Math.round(height),
+      });
+    });
+
+    resizeObserver.observe(viewportRef.current);
+    return () => resizeObserver.disconnect();
+  }, [viewport]);
+
+  const handleReset = () => {
+    if (!viewportRef.current) return;
+    viewportRef.current.style.width = viewport === "tablet" ? "768px" : "375px";
+    viewportRef.current.style.height =
+      viewport === "tablet" ? "1024px" : "667px";
+  };
 
   const handleUndo = useCallback(() => {
     undo();
@@ -746,8 +774,8 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
   };
 
   return (
-    <div className="flex h-screen bg-gray-100">
-      <div className="flex-1 flex flex-col relative">
+    <div className="flex h-screen bg-gray-100 overflow-hidden">
+      <div className="flex-1 flex flex-col relative h-screen">
         <TopBar
           isCodeViewActive={isCodeViewActive}
           onCodeViewToggle={() => setIsCodeViewActive(!isCodeViewActive)}
@@ -758,21 +786,41 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
           onPageChange={handlePageChange}
           onViewportChange={setViewport}
           onThemeChange={() => {}}
-          // {handleThemeChange}
           iframeRef={iframeRef}
           viewport={viewport}
           hasUnsavedChanges={hasUnsavedChanges}
+          viewportDimensions={
+            viewport !== "desktop" ? viewportDimensions : undefined
+          }
+          onResetViewport={viewport !== "desktop" ? handleReset : undefined}
         />
-        <div className="flex-1 flex items-center justify-center bg-gray-200 p-2 m-2 rounded-lg">
+        <div className="flex-1 flex items-center justify-center bg-gray-200 p-2 m-2 rounded-lg overflow-hidden">
           <div
+            ref={viewportRef}
             className={`relative bg-white shadow-lg ${
               viewport !== "desktop" ? "rounded-lg overflow-hidden" : ""
             }`}
             style={{
-              width: viewport === "desktop" ? "100%" : "auto",
-              height: viewport === "desktop" ? "100%" : "auto",
-              maxWidth: "100%",
-              maxHeight: "100%",
+              width:
+                viewport === "desktop"
+                  ? "100%"
+                  : viewport === "tablet"
+                  ? "768px"
+                  : "375px",
+              height:
+                viewport === "desktop"
+                  ? "100%"
+                  : viewport === "tablet"
+                  ? "1024px"
+                  : "667px",
+              maxWidth: viewport === "desktop" ? "100%" : "none",
+              maxHeight:
+                viewport === "desktop" ? "100%" : "calc(100vh - 160px)",
+              transform: viewport === "desktop" ? "none" : "scale(0.9)",
+              resize: viewport !== "desktop" ? "both" : "none",
+              overflow: "auto",
+              transitionProperty: "transform, scale",
+              transitionDuration: "0.3s",
             }}
           >
             {viewport !== "desktop" && (

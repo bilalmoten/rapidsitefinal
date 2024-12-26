@@ -21,18 +21,18 @@ const MainEditingPanel: React.FC<MainEditingPanelProps> = ({
     <div
       className="flex-1 relative overflow-auto"
       style={{
-        width: viewport === "desktop" ? "100%" : "auto",
-        height: viewport === "desktop" ? "100%" : "auto",
+        width: "100%",
+        height: viewport === "desktop" ? "100%" : "calc(100% - 24px)",
+        paddingTop: viewport !== "desktop" ? "24px" : "0",
       }}
     >
       <iframe
         ref={iframeRef}
-        className={`w-full h-full border-0 ${
-          viewport !== "desktop" ? "mt-6" : ""
-        }`}
+        className="w-full h-full border-0"
         style={{
           transform: `scale(${zoom / 100})`,
           transformOrigin: "top left",
+          minHeight: viewport === "desktop" ? "100%" : "100vh",
         }}
       />
       {isPickMode && hoveredElement && (

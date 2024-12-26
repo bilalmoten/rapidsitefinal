@@ -53,6 +53,8 @@ interface TopBarProps {
   isCodeViewActive: boolean;
   onCodeViewToggle: () => void;
   hasUnsavedChanges?: boolean;
+  viewportDimensions?: { width: number; height: number };
+  onResetViewport?: () => void;
 }
 
 const TopBar: React.FC<TopBarProps> = ({
@@ -66,6 +68,8 @@ const TopBar: React.FC<TopBarProps> = ({
   isCodeViewActive,
   onCodeViewToggle,
   hasUnsavedChanges = false,
+  viewportDimensions,
+  onResetViewport,
 }) => {
   const router = useRouter();
   const [showSaveDialog, setShowSaveDialog] = React.useState(false);
@@ -200,6 +204,28 @@ const TopBar: React.FC<TopBarProps> = ({
                 </TooltipTrigger>
                 <TooltipContent>Mobile view</TooltipContent>
               </Tooltip>
+
+              {viewport !== "desktop" && viewportDimensions && (
+                <>
+                  <div className="h-4 w-[1px] bg-border mx-2" />
+                  <div className="text-xs text-muted-foreground">
+                    {viewportDimensions.width} × {viewportDimensions.height}
+                  </div>
+                  {onResetViewport && (
+                    <>
+                      <div className="h-4 w-[1px] bg-border mx-2" />
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={onResetViewport}
+                        className="text-xs text-muted-foreground hover:text-foreground"
+                      >
+                        Reset
+                      </Button>
+                    </>
+                  )}
+                </>
+              )}
             </div>
           </TooltipProvider>
         </div>
