@@ -55,13 +55,13 @@ export default async function Login(props: {
           </svg>
         </div>
       </div>
-      <div className="w-3/5 flex items-center justify-center bg-gray-50">
-        <div className="w-full max-w-md space-y-8 p-10 bg-white rounded-xl shadow-lg">
+      <div className="w-3/5 flex items-center justify-center bg-background">
+        <div className="w-full max-w-md space-y-8 p-10 bg-card rounded-xl shadow-lg">
           <div className="text-center">
-            <h2 className="mt-6 text-3xl font-bold text-gray-900">
+            <h2 className="mt-6 text-3xl font-bold text-foreground">
               Welcome back
             </h2>
-            <p className="mt-2 text-sm text-gray-600">
+            <p className="mt-2 text-sm text-muted-foreground">
               Please sign in to your account
             </p>
           </div>
@@ -91,7 +91,7 @@ export default async function Login(props: {
                   type="email"
                   autoComplete="email"
                   required
-                  className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                  className="appearance-none rounded-none relative block w-full px-3 py-2 border border-input placeholder-muted-foreground text-foreground rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm bg-background"
                   placeholder="Email address"
                 />
               </div>
@@ -105,7 +105,7 @@ export default async function Login(props: {
                   type="password"
                   autoComplete="current-password"
                   required
-                  className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                  className="appearance-none rounded-none relative block w-full px-3 py-2 border border-input placeholder-muted-foreground text-foreground rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm bg-background"
                   placeholder="Password"
                 />
               </div>
@@ -121,7 +121,7 @@ export default async function Login(props: {
                 />
                 <label
                   htmlFor="remember-me"
-                  className="ml-2 block text-sm text-gray-900"
+                  className="ml-2 block text-sm text-foreground"
                 >
                   Remember me
                 </label>
