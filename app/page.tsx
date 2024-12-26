@@ -33,7 +33,7 @@ export default function LandingPage() {
       {/* <ThemePreview /> */}
       <HowItWorks />
       <EditorShowcase />
-      <Showcase />
+      {/* <Showcase /> */}
       <Testimonials />
       <FAQ />
       <Features />
