@@ -136,6 +136,36 @@ export default function ChatPage(props: ChatPageProps) {
 
     setLocalIsLoading(true);
     try {
+      // Find and update preferences message
+      const preferencesMessage: Message = {
+        id: String(Date.now()),
+        role: "user",
+        content: `My website preferences:\n${formatPreferences()}`,
+      };
+
+      const prefIndex = messages.findIndex(
+        (m) =>
+          m.role === "user" && m.content.startsWith("My website preferences:")
+      );
+
+      let updatedMessages;
+      if (prefIndex !== -1) {
+        // Update existing preferences
+        updatedMessages = [...messages];
+        updatedMessages[prefIndex] = preferencesMessage;
+      } else {
+        // Add preferences after greeting
+        updatedMessages = [
+          messages[0],
+          preferencesMessage,
+          ...messages.slice(1),
+        ];
+      }
+
+      // Update messages with latest preferences
+      setMessages(updatedMessages);
+
+      // Now handle the actual chat submission
       await handleSubmit(e);
     } catch (error) {
       console.error("Error submitting message:", error);
@@ -382,14 +412,71 @@ export default function ChatPage(props: ChatPageProps) {
     // You can add any additional logic here for starting the website build process
   };
 
+  const formatPreferences = () => {
+    const parts = [];
+
+    if (colorScheme.length > 0) {
+      parts.push(`Color Scheme: ${colorScheme.join(", ")}`);
+    }
+
+    if (logo) {
+      parts.push(`Logo URL: ${logo}`);
+    }
+
+    if (inspirationImages.length > 0) {
+      parts.push(
+        `Reference Images:\n${inspirationImages
+          .map((url) => `- ${url}`)
+          .join("\n")}`
+      );
+    }
+
+    if (inspirationLinks.length > 0) {
+      parts.push(
+        `Reference Links:\n${inspirationLinks
+          .map((url) => `- ${url}`)
+          .join("\n")}`
+      );
+    }
+
+    if (industry) {
+      parts.push(`Industry: ${industry}`);
+    }
+
+    return parts.join("\n\n");
+  };
+
   const handlePromptSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!promptInput.trim()) return;
 
     setIsProcessing(true);
     try {
-      // Add preferences message first
-      addPreferencesMessage();
+      // Create preferences message
+      const preferencesMessage: Message = {
+        id: String(Date.now()),
+        role: "user",
+        content: `My website preferences:\n${formatPreferences()}`,
+      };
+
+      const enhancedPrompt = `Please make a plan for the website of the user. A simple short plan detailing the website's purpose, pages, sections, design, color scheme, and any other relevant details. 1 page max.
+    USER REQUEST: ${promptInput}`;
+
+      // Create new messages array with preferences and prompt
+      const newMessages: Message[] = [
+        {
+          id: "1",
+          role: "assistant",
+          content:
+            "Hello! I'm your AI assistant. Let's create your dream website. To get started, could you tell me about your business and what kind of website you're looking for?",
+        },
+        preferencesMessage,
+        {
+          id: String(Date.now() + 1),
+          role: "user",
+          content: enhancedPrompt,
+        },
+      ];
 
       console.log(
         "Sending request to /api/prompt_chat with prompt:",
@@ -422,30 +509,16 @@ export default function ChatPage(props: ChatPageProps) {
         throw new Error("Received empty content from AI");
       }
 
-      const enhancedPrompt = `Please make a plan for the website of the user. A simple short plan detailing the website's purpose, pages, sections, design, color scheme, and any other relevant details. 1 page max.
-    USER REQUEST: ${promptInput}`;
-
-      // Create new messages array with correct types
-      const newMessages: Message[] = [
-        // ...messages,
-        {
-          id: "1",
-          role: "assistant",
-          content:
-            "Hello! I'm your AI assistant. Let's create your dream website. To get started, could you tell me about your business and what kind of website you're looking for?",
-        },
-        { id: "2", role: "user", content: enhancedPrompt },
-        {
-          id: "3",
-          role: "assistant",
-          content: aiResponse,
-        },
-      ];
+      // Add AI response to messages
+      newMessages.push({
+        id: String(Date.now() + 2),
+        role: "assistant",
+        content: aiResponse,
+      });
 
       // Update messages state
       setMessages(newMessages);
-
-      console.log("Updated messages:", messages);
+      console.log("Updated messages:", newMessages);
 
       setShowBuildButton(true);
       setIsChatActive(false);
