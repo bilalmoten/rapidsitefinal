@@ -13,26 +13,31 @@ export default function UpdatePasswordPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [isAuthorized, setIsAuthorized] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
-    // Check if we're in a password reset flow
     const supabase = createClient();
-    supabase.auth.onAuthStateChange(async (event, session) => {
-      if (event === "SIGNED_IN") {
-        // If user is signed in but came from password reset
-        if (window.location.hash.includes("type=recovery")) {
-          // Stay on the page to let them reset password
-          return;
-        }
-        // Otherwise redirect to dashboard
-        router.push("/dashboard");
+
+    // Check if user is in a recovery flow
+    supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "PASSWORD_RECOVERY") {
+        setIsAuthorized(true);
+      } else if (!session) {
+        // If no session and not in recovery, redirect to login
+        router.push("/login");
       }
     });
   }, [router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!isAuthorized) {
+      toast.error("Unauthorized access");
+      router.push("/login");
+      return;
+    }
 
     if (password !== confirmPassword) {
       toast.error("Passwords do not match");
@@ -63,6 +68,10 @@ export default function UpdatePasswordPage() {
       setIsLoading(false);
     }
   };
+
+  if (!isAuthorized) {
+    return null; // Or a loading state
+  }
 
   return (
     <div className="flex min-h-screen">
