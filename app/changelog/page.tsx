@@ -27,6 +27,43 @@ interface Update {
 
 const updates: Update[] = [
   {
+    date: "December 30, 2024",
+    title: "Roadmap & Navigation Improvements 🎯",
+    description:
+      "Major updates to help you track our progress and navigate better!",
+    updates: [
+      {
+        title: "Public Roadmap Launch",
+        description:
+          "Launched an interactive roadmap where you can view upcoming features, suggest new ones, and vote on community suggestions.",
+        type: "feature",
+        links: [{ text: "View Roadmap", url: "/roadmap" }],
+      },
+      {
+        title: "Navigation Enhancements",
+        description:
+          "Added quick access to Roadmap, Changelog, and upcoming features in the dashboard sidebar.",
+        type: "improvement",
+      },
+      {
+        title: "Footer Updates",
+        description:
+          "Reorganized footer with new links to Terms of Service, Privacy Policy, and Journey pages.",
+        type: "improvement",
+      },
+      {
+        title: "Company Information",
+        description:
+          "Added About Us and Contact pages with comprehensive company information and contact details.",
+        type: "improvement",
+        links: [
+          { text: "About Us", url: "/about" },
+          { text: "Contact", url: "/contact" },
+        ],
+      },
+    ],
+  },
+  {
     date: "December 29, 2023",
     title: "Enhanced Security & User Experience 🔒",
     description: "Added important security features to protect your account!",
