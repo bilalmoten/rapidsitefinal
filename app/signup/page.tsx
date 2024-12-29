@@ -3,7 +3,7 @@ import Link from "next/link";
 import { SubmitButton } from "../login/submit-button";
 import { Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
-import { signUp } from "./actions";
+import { signUp, signInWithGoogle } from "./actions";
 import { useSearchParams } from "next/navigation";
 
 // Add password requirements
@@ -97,6 +97,26 @@ export default function Signup() {
             </SubmitButton>
           </div>
         </form>
+        <div className="relative my-4">
+          <div className="absolute inset-0 flex items-center">
+            <div className="w-full border-t border-input"></div>
+          </div>
+          <div className="relative flex justify-center text-xs uppercase">
+            <span className="bg-card px-2 text-muted-foreground">
+              Or continue with
+            </span>
+          </div>
+        </div>
+        <button
+          onClick={async () => {
+            await signInWithGoogle();
+          }}
+          type="button"
+          className="w-full flex items-center justify-center gap-2 bg-background text-foreground border border-input rounded-md px-4 py-2 text-sm font-medium hover:bg-accent focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+        >
+          <img src="/google.svg" alt="Google" className="w-5 h-5" />
+          Sign up with Google
+        </button>
         {message && (
           <div
             className="mt-4 p-4 bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded relative"

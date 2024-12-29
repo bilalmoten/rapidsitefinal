@@ -6,7 +6,7 @@ import AnimatedLoginContent from "@/components/AnimatedLoginContent";
 import { FormMessage } from "@/components/form-message";
 import { Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
-import { signIn } from "./actions";
+import { signIn, signInWithGoogle } from "./actions";
 import { useSearchParams } from "next/navigation";
 
 export default function Login() {
@@ -141,6 +141,16 @@ export default function Login() {
               </Link>
             </p>
           </div>
+          <button
+            onClick={async () => {
+              await signInWithGoogle();
+            }}
+            type="button"
+            className="w-full flex items-center justify-center gap-2 bg-background text-foreground border border-input rounded-md px-4 py-2 text-sm font-medium hover:bg-accent focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+          >
+            <img src="/google.svg" alt="Google" className="w-5 h-5" />
+            Sign in with Google
+          </button>
         </div>
       </div>
     </MotionWrapper>
