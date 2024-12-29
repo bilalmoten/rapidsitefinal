@@ -546,13 +546,19 @@ export default function SettingsModal({
                           process.env.NEXT_PUBLIC_SITE_URL ||
                           "https://aiwebsitebuilder.tech";
 
-                        await supabase.auth.resetPasswordForEmail(
-                          user?.email || "",
-                          {
-                            redirectTo: `${siteUrl}/auth/callback#type=recovery`,
-                          }
-                        );
-                        toast.success("Password reset email sent");
+                        const { error } =
+                          await supabase.auth.resetPasswordForEmail(
+                            user?.email || "",
+                            {
+                              redirectTo: `${siteUrl}/reset-password`,
+                            }
+                          );
+
+                        if (error) {
+                          toast.error("Failed to send reset email");
+                        } else {
+                          toast.success("Password reset email sent");
+                        }
                       }}
                     >
                       <Key className="h-4 w-4 mr-2" />

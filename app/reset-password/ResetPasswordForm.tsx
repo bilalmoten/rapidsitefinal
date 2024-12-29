@@ -1,16 +1,41 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 export default function ResetPasswordForm() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
+
+  useEffect(() => {
+    // Check if we have a session
+    const checkSession = async () => {
+      const supabase = createClient();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      // If no session, redirect to login
+      if (!session) {
+        toast.error("Invalid or expired reset link");
+        router.push("/login");
+      }
+    };
+
+    checkSession();
+  }, [router]);
 
   const handleReset = async () => {
+    if (!password) {
+      toast.error("Please enter a new password");
+      return;
+    }
+
     setLoading(true);
     const supabase = createClient();
 
@@ -22,7 +47,7 @@ export default function ResetPasswordForm() {
       if (error) throw error;
 
       toast.success("Password updated successfully");
-      window.location.href = "/login";
+      router.push("/login");
     } catch (error: any) {
       console.error("Error resetting password:", error);
       toast.error(error.message || "Failed to reset password");
