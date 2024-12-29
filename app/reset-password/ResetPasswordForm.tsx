@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,11 +10,41 @@ import { useRouter } from "next/navigation";
 export default function ResetPasswordForm() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [isReady, setIsReady] = useState(false);
   const router = useRouter();
+
+  useEffect(() => {
+    const checkSession = async () => {
+      const supabase = createClient();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      if (!session) {
+        toast.error("Invalid or expired reset link");
+        router.push("/login");
+        return;
+      }
+
+      setIsReady(true);
+    };
+
+    // Small delay to ensure Supabase has time to set up the session
+    const timer = setTimeout(() => {
+      checkSession();
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, [router]);
 
   const handleReset = async () => {
     if (!password) {
       toast.error("Please enter a new password");
+      return;
+    }
+
+    if (password.length < 6) {
+      toast.error("Password must be at least 6 characters");
       return;
     }
 
@@ -37,6 +67,16 @@ export default function ResetPasswordForm() {
       setLoading(false);
     }
   };
+
+  if (!isReady) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="text-center">
+          <p className="text-muted-foreground">Verifying reset link...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen items-center justify-center">
