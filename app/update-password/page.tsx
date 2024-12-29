@@ -8,7 +8,11 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff } from "lucide-react";
 
-export default function UpdatePasswordPage() {
+interface PageProps {
+  searchParams: { [key: string]: string | string[] | undefined };
+}
+
+export default function UpdatePasswordPage({ searchParams }: PageProps) {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -16,34 +20,13 @@ export default function UpdatePasswordPage() {
   const router = useRouter();
 
   useEffect(() => {
-    console.log("Update password page mounted");
     const supabase = createClient();
 
-    // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      console.log("Initial session:", session ? "Exists" : "None");
-    });
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log("Auth state change:", { event, sessionExists: !!session });
-
-      // Only redirect if we're sure we're not in a recovery flow
-      if (
-        !session &&
-        event !== "PASSWORD_RECOVERY" &&
-        event !== "INITIAL_SESSION"
-      ) {
-        console.log("Redirecting to login - No session and not in recovery");
+    supabase.auth.onAuthStateChange(async (event, session) => {
+      if (!session && event !== "PASSWORD_RECOVERY") {
         router.push("/login");
       }
     });
-
-    return () => {
-      console.log("Cleaning up auth subscription");
-      subscription.unsubscribe();
-    };
   }, [router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -63,6 +46,23 @@ export default function UpdatePasswordPage() {
 
     try {
       const supabase = createClient();
+
+      // Get the access token from searchParams
+      const access_token = searchParams?.access_token as string;
+
+      if (!access_token) {
+        throw new Error("No access token found");
+      }
+
+      // Set the access token in the session
+      const { error: sessionError } = await supabase.auth.setSession({
+        access_token,
+        refresh_token: access_token,
+      });
+
+      if (sessionError) throw sessionError;
+
+      // Now update the password
       const { error } = await supabase.auth.updateUser({
         password: password,
       });
