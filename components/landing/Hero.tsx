@@ -79,24 +79,24 @@ export default function Hero() {
                       <AnimatedPrompts />
                     </div>
                   </div>
-                  <Button
-                    type="submit"
-                    className="bg-gradient-to-r from-cyan-500 to-violet-700 hover:from-cyan-600 hover:to-violet-800 text-white rounded-full px-8 py-6 sm:w-auto w-full"
-                  >
-                    Build Now
-                  </Button>
+                  <div className="flex flex-col items-center justify-center mt-2">
+                    <Button
+                      type="submit"
+                      className="bg-gradient-to-r from-cyan-500 to-violet-700 hover:from-cyan-600 hover:to-violet-800 text-white rounded-full px-8 py-6 sm:w-auto w-full"
+                    >
+                      Build Now
+                    </Button>
+                    <motion.div variants={itemVariants} className="mt-2">
+                      <span
+                        className={`${caveat.className} text-lg text-cyan-400`}
+                      >
+                        No credit card required
+                      </span>
+                    </motion.div>
+                  </div>
                 </div>
               </div>
             </form>
-
-            <motion.div
-              variants={itemVariants}
-              className="flex items-center justify-center mt-2"
-            >
-              <span className={`${caveat.className} text-lg text-cyan-400`}>
-                No credit card required
-              </span>
-            </motion.div>
           </motion.div>
         </motion.div>
       </div>
