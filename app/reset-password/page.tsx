@@ -5,28 +5,57 @@ import { createClient } from "@/utils/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+import { useSearchParams } from "next/navigation";
 
 export default function ResetPassword() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const searchParams = useSearchParams();
 
   const handleReset = async () => {
     setLoading(true);
     const supabase = createClient();
 
     try {
-      const { error } = await supabase.auth.updateUser({
-        password: password,
-      });
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
 
-      if (error) throw error;
+      if (session) {
+        // User is authenticated (from settings)
+        const { error } = await supabase.auth.updateUser({
+          password: password,
+        });
+        if (error) throw error;
+      } else {
+        // User is not authenticated (from email link)
+        const email = searchParams?.get("email");
+        const token = searchParams?.get("token");
+
+        if (!email || !token) {
+          throw new Error("Missing email or token");
+        }
+
+        // First verify the recovery token
+        const { error: verifyError } = await supabase.auth.verifyOtp({
+          email,
+          token,
+          type: "recovery",
+        });
+        if (verifyError) throw verifyError;
+
+        // Then update the password
+        const { error: updateError } = await supabase.auth.updateUser({
+          password: password,
+        });
+        if (updateError) throw updateError;
+      }
 
       toast.success("Password updated successfully");
-      // Redirect to dashboard
-      window.location.href = "/dashboard";
-    } catch (error) {
+      window.location.href = "/login";
+    } catch (error: any) {
       console.error("Error resetting password:", error);
-      toast.error("Failed to reset password");
+      toast.error(error.message || "Failed to reset password");
     } finally {
       setLoading(false);
     }
