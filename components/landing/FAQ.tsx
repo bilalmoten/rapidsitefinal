@@ -222,6 +222,7 @@ export default function FAQ() {
   const [activeCategory, setActiveCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
   const [activeQuestion, setActiveQuestion] = useState<string | null>(null);
+  const [showAll, setShowAll] = useState(false);
   const [helpfulResponses, setHelpfulResponses] = useState<
     Record<string, boolean>
   >({});
@@ -245,6 +246,8 @@ export default function FAQ() {
       faq.answer.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesCategory && matchesSearch;
   });
+
+  const displayedFaqs = showAll ? filteredFaqs : filteredFaqs.slice(0, 5);
 
   const handleFeedback = (faqId: string, isHelpful: boolean) => {
     setHelpfulResponses((prev) => ({ ...prev, [faqId]: isHelpful }));
@@ -299,7 +302,7 @@ export default function FAQ() {
 
         {/* FAQ List */}
         <div className="max-w-3xl mx-auto space-y-4">
-          {filteredFaqs.map((faq) => (
+          {displayedFaqs.map((faq) => (
             <motion.div
               key={faq.id}
               id={`faq-${faq.id}`}
@@ -398,6 +401,17 @@ export default function FAQ() {
               </AnimatePresence>
             </motion.div>
           ))}
+
+          {filteredFaqs.length > 5 && (
+            <motion.button
+              onClick={() => setShowAll(!showAll)}
+              className="w-full py-3 px-6 text-purple-500 font-medium hover:text-purple-600 transition-colors"
+            >
+              {showAll
+                ? "Show Less"
+                : `Show ${filteredFaqs.length - 5} More Questions`}
+            </motion.button>
+          )}
         </div>
       </div>
     </section>
