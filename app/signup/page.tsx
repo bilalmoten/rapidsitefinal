@@ -1,68 +1,33 @@
+"use client";
 import Link from "next/link";
-import { headers } from "next/headers";
-import { createClient } from "@/utils/supabase/server";
-import { redirect } from "next/navigation";
 import { SubmitButton } from "../login/submit-button";
+import { Eye, EyeOff } from "lucide-react";
+import { useState } from "react";
+import { signUp } from "./actions";
+import { useSearchParams } from "next/navigation";
 
 // Add password requirements
-const PASSWORD_REGEX = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
+const PASSWORD_REGEX =
+  /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
 const PASSWORD_REQUIREMENTS =
-  "Password must be at least 8 characters long and contain at least one letter and one number";
+  "Password must be at least 8 characters long and contain at least one letter, one number, and one special character (@$!%*?&)";
 
 // Add this validation regex near the top with other constants
 const EMAIL_REGEX = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
 
-export default async function Signup(props: {
-  searchParams: Promise<{ message: string }>;
-}) {
-  const searchParams = await props.searchParams;
-  const signUp = async (formData: FormData) => {
-    "use server";
-
-    const siteUrl = "https://aiwebsitebuilder.tech";
-    const email = formData.get("email") as string;
-    const password = formData.get("password") as string;
-
-    // Create a service role client for checking users
-    // const supabaseAdmin = await createClient();
-    const supabase = await createClient();
-
-    console.log("Signup attempt with:", {
-      email,
-      redirectUrl: `${siteUrl}/auth/callback`,
-    });
-
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: `${siteUrl}/auth/callback`,
-        data: {
-          redirect_url: `${siteUrl}/auth/callback`,
-        },
-      },
-    });
-
-    if (error) {
-      console.error("Signup error:", error);
-      return redirect(
-        `/signup?message=${encodeURIComponent(
-          error.message || "Sorry, we couldn't create your account"
-        )}`
-      );
-    }
-
-    return redirect("/signup?message=Check your email to verify your account");
-  };
+export default function Signup() {
+  const [showPassword, setShowPassword] = useState(false);
+  const searchParams = useSearchParams();
+  const message = searchParams?.get("message");
 
   return (
-    <div className="flex h-screen w-full items-center justify-center bg-gray-50">
-      <div className="w-full max-w-md space-y-8 p-10 bg-white rounded-xl shadow-lg">
+    <div className="flex h-screen w-full items-center justify-center bg-background">
+      <div className="w-full max-w-md space-y-8 p-10 bg-card rounded-xl shadow-lg">
         <div className="text-center">
-          <h2 className="mt-6 text-3xl font-bold text-gray-900">
+          <h2 className="mt-6 text-3xl font-bold text-foreground">
             Create your account
           </h2>
-          <p className="mt-2 text-sm text-gray-600">
+          <p className="mt-2 text-sm text-muted-foreground">
             Already have an account?{" "}
             <Link
               href="/login"
@@ -86,26 +51,37 @@ export default async function Signup(props: {
                 title="Please enter a valid email address"
                 autoComplete="email"
                 required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-input placeholder-muted-foreground text-foreground rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm bg-background"
                 placeholder="Email address"
               />
             </div>
-            <div>
+            <div className="relative">
               <label htmlFor="password" className="sr-only">
                 Password
               </label>
               <input
                 id="password"
                 name="password"
-                type="password"
+                type={showPassword ? "text" : "password"}
                 autoComplete="new-password"
                 required
                 pattern={PASSWORD_REGEX.source}
                 title={PASSWORD_REQUIREMENTS}
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                className="appearance-none rounded-none relative block w-full px-3 py-2 pr-10 border border-input placeholder-muted-foreground text-foreground rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm bg-background"
                 placeholder="Password"
               />
-              <p className="mt-1 text-xs text-gray-500">
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute top-0 right-0 h-[38px] w-[38px] flex items-center justify-center"
+              >
+                {showPassword ? (
+                  <EyeOff className="h-4 w-4" />
+                ) : (
+                  <Eye className="h-4 w-4" />
+                )}
+              </button>
+              <p className="mt-1 text-xs text-muted-foreground">
                 {PASSWORD_REQUIREMENTS}
               </p>
             </div>
@@ -121,14 +97,14 @@ export default async function Signup(props: {
             </SubmitButton>
           </div>
         </form>
-        {searchParams?.message && (
+        {message && (
           <div
             className="mt-4 p-4 bg-blue-100 border border-blue-400 text-blue-700 px-4 py-3 rounded relative"
             role="alert"
           >
             <p className="font-bold">Important:</p>
-            <p className="block sm:inline">{searchParams.message}</p>
-            {searchParams.message.includes("Check your email") && (
+            <p className="block sm:inline">{message}</p>
+            {message.includes("Check your email") && (
               <p className="mt-2">
                 Please check your email inbox and spam folder for a verification
                 link. You need to verify your email before you can log in.

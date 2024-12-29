@@ -1,45 +1,18 @@
+"use client";
 import Link from "next/link";
-import { createClient } from "@/utils/supabase/server";
-import { redirect } from "next/navigation";
 import { SubmitButton } from "./submit-button";
 import MotionWrapper from "@/components/MotionWrapper";
 import AnimatedLoginContent from "@/components/AnimatedLoginContent";
 import { FormMessage } from "@/components/form-message";
+import { Eye, EyeOff } from "lucide-react";
+import { useState } from "react";
+import { signIn } from "./actions";
+import { useSearchParams } from "next/navigation";
 
-export default async function Login(props: {
-  searchParams: Promise<{ message: string }>;
-}) {
-  const searchParams = await props.searchParams;
-
-  const signIn = async (formData: FormData) => {
-    "use server";
-
-    const email = formData.get("email") as string;
-    const password = formData.get("password") as string;
-    const supabase = await createClient();
-
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-
-    if (error) {
-      let errorMessage = "Could not authenticate user";
-
-      if (error.message.includes("Invalid login credentials")) {
-        errorMessage = "Invalid email or password";
-      } else if (error.message.includes("Email not confirmed")) {
-        errorMessage = "Please verify your email before logging in";
-      } else if (error.message.includes("Too many requests")) {
-        errorMessage = "Too many login attempts. Please try again later";
-      }
-
-      console.error("Login error:", error.message);
-      return redirect(`/login?message=${encodeURIComponent(errorMessage)}`);
-    }
-
-    return redirect("/dashboard");
-  };
+export default function Login() {
+  const [showPassword, setShowPassword] = useState(false);
+  const searchParams = useSearchParams();
+  const message = searchParams?.get("message");
 
   return (
     <MotionWrapper className="flex h-screen">
@@ -66,16 +39,16 @@ export default async function Login(props: {
             </p>
           </div>
 
-          {searchParams?.message && (
+          {message && (
             <div
               className={`p-4 ${
-                searchParams.message.toLowerCase().includes("success")
+                message.toLowerCase().includes("success")
                   ? "bg-green-100 border-green-400 text-green-700"
                   : "bg-red-100 border-red-400 text-red-700"
               } border rounded-md`}
               role="alert"
             >
-              <p className="text-sm">{searchParams.message}</p>
+              <p className="text-sm">{message}</p>
             </div>
           )}
 
@@ -95,19 +68,29 @@ export default async function Login(props: {
                   placeholder="Email address"
                 />
               </div>
-              <div>
+              <div className="relative">
                 <label htmlFor="password" className="sr-only">
                   Password
                 </label>
                 <input
                   id="password"
                   name="password"
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   autoComplete="current-password"
                   required
-                  className="appearance-none rounded-none relative block w-full px-3 py-2 border border-input placeholder-muted-foreground text-foreground rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm bg-background"
+                  className="appearance-none rounded-none relative block w-full px-3 py-2 pr-10 border border-input placeholder-muted-foreground text-foreground rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm bg-background"
                   placeholder="Password"
                 />
+                <div
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-0 h-full flex items-center px-3 text-muted-foreground hover:text-foreground cursor-pointer"
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-4 w-4" />
+                  ) : (
+                    <Eye className="h-4 w-4" />
+                  )}
+                </div>
               </div>
             </div>
 
