@@ -2,6 +2,16 @@
 
 RapidSite is a powerful AI-powered website builder that helps you create beautiful, responsive websites through natural language conversations. Simply describe what you want, and watch your website come to life in real-time.
 
+## 🎯 Latest Updates
+
+**December 28, 2023**: Making Things Better & More Secure 🛠️
+
+- Dark Mode Refinements
+- Better Password Support
+- Added Terms of Service & Privacy Policy
+
+[Follow Our Journey →](https://aiwebsitebuilder.tech/journey)
+
 ## ✨ Why RapidSite?
 
 - **No Code Required**: Just describe your website in plain English
