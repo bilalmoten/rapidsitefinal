@@ -15,6 +15,10 @@ import {
   ChevronRight,
   Moon,
   Wand2,
+  TimerIcon,
+  FileText,
+  BookOpen,
+  Video,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -97,12 +101,31 @@ const DashboardSidebar = () => {
       label: "Dashboard",
       href: "/dashboard",
     },
+    {
+      icon: TimerIcon,
+      label: "Roadmap",
+      href: "/roadmap",
+    },
+    {
+      icon: FileText,
+      label: "Changelog",
+      href: "/changelog",
+    },
+  ];
 
-    // {
-    //   icon: HelpCircle,
-    //   label: "Help",
-    //   href: "/dashboard/help",
-    // },
+  const comingSoonItems = [
+    {
+      icon: BookOpen,
+      label: "Documentation",
+    },
+    {
+      icon: Video,
+      label: "Tutorials",
+    },
+    {
+      icon: HelpCircle,
+      label: "Help & Support",
+    },
   ];
 
   const handleLogout = async () => {
@@ -178,15 +201,51 @@ const DashboardSidebar = () => {
                 <Button
                   variant="ghost"
                   className={cn(
-                    "w-full",
-                    isExpanded ? "justify-start px-3" : "justify-center px-0",
+                    "w-full relative",
+                    isExpanded ? "justify-start px-3" : "justify-center p-3",
                     isActive && "bg-muted"
                   )}
                 >
-                  <Icon className="h-6 w-6" />
+                  <Icon className="h-6 w-6 min-w-6 min-h-6" />
                   {isExpanded && <span className="ml-3">{item.label}</span>}
                 </Button>
               </Link>
+            );
+          })}
+
+          {comingSoonItems.map((item, index) => {
+            const Icon = item.icon;
+            return (
+              <div key={index} className="relative">
+                <Button
+                  variant="ghost"
+                  className={cn(
+                    "w-full relative",
+                    isExpanded ? "justify-start px-3" : "justify-center p-3",
+                    "opacity-50 cursor-not-allowed"
+                  )}
+                  disabled
+                >
+                  <div className="relative">
+                    <Icon className="h-6 w-6 min-w-6 min-h-6" />
+                    {!isExpanded && (
+                      <div className="absolute -right-1 -top-1">
+                        <div className="h-2 w-2 rounded-full bg-blue-500 animate-pulse" />
+                      </div>
+                    )}
+                  </div>
+                  {isExpanded && (
+                    <>
+                      <span className="ml-3">{item.label}</span>
+                      <div className="absolute right-2 top-1/2 -translate-y-1/2">
+                        <div className="text-xs px-1.5 py-0.5 rounded-full bg-blue-500/10 text-blue-500 border border-blue-500/20">
+                          Coming Soon
+                        </div>
+                      </div>
+                    </>
+                  )}
+                </Button>
+              </div>
             );
           })}
         </div>

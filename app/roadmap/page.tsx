@@ -478,24 +478,33 @@ export default function RoadmapPage() {
                           isRoadmap
                         />
                       ))}
-                      {features.length > 2 && !showAllRoadmap && (
-                        <Button
-                          variant="ghost"
-                          className="w-full text-muted-foreground hover:text-primary"
-                          onClick={() => setShowAllRoadmap(true)}
-                        >
-                          View {features.length - 2} more...
-                        </Button>
-                      )}
                     </div>
                   </div>
                 );
               })}
             </div>
+            {!showAllRoadmap && (
+              <div className="relative mt-8 text-center">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-border"></div>
+                </div>
+                <div className="relative flex justify-center">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="bg-background"
+                    onClick={() => setShowAllRoadmap(true)}
+                  >
+                    View All Features
+                  </Button>
+                </div>
+              </div>
+            )}
             {showAllRoadmap && (
-              <div className="text-center mt-6">
+              <div className="text-center mt-8">
                 <Button
                   variant="outline"
+                  size="sm"
                   onClick={() => setShowAllRoadmap(false)}
                 >
                   Show Less
