@@ -550,7 +550,7 @@ export default function SettingsModal({
                           await supabase.auth.resetPasswordForEmail(
                             user?.email || "",
                             {
-                              redirectTo: `${siteUrl}/reset-password`,
+                              redirectTo: `${siteUrl}/auth/callback?next=/reset-password`,
                             }
                           );
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { createClient } from "@/utils/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,24 +11,6 @@ export default function ResetPasswordForm() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-
-  useEffect(() => {
-    // Check if we have a session
-    const checkSession = async () => {
-      const supabase = createClient();
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-
-      // If no session, redirect to login
-      if (!session) {
-        toast.error("Invalid or expired reset link");
-        router.push("/login");
-      }
-    };
-
-    checkSession();
-  }, [router]);
 
   const handleReset = async () => {
     if (!password) {
@@ -71,6 +53,7 @@ export default function ResetPasswordForm() {
             placeholder="New password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            minLength={6}
           />
           <Button className="w-full" onClick={handleReset} disabled={loading}>
             {loading ? "Updating..." : "Update Password"}
