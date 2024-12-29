@@ -2,17 +2,19 @@ import ResetPasswordForm from "./ResetPasswordForm";
 import { Suspense } from "react";
 
 interface PageProps {
-  searchParams: Promise<{
+  searchParams: {
     email?: string;
     token?: string;
-  }>;
+  };
 }
 
-export default async function ResetPasswordPage({ searchParams }: PageProps) {
-  const params = await searchParams;
+export default function ResetPasswordPage({ searchParams }: PageProps) {
   return (
     <Suspense fallback={<div>Loading...</div>}>
-      <ResetPasswordForm email={params.email} token={params.token} />
+      <ResetPasswordForm
+        email={searchParams.email}
+        token={searchParams.token}
+      />
     </Suspense>
   );
 }

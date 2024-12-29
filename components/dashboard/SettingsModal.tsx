@@ -545,12 +545,11 @@ export default function SettingsModal({
                         const siteUrl =
                           process.env.NEXT_PUBLIC_SITE_URL ||
                           "https://aiwebsitebuilder.tech";
-                        console.log("Using site URL:", siteUrl); // Debug log
 
                         await supabase.auth.resetPasswordForEmail(
                           user?.email || "",
                           {
-                            redirectTo: `${siteUrl}/auth/callback?type=recovery`,
+                            redirectTo: `${siteUrl}/auth/callback?type=recovery&email=${user?.email}`,
                           }
                         );
                         toast.success("Password reset email sent");

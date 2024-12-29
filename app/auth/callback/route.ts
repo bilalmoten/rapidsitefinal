@@ -16,9 +16,13 @@ export async function GET(request: Request) {
     await supabase.auth.exchangeCodeForSession(code);
   }
 
-  // If it's a password reset, redirect to reset-password page
+  // If it's a password reset, redirect to reset-password page with necessary params
   if (type === "recovery") {
-    return NextResponse.redirect(`${origin}/reset-password`);
+    const token = requestUrl.searchParams.get("token");
+    const email = requestUrl.searchParams.get("email");
+    return NextResponse.redirect(
+      `${origin}/reset-password?token=${token}&email=${email}`
+    );
   }
 
   // Handle normal redirects
