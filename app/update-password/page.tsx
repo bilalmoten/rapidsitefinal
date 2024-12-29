@@ -13,18 +13,13 @@ export default function UpdatePasswordPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [isAuthorized, setIsAuthorized] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
     const supabase = createClient();
 
-    // Check if user is in a recovery flow
-    supabase.auth.onAuthStateChange((event, session) => {
-      if (event === "PASSWORD_RECOVERY") {
-        setIsAuthorized(true);
-      } else if (!session) {
-        // If no session and not in recovery, redirect to login
+    supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event !== "PASSWORD_RECOVERY") {
         router.push("/login");
       }
     });
@@ -32,12 +27,6 @@ export default function UpdatePasswordPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (!isAuthorized) {
-      toast.error("Unauthorized access");
-      router.push("/login");
-      return;
-    }
 
     if (password !== confirmPassword) {
       toast.error("Passwords do not match");
@@ -68,10 +57,6 @@ export default function UpdatePasswordPage() {
       setIsLoading(false);
     }
   };
-
-  if (!isAuthorized) {
-    return null; // Or a loading state
-  }
 
   return (
     <div className="flex min-h-screen">
