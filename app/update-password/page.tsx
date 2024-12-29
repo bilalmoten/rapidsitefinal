@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { createClient } from "@/utils/supabase/client";
@@ -14,6 +14,22 @@ export default function UpdatePasswordPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
+
+  useEffect(() => {
+    // Check if we're in a password reset flow
+    const supabase = createClient();
+    supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === "SIGNED_IN") {
+        // If user is signed in but came from password reset
+        if (window.location.hash.includes("type=recovery")) {
+          // Stay on the page to let them reset password
+          return;
+        }
+        // Otherwise redirect to dashboard
+        router.push("/dashboard");
+      }
+    });
+  }, [router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
