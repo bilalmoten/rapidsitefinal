@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { createClient } from "@/utils/supabase/client";
@@ -15,16 +15,6 @@ export default function UpdatePasswordForm() {
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
-
-  useEffect(() => {
-    const supabase = createClient();
-
-    supabase.auth.onAuthStateChange(async (event, session) => {
-      if (!session && event !== "PASSWORD_RECOVERY") {
-        router.push("/login");
-      }
-    });
-  }, [router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,23 +33,6 @@ export default function UpdatePasswordForm() {
 
     try {
       const supabase = createClient();
-
-      // Get the access token from URL
-      const access_token = searchParams?.get("access_token") ?? null;
-
-      if (!access_token) {
-        throw new Error("No access token found");
-      }
-
-      // Set the access token in the session
-      const { error: sessionError } = await supabase.auth.setSession({
-        access_token,
-        refresh_token: access_token,
-      });
-
-      if (sessionError) throw sessionError;
-
-      // Now update the password
       const { error } = await supabase.auth.updateUser({
         password: password,
       });
