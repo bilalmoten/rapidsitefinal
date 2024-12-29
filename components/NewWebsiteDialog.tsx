@@ -1,7 +1,7 @@
 // components/NewWebsiteDialog.tsx
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -13,8 +13,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useRouter } from "next/navigation";
-import { createClient } from "@/utils/supabase/server";
+import { createClient } from "@/utils/supabase/client";
 import { CheckCircle2, XCircle, AlertCircle } from "lucide-react";
+import { PLAN_LIMITS, PlanType } from "@/lib/constants/plans";
+import { toast } from "sonner";
 
 const sanitizeSubdomain = (value: string) => {
   // Replace spaces and special characters with hyphens, convert to lowercase
@@ -30,11 +32,9 @@ const sanitizeSubdomain = (value: string) => {
 export default function NewWebsiteDialog({
   children,
   userId,
-}: // onWebsiteCreated,
-{
+}: {
   children: React.ReactNode;
   userId: string;
-  // onWebsiteCreated: () => void;
 }) {
   const [websiteTitle, setWebsiteTitle] = useState("");
   const [subdomain, setSubdomain] = useState("");
@@ -48,6 +48,54 @@ export default function NewWebsiteDialog({
     description: "",
   });
   const router = useRouter();
+
+  const checkLimits = async () => {
+    const supabase = createClient();
+
+    // Get user's plan and current usage
+    const { data: usage, error: usageError } = await supabase
+      .from("user_usage")
+      .select("*")
+      .eq("user_id", userId)
+      .single();
+
+    if (usageError) {
+      console.error("Error checking usage:", usageError);
+      return false;
+    }
+
+    // Get current active websites count
+    const { count: activeWebsites } = await supabase
+      .from("websites")
+      .select("*", { count: "exact", head: true })
+      .eq("user_id", userId)
+      .neq("isdeleted", "yes");
+
+    const activeWebsitesCount = activeWebsites || 0;
+
+    if (activeWebsitesCount >= PLAN_LIMITS[usage.plan as PlanType].websites) {
+      toast.error(
+        `You've reached your plan's limit of ${
+          PLAN_LIMITS[usage.plan as PlanType].websites
+        } active websites. Please upgrade your plan or delete some websites.`
+      );
+      return false;
+    }
+
+    if (
+      usage.websites_generated >=
+      PLAN_LIMITS[usage.plan as PlanType].websitesGenerated
+    ) {
+      toast.error(
+        `You've reached your plan's limit of ${
+          PLAN_LIMITS[usage.plan as PlanType].websitesGenerated
+        } generated websites. Please upgrade your plan.`
+      );
+      return false;
+    }
+
+    return true;
+  };
 
   const loadExistingSubdomains = async () => {
     const response = await fetch("/api/check-subdomains", {
@@ -145,11 +193,13 @@ export default function NewWebsiteDialog({
   return (
     <Dialog
       open={isOpen}
-      onOpenChange={(open) => {
-        setIsOpen(open);
+      onOpenChange={async (open) => {
         if (open) {
+          const canProceed = await checkLimits();
+          if (!canProceed) return;
           loadExistingSubdomains();
         }
+        setIsOpen(open);
       }}
     >
       <DialogTrigger asChild>{children}</DialogTrigger>

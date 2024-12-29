@@ -79,7 +79,7 @@ const DashboardSidebar = () => {
 
     if (!usageError && usageData) {
       setUsage({
-        websitesActive: usageData.websites_active || 55,
+        websitesActive: usageData.websites_active || 0,
         websitesGenerated: usageData.websites_generated || 0,
         aiEditsCount: usageData.ai_edits_count || 0,
         plan: usageData.plan || "free",

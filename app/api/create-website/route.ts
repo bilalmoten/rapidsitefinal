@@ -2,6 +2,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/utils/supabase/server";
 import { PLAN_LIMITS, PlanType } from '@/lib/constants/plans';
+import { updateActiveWebsitesCount } from '@/middleware/usage-tracking';
 
 export async function POST(request: Request) {
     const supabase = await createClient();
@@ -26,11 +27,28 @@ export async function POST(request: Request) {
         });
     }
 
+    // Get current active websites count
+    const { count: activeWebsitesCount } = await supabase
+        .from('websites')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', userId)
+        .neq('isdeleted', 'yes');
+
+    const activeWebsites = activeWebsitesCount || 0;
+
     // Check against plan limits
     if (currentUsage.websites_generated >= PLAN_LIMITS[currentUsage.plan as PlanType].websitesGenerated) {
         return NextResponse.json({
             message: "Website generation limit reached for your plan",
             error: "LIMIT_REACHED"
+        });
+    }
+
+    // Check active websites limit
+    if (activeWebsites >= PLAN_LIMITS[currentUsage.plan as PlanType].websites) {
+        return NextResponse.json({
+            message: "Active websites limit reached for your plan. Please upgrade your plan or delete some websites.",
+            error: "ACTIVE_LIMIT_REACHED"
         });
     }
 
@@ -53,20 +71,20 @@ export async function POST(request: Request) {
         return NextResponse.json({ message: "Error creating website", error });
     }
 
-    // Update usage counts with the current usage values
+    // Update websites_generated count
     const { error: updateError } = await supabase
         .from('user_usage')
         .update({
-            websites_active: currentUsage.websites_active + 1,
             websites_generated: currentUsage.websites_generated + 1
         })
         .eq('user_id', userId);
 
     if (updateError) {
         console.error("Error updating usage counts:", updateError);
-        // Website was created but usage wasn't updated
-        // You might want to handle this case
     }
+
+    // Update active websites count
+    await updateActiveWebsitesCount(userId);
 
     return NextResponse.json({
         id: data[0].id,

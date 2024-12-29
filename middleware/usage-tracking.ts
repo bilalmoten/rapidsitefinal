@@ -28,6 +28,36 @@ export async function trackAIEdit(userId: string) {
         .eq('user_id', userId);
 }
 
+export async function updateActiveWebsitesCount(userId: string) {
+    const supabase = await createClient();
+
+    // Get current active websites count
+    const { count } = await supabase
+        .from('websites')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', userId)
+        .neq('isdeleted', 'yes');
+
+    // Get user's plan
+    const { data: usage } = await supabase
+        .from('user_usage')
+        .select('plan')
+        .eq('user_id', userId)
+        .single();
+
+    if (!usage) throw new Error('User usage data not found');
+
+    // Update the active websites count
+    await supabase
+        .from('user_usage')
+        .update({
+            websites_active: count || 0
+        })
+        .eq('user_id', userId);
+
+    return count || 0;
+}
+
 export async function trackWebsiteGeneration(userId: string) {
     const supabase = await createClient();
 
@@ -43,11 +73,14 @@ export async function trackWebsiteGeneration(userId: string) {
         throw new Error('Website generation limit reached');
     }
 
+    // Only increment the generation count
     await supabase
         .from('user_usage')
         .update({
-            websites_generated: usage.websites_generated + 1,
-            websites_active: usage.websites_active + 1
+            websites_generated: usage.websites_generated + 1
         })
         .eq('user_id', userId);
+
+    // Update active websites count
+    await updateActiveWebsitesCount(userId);
 } 

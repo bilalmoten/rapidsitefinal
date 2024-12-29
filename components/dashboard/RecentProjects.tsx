@@ -9,6 +9,7 @@ import DeleteWebsiteDialog from "@/components/DeleteWebsiteDialog";
 
 import { createClient } from "@/utils/supabase/client";
 import { User } from "@supabase/supabase-js";
+import { toast } from "sonner";
 
 interface RecentProjectsProps {
   websites: {
@@ -54,6 +55,29 @@ const RecentProjects: React.FC<RecentProjectsProps> = ({ websites }) => {
   const handleRegenerate = async (websiteId: string) => {
     setIsProcessing(true);
     try {
+      // Track website generation first
+      const trackResponse = await fetch("/api/track-generation", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId: user?.id,
+        }),
+      });
+
+      if (!trackResponse.ok) {
+        const error = await trackResponse.json();
+        if (error.error === "LIMIT_REACHED") {
+          toast.error(
+            "You've reached your plan's website generation limit. Please upgrade to continue."
+          );
+          setIsProcessing(false);
+          return;
+        }
+        throw new Error("Failed to track website generation");
+      }
+
       const response = await fetch(
         `https://api2.azurewebsites.net/api/code_website?website_id=${websiteId}&user_id=${user?.id}&model=o1-mini`,
         {

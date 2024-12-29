@@ -3,6 +3,9 @@ export const PLAN_LIMITS = {
         websites: 1,
         aiEdits: 10,
         websitesGenerated: 3
+        // websites: 0,
+        // aiEdits: 0,
+        // websitesGenerated: 0
     },
     pro: {
         websites: 5,

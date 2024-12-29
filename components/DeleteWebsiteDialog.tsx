@@ -32,13 +32,32 @@ const DeleteWebsiteDialog: React.FC<DeleteWebsiteDialogProps> = ({
 
   const handleDelete = async () => {
     setIsLoading(true);
-    const { error } = await supabase
-      .from("websites")
-      .update({ isdeleted: "yes" })
-      .eq("id", websiteId);
 
-    if (error) {
-      console.error("Error marking website as deleted:", error);
+    // Get user ID
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      console.error("No user found");
+      setIsLoading(false);
+      return;
+    }
+
+    // Call the delete website API
+    const response = await fetch("/api/delete-website", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        websiteId,
+        userId: user.id,
+      }),
+    });
+
+    if (!response.ok) {
+      console.error("Error deleting website");
     } else {
       router.refresh();
     }
@@ -78,7 +97,6 @@ const DeleteWebsiteDialog: React.FC<DeleteWebsiteDialogProps> = ({
           </Button>
         </div>
       </DialogContent>
-      {/* {children} */}
     </Dialog>
   );
 };
