@@ -1,34 +1,24 @@
-import { NextResponse } from 'next/server'
-import { createClient } from '@/utils/supabase/server'
+import { createClient } from "@/utils/supabase/server";
+import { NextResponse } from "next/server";
 
 export async function GET(request: Request) {
-  console.log('Auth callback triggered');
-  const { searchParams } = new URL(request.url)
-  const code = searchParams.get('code')
-  const next = searchParams.get('next') ?? '/dashboard'
-
-  console.log('Auth params:', { code: code?.slice(0, 5) + '...', next });
-
-  // Get the protocol and host from the request
-  const protocol = process.env.NODE_ENV === 'development' ? 'http' : 'https'
-  const host = request.headers.get('host') || 'aiwebsitebuilder.tech'
-
-  console.log('Environment:', { protocol, host });
+  // The `/auth/callback` route is required for the server-side auth flow implemented
+  // by the SSR package. It exchanges an auth code for the user's session.
+  // https://supabase.com/docs/guides/auth/server-side/nextjs
+  const requestUrl = new URL(request.url);
+  const code = requestUrl.searchParams.get("code");
+  const origin = requestUrl.origin;
+  const redirectTo = requestUrl.searchParams.get("redirect_to")?.toString();
 
   if (code) {
-    const supabase = await createClient()
-    const { error } = await supabase.auth.exchangeCodeForSession(code)
-    if (!error) {
-      // Construct the full URL for redirection
-      const redirectUrl = `${protocol}://${host}${next}`
-      console.log('Successful auth, redirecting to:', redirectUrl)
-      return NextResponse.redirect(redirectUrl)
-    } else {
-      console.error('Auth error:', error)
-    }
+    const supabase = await createClient();
+    await supabase.auth.exchangeCodeForSession(code);
   }
 
-  console.log('Auth failed, redirecting to login')
-  // Return the user to an error page with instructions
-  return NextResponse.redirect(`${protocol}://${host}/login?message=Could not authenticate user`)
+  if (redirectTo) {
+    return NextResponse.redirect(`${origin}${redirectTo}`);
+  }
+
+  // URL to redirect to after sign up process completes
+  return NextResponse.redirect(`${origin}/dashboard`);
 }
