@@ -16,13 +16,34 @@ export default function UpdatePasswordPage() {
   const router = useRouter();
 
   useEffect(() => {
+    console.log("Update password page mounted");
     const supabase = createClient();
 
-    supabase.auth.onAuthStateChange(async (event, session) => {
-      if (event !== "PASSWORD_RECOVERY") {
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      console.log("Initial session:", session ? "Exists" : "None");
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log("Auth state change:", { event, sessionExists: !!session });
+
+      // Only redirect if we're sure we're not in a recovery flow
+      if (
+        !session &&
+        event !== "PASSWORD_RECOVERY" &&
+        event !== "INITIAL_SESSION"
+      ) {
+        console.log("Redirecting to login - No session and not in recovery");
         router.push("/login");
       }
     });
+
+    return () => {
+      console.log("Cleaning up auth subscription");
+      subscription.unsubscribe();
+    };
   }, [router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
