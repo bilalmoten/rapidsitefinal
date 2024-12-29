@@ -9,16 +9,23 @@ export async function GET(request: Request) {
   const code = requestUrl.searchParams.get("code");
   const origin = requestUrl.origin;
   const redirectTo = requestUrl.searchParams.get("redirect_to")?.toString();
+  const type = requestUrl.searchParams.get("type");
 
   if (code) {
     const supabase = await createClient();
     await supabase.auth.exchangeCodeForSession(code);
   }
 
+  // If it's a password reset, redirect to reset-password page
+  if (type === "recovery") {
+    return NextResponse.redirect(`${origin}/reset-password`);
+  }
+
+  // Handle normal redirects
   if (redirectTo) {
     return NextResponse.redirect(`${origin}${redirectTo}`);
   }
 
-  // URL to redirect to after sign up process completes
+  // Default redirect
   return NextResponse.redirect(`${origin}/dashboard`);
 }
