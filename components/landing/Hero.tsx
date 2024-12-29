@@ -91,26 +91,10 @@ export default function Hero() {
 
             <motion.div
               variants={itemVariants}
-              className="flex items-center justify-end mt-2 gap-2 pr-4"
+              className="flex items-center justify-center mt-2"
             >
-              <span
-                className={`${caveat.className} text-lg text-cyan-400 rotate-[-4deg] relative`}
-              >
+              <span className={`${caveat.className} text-lg text-cyan-400`}>
                 No credit card required
-                <motion.svg
-                  className="absolute -right-16 top-1/2 -translate-y-1/2 w-12 h-8 text-cyan-500"
-                  viewBox="0 0 100 100"
-                  initial={{ pathLength: 0, opacity: 0 }}
-                  animate={{ pathLength: 1, opacity: 1 }}
-                  transition={{ duration: 2, ease: "easeInOut" }}
-                >
-                  <motion.path
-                    d="M10,50 Q30,10 50,50 T90,50"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="3"
-                  />
-                </motion.svg>
               </span>
             </motion.div>
           </motion.div>
