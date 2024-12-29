@@ -549,7 +549,7 @@ export default function SettingsModal({
                         await supabase.auth.resetPasswordForEmail(
                           user?.email || "",
                           {
-                            redirectTo: `${siteUrl}/auth/callback?type=recovery&email=${user?.email}`,
+                            redirectTo: `${siteUrl}/auth/callback#type=recovery`,
                           }
                         );
                         toast.success("Password reset email sent");

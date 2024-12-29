@@ -6,15 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 
-interface ResetPasswordFormProps {
-  email?: string;
-  token?: string;
-}
-
-export default function ResetPasswordForm({
-  email,
-  token,
-}: ResetPasswordFormProps) {
+export default function ResetPasswordForm() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -23,36 +15,11 @@ export default function ResetPasswordForm({
     const supabase = createClient();
 
     try {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
+      const { error } = await supabase.auth.updateUser({
+        password: password,
+      });
 
-      if (session) {
-        // User is authenticated (from settings)
-        const { error } = await supabase.auth.updateUser({
-          password: password,
-        });
-        if (error) throw error;
-      } else {
-        // User is not authenticated (from email link)
-        if (!email || !token) {
-          throw new Error("Missing email or token");
-        }
-
-        // First verify the recovery token
-        const { error: verifyError } = await supabase.auth.verifyOtp({
-          email,
-          token,
-          type: "recovery",
-        });
-        if (verifyError) throw verifyError;
-
-        // Then update the password
-        const { error: updateError } = await supabase.auth.updateUser({
-          password: password,
-        });
-        if (updateError) throw updateError;
-      }
+      if (error) throw error;
 
       toast.success("Password updated successfully");
       window.location.href = "/login";

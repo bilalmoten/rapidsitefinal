@@ -9,27 +9,21 @@ export async function GET(request: Request) {
   const code = requestUrl.searchParams.get("code");
   const origin = requestUrl.origin;
   const redirectTo = requestUrl.searchParams.get("redirect_to")?.toString();
-  const type = requestUrl.searchParams.get("type");
 
   if (code) {
     const supabase = await createClient();
-    await supabase.auth.exchangeCodeForSession(code);
+    const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+    if (!error && data.session) {
+      // If there's a hash fragment for password reset
+      if (requestUrl.hash.includes('type=recovery')) {
+        return NextResponse.redirect(`${origin}/reset-password`);
+      }
+    }
   }
 
-  // If it's a password reset, redirect to reset-password page with necessary params
-  if (type === "recovery") {
-    const token = requestUrl.searchParams.get("token");
-    const email = requestUrl.searchParams.get("email");
-    return NextResponse.redirect(
-      `${origin}/reset-password?token=${token}&email=${email}`
-    );
-  }
-
-  // Handle normal redirects
   if (redirectTo) {
     return NextResponse.redirect(`${origin}${redirectTo}`);
   }
 
-  // Default redirect
   return NextResponse.redirect(`${origin}/dashboard`);
 }
