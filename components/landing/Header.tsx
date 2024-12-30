@@ -14,15 +14,22 @@ export default function Header() {
   const menuItems = [
     { href: "#how-it-works", label: "How It Works" },
     { href: "#showcase", label: "Showcase" },
-    { href: "#gallery", label: "Gallery" },
+    // { href: "#gallery", label: "Gallery" },
     { href: "#testimonials", label: "Testimonials" },
     { href: "#faq", label: "FAQ" },
     { href: "#features", label: "Features" },
     { href: "#pricing", label: "Pricing" },
+    { href: "/blog", label: "Blog" },
   ];
 
-  const handleGetStarted = () => {
-    router.push("/dashboard");
+  // const handleGetStarted = () => {
+  //   router.push("/dashboard");
+  const handleLogin = () => {
+    router.push("/login");
+  };
+
+  const handleSignup = () => {
+    router.push("/signup");
   };
 
   return (
@@ -64,9 +71,13 @@ export default function Header() {
               ))}
             </div>
           </div>
-
-          <div className="hidden md:block shrink-0">
-            <ShinyButton onClick={handleGetStarted}>Get Started</ShinyButton>
+          {/* <div className="hidden md:block shrink-0">
+            <ShinyButton onClick={handleGetStarted}>Get Started</ShinyButton> */}
+          <div className="hidden md:flex items-center gap-4 shrink-0">
+            <ShinyButton onClick={handleLogin} className="bg-background">
+              Login
+            </ShinyButton>
+            <ShinyButton onClick={handleSignup}>Sign Up</ShinyButton>
           </div>
 
           <motion.button
@@ -102,10 +113,14 @@ export default function Header() {
                   </Link>
                 </motion.div>
               ))}
-              <div className="flex items-center justify-between pt-4 border-t border-border">
+              {/* <div className="flex items-center justify-between pt-4 border-t border-border">
                 <ShinyButton onClick={handleGetStarted}>
-                  Get Started
+                  Get Started */}
+              <div className="flex items-center justify-between pt-4 border-t border-border gap-4">
+                <ShinyButton onClick={handleLogin} className="bg-background">
+                  Login
                 </ShinyButton>
+                <ShinyButton onClick={handleSignup}>Sign Up</ShinyButton>
               </div>
             </nav>
           </motion.div>
