@@ -27,6 +27,26 @@ interface Update {
 
 const updates: Update[] = [
   {
+    date: "December 31, 2023",
+    title: "Analytics Integration & Tracking 📊",
+    description:
+      "Added comprehensive analytics to track and improve user experience",
+    updates: [
+      {
+        title: "Google Analytics Integration",
+        description:
+          "Implemented Google Analytics 4 for better insights into user behavior and website performance",
+        type: "feature",
+      },
+      {
+        title: "Custom Event Tracking",
+        description:
+          "Added detailed event tracking for website creation, AI interactions, and user authentication",
+        type: "improvement",
+      },
+    ],
+  },
+  {
     date: "December 30, 2024",
     title: "Roadmap & Navigation Improvements 🎯",
     description:

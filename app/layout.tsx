@@ -5,6 +5,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import "prismjs/themes/prism-tomorrow.css";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { GoogleAnalytics } from "@next/third-parties/google";
 
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
@@ -38,6 +39,7 @@ export default function RootLayout({
         </ThemeProvider>
         <Analytics />
         <SpeedInsights />
+        <GoogleAnalytics gaId="G-6CS8ZP8T4K" />
       </body>
     </html>
   );
