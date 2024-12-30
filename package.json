@@ -4,7 +4,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "test-auth": "node -r dotenv/config --loader ts-node/esm scripts/test-gcloud-auth.mts"
+    "test-auth": "node -r dotenv/config --loader ts-node/esm scripts/test-gcloud-auth.mts",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@ai-sdk/azure": "^0.0.48",

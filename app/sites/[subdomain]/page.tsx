@@ -4,11 +4,9 @@ import Script from "next/script";
 import { JSDOM } from "jsdom";
 import NoSitePage from "@/components/NoSitePage";
 
-export default async function SubdomainPage(
-  props: {
-    params: Promise<{ subdomain: string }>;
-  }
-) {
+export default async function SubdomainPage(props: {
+  params: Promise<{ subdomain: string }>;
+}) {
   const params = await props.params;
   const supabase = await createClient();
 
@@ -46,8 +44,7 @@ export default async function SubdomainPage(
   const replaceLinks = (content: string) => {
     const dom = new JSDOM(content);
     const document = dom.window.document;
-
-    document.querySelectorAll("a").forEach((a) => {
+    document.querySelectorAll("a").forEach((a: HTMLAnchorElement) => {
       const href = a.getAttribute("href");
       if (href && !href.startsWith("http") && !href.startsWith("#")) {
         const newHref = `/sites/${params.subdomain}/${href.replace(
@@ -87,11 +84,9 @@ export default async function SubdomainPage(
   );
 }
 
-export async function generateMetadata(
-  props: {
-    params: Promise<{ subdomain: string }>;
-  }
-) {
+export async function generateMetadata(props: {
+  params: Promise<{ subdomain: string }>;
+}) {
   const params = await props.params;
   const supabase = await createClient();
   const { data: website } = await supabase
