@@ -70,7 +70,7 @@ export default async function SitePage(props: SitePageProps) {
     const dom = new JSDOM(content);
     const document = dom.window.document;
 
-    document.querySelectorAll("a").forEach((a) => {
+    document.querySelectorAll("a").forEach((a: HTMLAnchorElement) => {
       const href = a.getAttribute("href");
       if (href && !href.startsWith("http") && !href.startsWith("#")) {
         const newHref = `/sites/${params.subdomain}/${href.replace(
