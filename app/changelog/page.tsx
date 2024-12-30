@@ -27,7 +27,28 @@ interface Update {
 
 const updates: Update[] = [
   {
-    date: "December 31, 2023",
+    date: "December 31, 2024",
+    title: "Waitlist System Launch 🎟️",
+    milestone: true,
+    description:
+      "Implemented a waitlist system to manage our growing user base",
+    updates: [
+      {
+        title: "Waitlist System",
+        description:
+          "Introduced a waitlist system to ensure a smooth onboarding experience for new users. We'll be inviting users in batches to maintain service quality.",
+        type: "feature",
+      },
+      {
+        title: "Email Notifications",
+        description:
+          "Set up automated email notifications to keep waitlisted users informed about their status and position.",
+        type: "improvement",
+      },
+    ],
+  },
+  {
+    date: "December 31, 2024",
     title: "Analytics Integration & Tracking 📊",
     description:
       "Added comprehensive analytics to track and improve user experience",
