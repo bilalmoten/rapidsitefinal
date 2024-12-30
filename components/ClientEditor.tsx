@@ -31,6 +31,7 @@ import {
   checkAIEditsLimit,
   incrementAIEdits,
 } from "@/utils/usage-tracker";
+import { trackEvent, EVENTS } from "@/utils/analytics";
 // import debounce from "lodash.debounce";
 // import DOMPurify from "dompurify";
 
@@ -673,6 +674,12 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
     if (!selectedElement || !iframeRef.current?.contentDocument) return;
 
     try {
+      // Track start of AI edit
+      trackEvent(EVENTS.AI.EDIT_MADE, {
+        mode: mode,
+        elementType: selectedElement.tagName.toLowerCase(),
+      });
+
       // First check if user can make edits
       const { canEdit, remaining } = await checkAIEditsLimit(userId);
 

@@ -17,6 +17,7 @@ import { createClient } from "@/utils/supabase/client";
 import { CheckCircle2, XCircle, AlertCircle } from "lucide-react";
 import { PLAN_LIMITS, PlanType } from "@/lib/constants/plans";
 import { toast } from "sonner";
+import { trackEvent, EVENTS } from "@/utils/analytics";
 
 const sanitizeSubdomain = (value: string) => {
   // Replace spaces and special characters with hyphens, convert to lowercase
@@ -180,6 +181,11 @@ export default function NewWebsiteDialog({
     console.log("Response.ok: successful");
 
     if (response.ok) {
+      trackEvent(EVENTS.WEBSITE.CREATED, {
+        websiteId: result.id,
+        title: websiteTitle,
+        subdomain: subdomain,
+      });
       router.push(`/dashboard/chat/${result.id}`);
       console.log("Website created:", result.id);
     } else {

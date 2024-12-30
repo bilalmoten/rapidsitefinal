@@ -39,9 +39,15 @@ const updates: Update[] = [
         type: "feature",
       },
       {
-        title: "Custom Event Tracking",
+        title: "AI Interaction Tracking",
         description:
-          "Added detailed event tracking for website creation, AI interactions, and user authentication",
+          "Added detailed tracking for AI chat sessions and AI-powered edits, including message lengths and edit types",
+        type: "improvement",
+      },
+      {
+        title: "Performance Monitoring",
+        description:
+          "Set up analytics to monitor website generation times, edit success rates, and user engagement patterns",
         type: "improvement",
       },
     ],

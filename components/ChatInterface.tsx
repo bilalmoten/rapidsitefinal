@@ -14,6 +14,7 @@ import {
   TooltipTrigger,
   TooltipProvider,
 } from "@/components/ui/tooltip";
+import { trackEvent, EVENTS } from "@/utils/analytics";
 
 interface ChatInterfaceProps {
   messages: Message[];
@@ -59,6 +60,14 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    trackEvent(EVENTS.AI.CHAT_STARTED, {
+      messageLength: input.length,
+    });
+    await onSubmit(e);
+    trackEvent(EVENTS.AI.CHAT_COMPLETED);
+  };
 
   return (
     <div className="flex-1 overflow-hidden flex flex-col max-w-5xl mx-auto w-full">
@@ -131,7 +140,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
 
       {/* Input Area */}
       <div className="border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <form onSubmit={onSubmit} className="p-4">
+        <form onSubmit={handleSubmit} className="p-4">
           <div className="flex gap-3 bg-secondary/50 rounded-lg p-2">
             <Textarea
               ref={textareaRef}
