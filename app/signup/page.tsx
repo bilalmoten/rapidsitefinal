@@ -5,15 +5,13 @@ import AnimatedLoginContent from "@/components/AnimatedLoginContent";
 import MotionWrapper from "@/components/MotionWrapper";
 
 interface PageProps {
-  searchParams: Promise<{ message?: string }>;
+  searchParams: { message?: string };
 }
 
 // Set this to false to enable normal signups
 const WAITLIST_MODE = true;
 
-export default async function SignupPage({ searchParams }: PageProps) {
-  const params = await searchParams;
-
+export default function SignupPage({ searchParams }: PageProps) {
   if (WAITLIST_MODE) {
     return (
       <Suspense fallback={<div>Loading...</div>}>
@@ -54,7 +52,7 @@ export default async function SignupPage({ searchParams }: PageProps) {
       <div className="w-3/5 flex items-center justify-center bg-background">
         <div className="w-full max-w-md space-y-8 p-10 bg-card rounded-xl shadow-lg">
           <Suspense fallback={<div>Loading...</div>}>
-            <SignupForm message={params.message} />
+            <SignupForm message={searchParams.message} />
           </Suspense>
         </div>
       </div>

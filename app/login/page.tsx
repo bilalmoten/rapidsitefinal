@@ -2,14 +2,13 @@ import LoginForm from "./LoginForm";
 import { Suspense } from "react";
 
 interface PageProps {
-  searchParams: Promise<{ message?: string }>;
+  searchParams: { message?: string };
 }
 
-export default async function LoginPage({ searchParams }: PageProps) {
-  const params = await searchParams;
+export default function LoginPage({ searchParams }: PageProps) {
   return (
     <Suspense fallback={<div>Loading...</div>}>
-      <LoginForm message={params.message} />
+      <LoginForm message={searchParams.message} />
     </Suspense>
   );
 }
