@@ -10,9 +10,8 @@ import { getPostBySlug, getAllPosts } from "@/lib/mdx";
 import Markdown from "react-markdown";
 
 interface BlogPostPageProps {
-  params: {
-    slug: string;
-  };
+  params: { slug: string };
+  searchParams?: { [key: string]: string | string[] | undefined };
 }
 
 export async function generateStaticParams() {
