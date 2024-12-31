@@ -4,14 +4,15 @@ import WaitlistForm from "@/components/WaitlistForm";
 import AnimatedLoginContent from "@/components/AnimatedLoginContent";
 import MotionWrapper from "@/components/MotionWrapper";
 
-interface PageProps {
-  searchParams: { message?: string };
-}
-
 // Set this to false to enable normal signups
 const WAITLIST_MODE = true;
 
-export default function SignupPage({ searchParams }: PageProps) {
+export default async function SignupPage(props: {
+  params: Promise<{}>;
+  searchParams: Promise<{ message?: string }>;
+}) {
+  const searchParams = await props.searchParams;
+
   if (WAITLIST_MODE) {
     return (
       <Suspense fallback={<div>Loading...</div>}>
@@ -34,7 +35,6 @@ export default function SignupPage({ searchParams }: PageProps) {
     );
   }
 
-  // Original signup form
   return (
     <MotionWrapper className="flex h-screen">
       <div className="w-2/5 bg-gradient-to-br from-indigo-500 to-purple-600 text-white flex flex-col justify-center items-center p-12 relative overflow-hidden">
