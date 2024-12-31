@@ -9,10 +9,8 @@ import Link from "next/link";
 import { getPostBySlug, getAllPosts } from "@/lib/mdx";
 import Markdown from "react-markdown";
 
-interface BlogPostPageProps {
-  params: { slug: string };
-  searchParams?: { [key: string]: string | string[] | undefined };
-}
+type Params = Promise<{ slug: string }>;
+type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>;
 
 export async function generateStaticParams() {
   const posts = getAllPosts();
@@ -21,7 +19,11 @@ export async function generateStaticParams() {
   }));
 }
 
-export async function generateMetadata({ params }: BlogPostPageProps) {
+export async function generateMetadata(props: {
+  params: Params;
+  searchParams: SearchParams;
+}) {
+  const params = await props.params;
   const post = getPostBySlug(params.slug);
   if (!post) return {};
 
@@ -36,7 +38,11 @@ export async function generateMetadata({ params }: BlogPostPageProps) {
   };
 }
 
-export default function BlogPostPage({ params }: BlogPostPageProps) {
+export default async function BlogPostPage(props: {
+  params: Params;
+  searchParams: SearchParams;
+}) {
+  const params = await props.params;
   const post = getPostBySlug(params.slug);
   if (!post) return notFound();
 
