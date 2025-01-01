@@ -18,7 +18,7 @@ export default function ContactPage() {
             Contact Us
           </h1>
           <p className="text-xl text-muted-foreground">
-            We'd love to hear from you
+            We would love to hear from you
           </p>
         </motion.div>
 
