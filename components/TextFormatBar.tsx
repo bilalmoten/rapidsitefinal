@@ -38,14 +38,13 @@ const TextFormatBar: React.FC<TextFormatBarProps> = ({
   return (
     <TooltipProvider>
       <div
-        className="fixed z-[60] rounded-lg shadow-lg p-1 flex gap-1 transition-all duration-200 format-bar bg-white"
+        className="fixed z-[60] rounded-lg shadow-lg p-1 flex gap-1 transition-all duration-200 format-bar bg-white dark:bg-gray-800 border dark:border-gray-700"
         style={{
           left: `${position.x}px`,
           top: `${position.y}px`,
           opacity: isActive ? 1 : 0,
           pointerEvents: isActive ? "auto" : "none",
           transform: `translateY(${isActive ? "0" : "10px"})`,
-          border: "1px solid rgba(0,0,0,0.1)",
         }}
         onMouseDown={(e) => e.preventDefault()}
       >
@@ -91,7 +90,7 @@ const TextFormatBar: React.FC<TextFormatBarProps> = ({
           <TooltipContent>Underline</TooltipContent>
         </Tooltip>
 
-        <div className="flex gap-1 border-l pl-1">
+        <div className="flex gap-1 border-l dark:border-gray-700 pl-1">
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
