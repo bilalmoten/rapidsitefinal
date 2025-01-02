@@ -17,6 +17,7 @@ export default function ContactPage() {
           <h1 className="text-4xl font-bold text-foreground mb-4">
             Contact Us
           </h1>
+          {/* commit check new */}
           <p className="text-xl text-muted-foreground">
             We would love to hear from you
           </p>
