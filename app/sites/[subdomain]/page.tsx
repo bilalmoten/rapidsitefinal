@@ -1,8 +1,9 @@
 import { createClient } from "@/utils/supabase/server";
 import { notFound } from "next/navigation";
-import Script from "next/script";
 import { JSDOM } from "jsdom";
 import NoSitePage from "@/components/NoSitePage";
+import SiteContent from "@/components/SiteContent";
+import { Metadata, Viewport } from "next";
 
 export default async function SubdomainPage(props: {
   params: Promise<{ subdomain: string }>;
@@ -41,7 +42,7 @@ export default async function SubdomainPage(props: {
     return <NoSitePage subdomain={params.subdomain} />;
   }
 
-  const replaceLinks = (content: string) => {
+  const processContent = (content: string) => {
     const dom = new JSDOM(content);
     const document = dom.window.document;
     document.querySelectorAll("a").forEach((a: HTMLAnchorElement) => {
@@ -55,50 +56,19 @@ export default async function SubdomainPage(props: {
       }
     });
 
-    return document.body.innerHTML;
+    return {
+      bodyContent: document.body.innerHTML,
+    };
   };
 
-  const modifiedContent = replaceLinks(page.content);
+  const { bodyContent } = processContent(page.content);
 
-  return (
-    <>
-      <link
-        href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
-        rel="stylesheet"
-      ></link>
-      <link
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
-        rel="stylesheet"
-      >
-        {" "}
-      </link>
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-      <script src="https://cdn.jsdelivr.net/npm/framer-motion@11.15.0/dist/framer-motion.min.js"></script>
-      <script
-        src="https://cdnjs.cloudflare.com/ajax/libs/alpinejs/2.3.0/alpine-ie11.js"
-        integrity="sha512-6m6AtgVSg7JzStQBuIpqoVuGPVSAK5Sp/ti6ySu6AjRDa1pX8mIl1TwP9QmKXU+4Mhq/73SzOk6mbNvyj9MPzQ=="
-        crossOrigin="anonymous"
-        referrerPolicy="no-referrer"
-      ></script>
-      <div
-        id="page-content"
-        dangerouslySetInnerHTML={{ __html: modifiedContent }}
-      />
-      <Script id="apply-styles">
-        {`
-          document.body.innerHTML = document.getElementById('page-content').innerHTML;
-          document.body.style.margin = '0';
-          document.body.style.padding = '0';
-          document.body.className = 'bg-white text-gray-800';
-        `}
-      </Script>
-    </>
-  );
+  return <SiteContent content={bodyContent} />;
 }
 
 export async function generateMetadata(props: {
   params: Promise<{ subdomain: string }>;
-}) {
+}): Promise<Metadata> {
   const params = await props.params;
   const supabase = await createClient();
   const { data: website } = await supabase
@@ -112,7 +82,7 @@ export async function generateMetadata(props: {
   };
 }
 
-export function generateViewport() {
+export function generateViewport(): Viewport {
   return {
     width: "device-width",
     initialScale: 1,
