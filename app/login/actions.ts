@@ -5,14 +5,24 @@ import { redirect } from "next/navigation";
 
 export async function signInWithGoogle() {
     const supabase = await createClient();
+    console.log("Signing in with Google");
+    console.log("NODE_ENV:", process.env.NODE_ENV);
     const siteUrl = process.env.NODE_ENV === 'development'
         ? 'http://localhost:3000'
         : 'https://aiwebsitebuilder.tech';
+    console.log("Site URL:", siteUrl);
+    console.log("Starting OAuth flow with options:", {
+        redirectTo: `${siteUrl}/auth/callback`,
+        queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+        }
+    });
 
     const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-            redirectTo: `${siteUrl}/auth/callback?redirect_to=/dashboard`,
+            redirectTo: `${siteUrl}/auth/callback`,
             queryParams: {
                 access_type: 'offline',
                 prompt: 'consent',
@@ -21,9 +31,11 @@ export async function signInWithGoogle() {
     });
 
     if (error) {
+        console.error("Google sign-in error:", error.message, error);
         return redirect(`/login?message=${encodeURIComponent(error.message)}`);
     }
 
+    console.log("OAuth flow initiated, redirecting to:", data.url);
     return redirect(data.url);
 }
 

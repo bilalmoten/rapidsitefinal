@@ -6,6 +6,14 @@ export async function middleware(request: NextRequest) {
   const url = request.nextUrl;
   const hostname = request.headers.get('host')!;
 
+  // Check for auth callback at root level and redirect if needed
+  const code = url.searchParams.get('code');
+  if (code && url.pathname === '/') {
+    console.log('Detected auth callback at root, redirecting to /auth/callback');
+    url.pathname = '/auth/callback';
+    return NextResponse.redirect(url);
+  }
+
   // Handle session update first
   const res = NextResponse.next();
   await updateSession(request);
