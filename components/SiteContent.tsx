@@ -21,6 +21,7 @@ export default function SiteContent({ content }: SiteContentProps) {
         src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"
         strategy="beforeInteractive"
       />
+      <Script src="https://cdn.tailwindcss.com" strategy="afterInteractive" />
       <link
         href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
         rel="stylesheet"

@@ -5,6 +5,11 @@ import NoSitePage from "@/components/NoSitePage";
 import SiteContent from "@/components/SiteContent";
 import { Metadata, Viewport } from "next";
 
+interface WebsiteData {
+  id: string;
+  pages: string[];
+}
+
 export default async function SubdomainPage(props: {
   params: Promise<{ subdomain: string }>;
 }) {
