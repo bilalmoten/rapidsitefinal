@@ -124,7 +124,7 @@ const RecentProjects: React.FC<RecentProjectsProps> = ({ websites }) => {
       return data.url;
     } catch (error) {
       console.error("Error generating thumbnail:", error);
-      return null;
+      return "https://lervpgatcoelsswuahga.supabase.co/storage/v1/object/public/website-thumbnails/public/placeholder-website.jpg";
     }
   };
 
@@ -146,7 +146,13 @@ const RecentProjects: React.FC<RecentProjectsProps> = ({ websites }) => {
           return website;
         })
       );
-      setWebsitesWithThumbnails(updatedWebsites);
+      setWebsitesWithThumbnails(
+        websites.map((website) => ({
+          ...website,
+          thumbnail_url: "/placeholder-website.jpg",
+        }))
+      );
+
       setIsLoading(false);
     };
 
@@ -208,17 +214,18 @@ const RecentProjects: React.FC<RecentProjectsProps> = ({ websites }) => {
                 <div className="flex flex-col h-full">
                   <div className="mb-4 relative h-32 rounded-md overflow-hidden border border-border">
                     <Image
-                      src={website.thumbnail_url || "/placeholder-website.jpg"}
+                      src={
+                        website.thumbnail_url ||
+                        "https://lervpgatcoelsswuahga.supabase.co/storage/v1/object/public/website-thumbnails/public/placeholder-website.jpg"
+                      }
                       alt={website.website_name}
                       fill
-                      sizes="(max-width: 640px) 100vw, 
-                             (max-width: 768px) 50vw, 
-                             (max-width: 1024px) 33vw, 
-                             25vw"
+                      sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
                       className="object-cover"
                       onError={(e) => {
-                        const img = e.target as HTMLImageElement;
-                        img.src = "/placeholder-website.jpg";
+                        e.currentTarget.src =
+                          "https://lervpgatcoelsswuahga.supabase.co/storage/v1/object/public/website-thumbnails/public/placeholder-website.jpg";
+                        e.currentTarget.srcset = "";
                       }}
                     />
                   </div>

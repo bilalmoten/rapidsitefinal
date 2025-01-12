@@ -73,6 +73,8 @@ export async function POST(req: Request) {
             .from('website-thumbnails')
             .getPublicUrl(`${websiteId}/thumbnail.jpg`);
 
+            console.log("URL" + publicUrl)
+
         const { error: updateError } = await supabase
             .from('websites')
             .update({ thumbnail_url: publicUrl })
