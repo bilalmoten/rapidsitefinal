@@ -27,6 +27,26 @@ interface Update {
 
 const updates: Update[] = [
   {
+    date: "January 12, 2025",
+    title: "Enhanced Free Plan & Community Growth 🌱",
+    description:
+      "Introducing features to grow our community and improve user experience",
+    updates: [
+      {
+        title: "Promotional Banner for Free Sites",
+        description:
+          "Added an elegant promotional banner to websites created with our free plan, helping spread the word about RapidSite while maintaining site aesthetics.",
+        type: "feature",
+      },
+      {
+        title: "User Plan Integration",
+        description:
+          "Enhanced our website rendering system to intelligently handle different user plans and their features.",
+        type: "improvement",
+      },
+    ],
+  },
+  {
     date: "December 31, 2024",
     title: "Waitlist System Launch 🎟️",
     milestone: true,

@@ -33,7 +33,7 @@ export default function BlogPage() {
                 href={`/blog/${post.slug}`}
                 className="flex flex-col flex-1"
               >
-                {post.coverImage && (
+                {post.coverImage ? (
                   <div className="relative h-48 overflow-hidden bg-muted">
                     <img
                       src={post.coverImage}
@@ -41,18 +41,32 @@ export default function BlogPage() {
                       className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                     />
                   </div>
+                ) : (
+                  <div className="h-4 bg-gradient-to-r from-primary/10 to-primary/5" />
                 )}
-                <div className="p-6 flex-1 flex flex-col">
+                <div
+                  className={`p-6 flex-1 flex flex-col ${
+                    !post.coverImage ? "pt-8" : ""
+                  }`}
+                >
                   <div className="flex items-center text-sm text-muted-foreground mb-3">
                     <Calendar className="mr-1 h-4 w-4" />
                     <span className="mr-3">{formatDate(post.date)}</span>
                     <User className="mr-1 h-4 w-4" />
                     <span className="truncate">{post.author}</span>
                   </div>
-                  <h2 className="text-xl font-bold mb-3 group-hover:text-primary transition-colors line-clamp-2">
+                  <h2
+                    className={`text-xl font-bold mb-3 group-hover:text-primary transition-colors line-clamp-2 ${
+                      !post.coverImage ? "text-2xl" : ""
+                    }`}
+                  >
                     {post.title}
                   </h2>
-                  <p className="text-muted-foreground mb-4 line-clamp-3">
+                  <p
+                    className={`text-muted-foreground mb-4 line-clamp-3 ${
+                      !post.coverImage ? "line-clamp-4" : ""
+                    }`}
+                  >
                     {post.description}
                   </p>
                   <Button
