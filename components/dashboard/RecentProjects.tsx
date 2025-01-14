@@ -20,6 +20,7 @@ interface RecentProjectsProps {
     subdomain: string;
   }[];
 }
+
 import { MoreHorizontal, RefreshCw } from "lucide-react";
 import {
   DropdownMenu,
@@ -55,7 +56,6 @@ const RecentProjects: React.FC<RecentProjectsProps> = ({ websites }) => {
   const handleRegenerate = async (websiteId: string) => {
     setIsProcessing(true);
     try {
-      // Track website generation first
       const trackResponse = await fetch("/api/track-generation", {
         method: "POST",
         headers: {
@@ -89,7 +89,6 @@ const RecentProjects: React.FC<RecentProjectsProps> = ({ websites }) => {
         throw new Error("Failed to regenerate website");
       }
 
-      // Redirect to editor
       window.location.href = `/dashboard/editor/${websiteId}`;
     } catch (error) {
       console.error("Error regenerating website:", error);
@@ -133,26 +132,25 @@ const RecentProjects: React.FC<RecentProjectsProps> = ({ websites }) => {
       setIsLoading(true);
       const updatedWebsites = await Promise.all(
         websites.map(async (website) => {
-          if (!website.thumbnail_url) {
+          if (
+            !website.thumbnail_url ||
+            website.thumbnail_url === "https://example.com/placeholder"
+          ) {
             const thumbnailUrl = await generateThumbnail(
               website.id,
               website.subdomain
             );
             return {
               ...website,
-              thumbnail_url: thumbnailUrl || "/placeholder-website.jpg",
+              thumbnail_url:
+                thumbnailUrl ||
+                "https://lervpgatcoelsswuahga.supabase.co/storage/v1/object/public/website-thumbnails/public/placeholder-website.jpg",
             };
           }
           return website;
         })
       );
-      setWebsitesWithThumbnails(
-        websites.map((website) => ({
-          ...website,
-          thumbnail_url: "/placeholder-website.jpg",
-        }))
-      );
-
+      setWebsitesWithThumbnails(updatedWebsites);
       setIsLoading(false);
     };
 
@@ -163,6 +161,7 @@ const RecentProjects: React.FC<RecentProjectsProps> = ({ websites }) => {
     currentPage * projectsPerPage,
     (currentPage + 1) * projectsPerPage
   );
+
   if (isProcessing) {
     return (
       <div className="flex flex-col justify-center items-center min-h-screen w-full px-4">
@@ -222,11 +221,6 @@ const RecentProjects: React.FC<RecentProjectsProps> = ({ websites }) => {
                       fill
                       sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
                       className="object-cover"
-                      onError={(e) => {
-                        e.currentTarget.src =
-                          "https://lervpgatcoelsswuahga.supabase.co/storage/v1/object/public/website-thumbnails/public/placeholder-website.jpg";
-                        e.currentTarget.srcset = "";
-                      }}
                     />
                   </div>
                   <div className="flex-grow">
