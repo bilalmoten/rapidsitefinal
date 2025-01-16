@@ -134,7 +134,9 @@ const RecentProjects: React.FC<RecentProjectsProps> = ({ websites }) => {
         websites.map(async (website) => {
           if (
             !website.thumbnail_url ||
-            website.thumbnail_url === "https://example.com/placeholder"
+            /example|placeholder/i.test(website.thumbnail_url) ||
+            website.thumbnail_url === "https://example.com/placeholder" ||
+            website.thumbnail_url === "https://example.com/placeholder.jpg"
           ) {
             const thumbnailUrl = await generateThumbnail(
               website.id,
