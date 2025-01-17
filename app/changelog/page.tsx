@@ -27,6 +27,31 @@ interface Update {
 
 const updates: Update[] = [
   {
+    date: "January 17, 2025",
+    title: "Custom Domains Launch 🌐",
+    description: "Introducing custom domain support for premium users",
+    updates: [
+      {
+        title: "Custom Domain Support",
+        description:
+          "Premium users can now connect their own domains to their websites, providing a professional and branded experience for their visitors.",
+        type: "feature",
+      },
+      {
+        title: "Domain Management Interface",
+        description:
+          "New intuitive interface for managing custom domains, including easy DNS configuration and verification.",
+        type: "feature",
+      },
+      {
+        title: "Automatic SSL",
+        description:
+          "All custom domains automatically get SSL certificates for secure HTTPS connections.",
+        type: "feature",
+      },
+    ],
+  },
+  {
     date: "January 12, 2025",
     title: "Enhanced Free Plan & Community Growth 🌱",
     description:
