@@ -2,7 +2,7 @@
 
 import React, { KeyboardEvent, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Send, Loader2, Mic } from "lucide-react";
+import { Send, Loader2, Mic, Copy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -15,6 +15,15 @@ import {
   TooltipProvider,
 } from "@/components/ui/tooltip";
 import { trackEvent, EVENTS } from "@/utils/analytics";
+import DashboardBackground from "@/components/dashboard/DashboardBackground";
+// import {
+//   Breadcrumb,
+//   BreadcrumbItem,
+//   BreadcrumbLink,
+//   BreadcrumbList,
+//   BreadcrumbPage,
+//   BreadcrumbSeparator,
+// } from "@/components/ui/breadcrumb";
 
 interface ChatInterfaceProps {
   messages: Message[];
@@ -69,8 +78,16 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
     trackEvent(EVENTS.AI.CHAT_COMPLETED);
   };
 
+  const copyToClipboard = async (text: string) => {
+    await navigator.clipboard.writeText(text);
+  };
+
   return (
-    <div className="flex-1 overflow-hidden flex flex-col max-w-5xl mx-auto w-full">
+    <div className="flex-1 overflow-hidden flex flex-col max-w-5xl mx-auto w-full relative">
+      <div className="absolute inset-0 -z-10">
+        <DashboardBackground />
+      </div>
+
       {/* Messages Area */}
       <div className="flex-1 overflow-y-auto">
         <div className="space-y-4 p-4">
@@ -86,15 +103,15 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                 }`}
               >
                 <div
-                  className={`flex items-start gap-3 max-w-[85%] ${
+                  className={`flex items-start gap-3 max-w-[85%] group ${
                     message.role === "user" ? "flex-row-reverse" : ""
                   }`}
                 >
                   <Avatar
                     className={`${
                       message.role === "user"
-                        ? "bg-blue-600"
-                        : "bg-secondary border-2 border-primary/10"
+                        ? "bg-primary-main text-neutral-90"
+                        : "bg-neutral-90 border border-neutral-70 text-neutral-30"
                     } h-8 w-8`}
                   >
                     <AvatarFallback>
@@ -103,10 +120,10 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                   </Avatar>
 
                   <div
-                    className={`rounded-2xl px-4 py-2 shadow-sm ${
+                    className={`rounded-xl px-4 py-2 relative ${
                       message.role === "user"
-                        ? "bg-blue-600 text-white"
-                        : "bg-secondary/50 border border-primary/10"
+                        ? "bg-primary-main text-neutral-90"
+                        : "bg-neutral-90/50 backdrop-blur-sm border border-neutral-70 text-neutral-10"
                     }`}
                   >
                     {message.role === "assistant" ? (
@@ -118,6 +135,24 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                         {message.content}
                       </p>
                     )}
+
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="absolute -right-10 top-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                            onClick={() => copyToClipboard(message.content)}
+                          >
+                            <Copy className="h-4 w-4" />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Copy message</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
                   </div>
                 </div>
               </motion.div>
@@ -128,7 +163,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="flex items-center gap-2 text-sm text-muted-foreground"
+              className="flex items-center gap-2 text-sm text-neutral-40"
             >
               <Loader2 className="h-4 w-4 animate-spin" />
               Hmm, Let me think about that...
@@ -139,9 +174,9 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
       </div>
 
       {/* Input Area */}
-      <div className="border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="border-t border-neutral-70 bg-neutral-90/50 backdrop-blur-xl">
         <form onSubmit={handleSubmit} className="p-4">
-          <div className="flex gap-3 bg-secondary/50 rounded-lg p-2">
+          <div className="flex gap-3 bg-neutral-90 border border-neutral-70 rounded-xl p-2">
             <Textarea
               ref={textareaRef}
               placeholder={
@@ -152,7 +187,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
               value={input}
               onChange={onInputChange}
               onKeyDown={handleKeyDown}
-              className="min-h-[44px] max-h-[200px] w-full resize-none bg-transparent border-0 focus-visible:ring-0 focus-visible:ring-offset-0 overflow-y-auto"
+              className="min-h-[44px] max-h-[200px] w-full resize-none bg-transparent border-0 focus-visible:ring-0 focus-visible:ring-offset-0 overflow-y-auto text-neutral-10 placeholder:text-neutral-40"
               disabled={!isChatActive || isLoading}
             />
 
@@ -161,7 +196,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                 type="submit"
                 size="icon"
                 disabled={isLoading || !isChatActive || !input.trim()}
-                className="h-11 w-11 bg-blue-600 hover:bg-blue-700 rounded-lg"
+                className="h-11 w-11 bg-primary-main hover:bg-primary-light text-neutral-90 rounded-xl"
               >
                 {isLoading ? (
                   <Loader2 className="h-5 w-5 animate-spin" />
@@ -176,14 +211,14 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                   type="button"
                   variant="outline"
                   size="icon"
-                  className="h-11 w-11 opacity-50 pointer-events-none rounded-lg"
+                  className="h-11 w-11 opacity-50 pointer-events-none rounded-xl border-neutral-70 bg-neutral-90 text-neutral-40"
                   disabled={true}
                 >
                   <Mic className="h-5 w-5" />
                   <div className="absolute -top-1 -right-1">
                     <span className="relative flex h-2 w-2">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-                      <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary-light opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-primary-main"></span>
                     </span>
                   </div>
                 </Button>

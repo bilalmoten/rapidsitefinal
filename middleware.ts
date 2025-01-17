@@ -31,7 +31,7 @@ export async function middleware(request: NextRequest) {
     `.aiwebsitebuilder.tech`
   );
 
-  console.log('Processed host:', host);
+  // console.log('Processed host:', host);
 
   // Special case for Vercel preview deployments
   if (

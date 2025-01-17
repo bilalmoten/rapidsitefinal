@@ -7,7 +7,7 @@ import Stats from "./Stats";
 import AIAssistantPopup from "./AIAssistantPopup";
 import DashboardBackground from "./DashboardBackground";
 import DashboardRightPanel from "./DashboardRightPanel";
-import { useSidebar } from "@/contexts/SidebarContext";
+// import { useSidebar } from "@/contexts/SidebarContext";
 import { cn } from "@/lib/utils";
 import { ChevronRight, ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -35,7 +35,7 @@ const DashboardContent: React.FC<DashboardContentProps> = ({
 }) => {
   const [isAIAssistantOpen, setIsAIAssistantOpen] = useState(false);
   const [isRightPanelOpen, setIsRightPanelOpen] = useState(true);
-  const { isExpanded } = useSidebar();
+  // const { isExpanded } = useSidebar();
 
   const toggleAIAssistant = () => {
     setIsAIAssistantOpen(!isAIAssistantOpen);
@@ -65,9 +65,9 @@ const DashboardContent: React.FC<DashboardContentProps> = ({
       {/* Main Content Area */}
       <div
         className={cn(
-          "flex-1 transition-all duration-300",
-          isExpanded ? "ml-64" : "ml-20",
-          isRightPanelOpen ? "mr-[400px]" : "mr-0"
+          "flex-auto transition-all duration-300 flex",
+          // isExpanded ? "ml-64" : "ml-20",
+          isRightPanelOpen ? "mr-[480px]" : "mr-0"
         )}
       >
         <main className="relative z-[1] h-screen overflow-y-auto">
@@ -78,7 +78,7 @@ const DashboardContent: React.FC<DashboardContentProps> = ({
       </div>
 
       {/* Desktop Right Panel */}
-      <div className="hidden lg:block fixed right-0 top-0 z-[2] h-screen">
+      <div className="flex-auto hidden lg:block fixed right-0 top-0 z-[2] h-screen">
         {!isRightPanelOpen ? (
           <Button
             className="fixed right-4 bottom-4 rounded-full h-12 w-12 bg-primary shadow-lg hover:shadow-xl transition-shadow"

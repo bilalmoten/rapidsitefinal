@@ -13,6 +13,16 @@ import Sidebar from "@/components/chat-Sidebar";
 import { useChat, Message } from "ai/react";
 import React from "react";
 import { toast } from "react-hot-toast";
+import DashboardBackground from "@/components/dashboard/DashboardBackground";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
+// import { useSidebar } from "@/contexts/SidebarContext";
 
 interface ChatPageProps {
   params: Promise<{ website_id: string }>;
@@ -21,6 +31,7 @@ interface ChatPageProps {
 export default function ChatPage(props: ChatPageProps) {
   const params = React.use(props.params);
   const websiteId = params.website_id;
+  // const { isExpanded } = useSidebar();
 
   const supabase = createClient();
   const router = useRouter();
@@ -63,10 +74,10 @@ export default function ChatPage(props: ChatPageProps) {
           "Hello! I'm your AI assistant. Let's create your dream website. To get started, could you tell me about your business and what kind of website you're looking for?",
       },
     ],
-    onResponse: (response) => {
+    onResponse: (response: Response) => {
       console.log("Response from AI:", response);
     },
-    onFinish: (message) => {
+    onFinish: (message: Message) => {
       console.log("Finished message:", message);
       if (message.content.includes("EXIT")) {
         const cleanContent = message.content.replace("EXIT", "").trim();
@@ -144,7 +155,7 @@ export default function ChatPage(props: ChatPageProps) {
       };
 
       const prefIndex = messages.findIndex(
-        (m) =>
+        (m: Message) =>
           m.role === "user" && m.content.startsWith("My website preferences:")
       );
 
@@ -592,7 +603,7 @@ export default function ChatPage(props: ChatPageProps) {
 
     // Find and update existing preferences message or add new one
     const prefIndex = messages.findIndex(
-      (m) =>
+      (m: Message) =>
         m.role === "user" && m.content.startsWith("My website preferences:")
     );
 
@@ -601,13 +612,13 @@ export default function ChatPage(props: ChatPageProps) {
       newMessages[prefIndex] = newMessage;
       setMessages(newMessages);
     } else {
-      setMessages((prev) => [newMessage, ...prev]);
+      setMessages((prev: Message[]) => [newMessage, ...prev]);
     }
   };
 
   if (isProcessing || isGenerating) {
     return (
-      <div className="flex flex-col justify-center items-center min-h-screen w-full px-4">
+      <div className="flex flex-col justify-center items-center h-full w-full px-4">
         <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-blue-500"></div>
         <p className="mt-4">
           {isGenerating
@@ -622,86 +633,121 @@ export default function ChatPage(props: ChatPageProps) {
   }
 
   return (
-    <div className="flex h-screen bg-gray-100 dark:bg-gray-900">
-      <div className="flex-1 flex flex-col">
-        <header className="bg-white dark:bg-gray-800 shadow-sm p-4">
-          <div className="container mx-auto flex justify-between items-center">
-            <Link
-              href="/dashboard"
-              className="flex items-center text-primary hover:text-primary/80"
-            >
-              <ArrowLeft className="h-5 w-5 mr-2" />
-              Back to Dashboard
-            </Link>
-            <h1 className="text-2xl font-bold">AI Website Builder Chat</h1>
-          </div>
-        </header>
+    <div className="h-full w-full relative">
+      <div className="absolute inset-0 z-[0]">
+        <DashboardBackground />
+      </div>
 
-        {chatMode === "prompt" ? (
-          <div className="flex-1 p-4">
-            <form onSubmit={handlePromptSubmit} className="space-y-4">
-              <textarea
-                value={promptInput}
-                onChange={(e) => setPromptInput(e.target.value)}
-                placeholder="Describe your website idea in a few sentences..."
-                className="w-full p-2 border rounded-md"
-                rows={4}
-              />
-              <Button type="submit" className="w-full">
-                Generate Website
-              </Button>
-            </form>
-            <Button
-              onClick={() => setChatMode("conversation")}
-              variant="outline"
-              className="w-full mt-4"
-            >
-              Start a Detailed Conversation Instead
-            </Button>
-          </div>
-        ) : (
-          <>
-            <div className="p-4 bg-white dark:bg-gray-800 border-b">
-              <Button
-                onClick={() => setChatMode("prompt")}
-                variant="outline"
-                className="w-full"
-              >
-                Switch to Quick Prompt Mode
-              </Button>
+      <div className="flex h-full z-20">
+        <div className="flex-1 flex flex-col">
+          <header className="relative z-20 border-b border-neutral-70 bg-neutral-90/50 backdrop-blur-xl p-4">
+            <div className="container mx-auto flex justify-between items-center">
+              <div className="flex items-center gap-2">
+                <Breadcrumb>
+                  <BreadcrumbList>
+                    <BreadcrumbItem>
+                      <BreadcrumbLink
+                        href="/dashboard"
+                        className="text-neutral-30 hover:text-neutral-10"
+                      >
+                        Dashboard
+                      </BreadcrumbLink>
+                    </BreadcrumbItem>
+                    <BreadcrumbSeparator />
+                    <BreadcrumbItem>
+                      <BreadcrumbPage className="text-neutral-10">
+                        Chat
+                      </BreadcrumbPage>
+                    </BreadcrumbItem>
+                  </BreadcrumbList>
+                </Breadcrumb>
+              </div>
+              <h1 className="text-2xl font-bold text-neutral-10">
+                AI Website Builder Chat
+              </h1>
             </div>
-            <ChatInterface
-              messages={messages}
-              input={input}
-              isLoading={isLoading || localIsLoading}
-              isListening={isListening}
-              onInputChange={handleInputChange}
-              onSubmit={customHandleSubmit}
-              onVoiceInput={handleVoiceInput}
-              isChatActive={isChatActive}
-            />
-            {showBuildButton && (
-              <div className="p-4 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
-                <Button onClick={handleBuildWebsite} className="w-full">
-                  Start Building My Website...
+          </header>
+
+          {chatMode === "prompt" ? (
+            <div className="flex-1 p-4 relative z-20">
+              <div className="max-w-2xl mx-auto space-y-4">
+                <form onSubmit={handlePromptSubmit} className="space-y-4">
+                  <textarea
+                    value={promptInput}
+                    onChange={(e) => setPromptInput(e.target.value)}
+                    placeholder="Describe your website idea in a few sentences..."
+                    className="w-full p-4 bg-neutral-90/50 backdrop-blur-sm border border-neutral-70 rounded-xl text-neutral-10 placeholder:text-neutral-40"
+                    rows={4}
+                  />
+                  <Button
+                    type="submit"
+                    className="w-full bg-primary-main text-neutral-90 hover:bg-primary-light"
+                  >
+                    Generate Website
+                  </Button>
+                </form>
+                <Button
+                  onClick={() => setChatMode("conversation")}
+                  variant="outline"
+                  className="w-full border-neutral-70 text-neutral-30 hover:text-neutral-10"
+                >
+                  Start a Detailed Conversation Instead
                 </Button>
               </div>
-            )}
-          </>
-        )}
+            </div>
+          ) : (
+            <div className="flex-1 flex flex-col">
+              <div className="p-4 relative z-20 border-b border-neutral-70 bg-neutral-90/50 backdrop-blur-xl">
+                <div className="max-w-2xl mx-auto">
+                  <Button
+                    onClick={() => setChatMode("prompt")}
+                    variant="outline"
+                    className="w-full border-neutral-70 text-neutral-30 hover:text-neutral-10"
+                  >
+                    Switch to Quick Prompt Mode
+                  </Button>
+                </div>
+              </div>
+              {/* <div className="flex-1"> */}
+              <ChatInterface
+                messages={messages}
+                input={input}
+                isLoading={isLoading || localIsLoading}
+                isListening={isListening}
+                onInputChange={handleInputChange}
+                onSubmit={customHandleSubmit}
+                onVoiceInput={handleVoiceInput}
+                isChatActive={isChatActive}
+              />
+              {/* </div> */}
+              {showBuildButton && (
+                <div className="p-4 relative z-20 border-t border-neutral-70 bg-neutral-90/50 backdrop-blur-xl">
+                  <div className="max-w-2xl mx-auto">
+                    <Button
+                      onClick={handleBuildWebsite}
+                      className="w-full bg-primary-main text-neutral-90 hover:bg-primary-light"
+                    >
+                      Start Building My Website...
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+        <Sidebar
+          colorScheme={colorScheme}
+          logo={logo}
+          inspirationImages={inspirationImages}
+          inspirationLinks={inspirationLinks}
+          industry={industry}
+          onLogoUpload={handleLogoUpload}
+          onInspirationUpload={handleInspirationUpload}
+          onAddLink={handleAddLink}
+          onIndustryChange={setIndustry}
+          onColorSchemeChange={handleColorSchemeChange}
+        />
       </div>
-      <Sidebar
-        colorScheme={colorScheme}
-        logo={logo}
-        inspirationImages={inspirationImages}
-        inspirationLinks={inspirationLinks}
-        industry={industry}
-        onLogoUpload={handleLogoUpload}
-        onInspirationUpload={handleInspirationUpload}
-        onAddLink={handleAddLink}
-        onIndustryChange={setIndustry}
-        onColorSchemeChange={handleColorSchemeChange}
-      />
     </div>
   );
 }

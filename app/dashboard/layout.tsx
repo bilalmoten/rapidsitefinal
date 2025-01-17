@@ -1,6 +1,27 @@
-import { SidebarProvider } from "@/contexts/SidebarContext";
+"use client";
+
+import { SidebarProvider, useSidebar } from "@/contexts/SidebarContext";
 import DashboardSidebar from "@/components/DashboardSidebar";
 
+// Create a wrapper component to use the sidebar context
+function DashboardContent({ children }: { children: React.ReactNode }) {
+  const { isExpanded } = useSidebar();
+
+  return (
+    <div className="flex min-h-screen">
+      <DashboardSidebar />
+      <main
+        className={`flex-1 transition-all duration-300 ${
+          isExpanded ? "ml-[280px]" : "ml-[80px]"
+        }`}
+      >
+        {children}
+      </main>
+    </div>
+  );
+}
+
+// Main layout component
 export default function DashboardLayout({
   children,
 }: {
@@ -8,10 +29,7 @@ export default function DashboardLayout({
 }) {
   return (
     <SidebarProvider>
-      <div className="flex">
-        <DashboardSidebar />
-        <main className="flex-1">{children}</main>
-      </div>
+      <DashboardContent>{children}</DashboardContent>
     </SidebarProvider>
   );
 }
