@@ -7,11 +7,11 @@ export async function middleware(request: NextRequest) {
   const url = request.nextUrl;
   const hostname = request.headers.get('host')!;
 
-  console.log('Incoming request:', {
-    hostname,
-    pathname: url.pathname,
-    url: request.url
-  });
+  // console.log('Incoming request:', {
+  //   hostname,
+  //   pathname: url.pathname,
+  //   url: request.url
+  // });
 
   // Check for auth callback at root level and redirect if needed
   const code = url.searchParams.get('code');
