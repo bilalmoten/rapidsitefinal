@@ -272,7 +272,7 @@ export default function NewWebsiteDialog({
                   placeholder="my-site"
                 />
                 <span className="bg-neutral-20 dark:bg-neutral-80 border-neutral-20 dark:border-neutral-70 text-neutral-60 dark:text-neutral-40 px-4 py-2 border border-l-0 rounded-r-md flex items-center">
-                  .rapidsite.app
+                  .aiwebsitebuilder.tech
                 </span>
               </div>
               {subdomain && (
