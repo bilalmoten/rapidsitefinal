@@ -1,12 +1,13 @@
 "use client";
 
 import React, { useState } from "react";
-import Header from "./Header";
 import WelcomeSection from "./WelcomeSection";
 import QuickActions from "./QuickActions";
 import RecentProjects from "./RecentProjects";
 import Stats from "./Stats";
 import AIAssistantPopup from "./AIAssistantPopup";
+import DashboardBackground from "./DashboardBackground";
+import Navbar from "./Navbar";
 
 interface DashboardContentProps {
   user: any;
@@ -32,11 +33,11 @@ const DashboardContent: React.FC<DashboardContentProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <main className="flex-1 overflow-y-auto">
-        {/* <Header user={user} /> */}
+    <div className="relative min-h-screen">
+      <DashboardBackground />
+      <main className="relative z-[1] ml-20 flex-1 overflow-y-auto">
         <div className="container mx-auto px-4 py-8 space-y-8">
-          <div className="rounded-lg bg-card p-6 shadow-sm">
+          <div className="rounded-lg bg-neutral-90/50 backdrop-blur-sm p-6 shadow-lg border border-neutral-80">
             <WelcomeSection user={user} />
           </div>
           <QuickActions
