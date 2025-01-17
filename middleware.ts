@@ -61,10 +61,20 @@ export async function middleware(request: NextRequest) {
 
   // Check custom domains first
   const supabase = await createClient();
+
+  // Try different variations of the domain
+  const domainVariations = [
+    hostname,
+    hostname.replace('www.', ''),
+    `www.${hostname}`
+  ];
+
+  console.log('Checking domain variations:', domainVariations);
+
   const { data: customDomain, error: domainError } = await supabase
     .from('custom_domains')
-    .select('website_id, status')
-    .eq('domain', hostname)
+    .select('website_id, status, domain')
+    .in('domain', domainVariations)
     .eq('status', 'active')
     .single();
 
@@ -75,11 +85,22 @@ export async function middleware(request: NextRequest) {
   });
 
   if (customDomain) {
-    console.log('Custom domain found:', hostname, 'for website:', customDomain.website_id);
-    // Rewrite to the internal site route
-    return NextResponse.rewrite(
-      new URL(`/sites/${customDomain.website_id}${url.pathname}`, request.url)
-    );
+    console.log('Custom domain found:', customDomain.domain, 'for website:', customDomain.website_id);
+
+    // Get the website details to ensure it exists
+    const { data: website } = await supabase
+      .from('websites')
+      .select('id, subdomain')
+      .eq('id', customDomain.website_id)
+      .single();
+
+    if (website) {
+      console.log('Website found:', website);
+      // Rewrite to the internal site route
+      return NextResponse.rewrite(
+        new URL(`/sites/${website.subdomain}${url.pathname}`, request.url)
+      );
+    }
   }
 
   // Only handle subdomains for aiwebsitebuilder.tech
