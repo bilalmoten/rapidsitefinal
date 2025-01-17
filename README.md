@@ -2,13 +2,13 @@
 
 RapidSite is a powerful AI-powered website builder that helps you create beautiful, responsive websites through natural language conversations. Simply describe what you want, and watch your website come to life in real-time.
 
-## 🎯 Latest Updates
+## �� Latest Updates
 
-**December 28, 2023**: Making Things Better & More Secure 🛠️
+**January 17, 2025**: Custom Domains Launch 🌐
 
-- Dark Mode Refinements
-- Better Password Support
-- Added Terms of Service & Privacy Policy
+- Custom domain support for premium users
+- Easy DNS configuration with clear instructions
+- Automatic SSL certificates
 
 [Follow Our Journey →](https://aiwebsitebuilder.tech/journey)
 
@@ -19,6 +19,7 @@ RapidSite is a powerful AI-powered website builder that helps you create beautif
 - **Professional Results**: Beautiful, responsive designs powered by modern technology
 - **Real-time Preview**: See your changes instantly as you describe them
 - **AI-Powered**: Leveraging cutting-edge AI to understand your needs and create exactly what you want
+- **Custom Domains**: Use your own domain name for a professional branded presence (Premium)
 
 ## 🎯 Perfect For
 
@@ -32,7 +33,7 @@ RapidSite is a powerful AI-powered website builder that helps you create beautif
 - **AI Website Generation**: Create complete websites using natural language
 - **Real-time Preview**: See your website take shape as you chat
 - **Responsive Design**: Looks perfect on all devices
-- **Custom Domains**: Use your own domain name
+- **Custom Domains**: Use your own domain name (Premium)
 - **SEO Optimized**: Built-in best practices for search engines
 - **Secure & Fast**: Built on enterprise-grade infrastructure
 
@@ -42,6 +43,7 @@ RapidSite is a powerful AI-powered website builder that helps you create beautif
 - Enterprise-grade security with Supabase
 - Blazing fast performance with Vercel's edge network
 - Regular backups and monitoring
+- Automatic SSL certificates for all domains
 
 ## 🌟 Get Started
 

@@ -27,6 +27,13 @@ import { toast } from "sonner";
 
 const roadmapFeatures = [
   {
+    title: "Custom Domain Support",
+    description:
+      "Connect your own domain to your website for a professional branded experience",
+    status: "completed",
+    launchDate: "January 2025",
+  },
+  {
     title: "Promotional Banner System",
     description:
       "Smart promotional banners for free plan websites to help grow our community",
