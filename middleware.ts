@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { updateSession } from "@/utils/supabase/middleware";
+import { createClient } from "@/utils/supabase/server";
 
 export async function middleware(request: NextRequest) {
   // Get the hostname and url
@@ -48,6 +49,29 @@ export async function middleware(request: NextRequest) {
     host.endsWith('.localhost:3000')
   ) {
     return res;
+  }
+
+  // Check custom domains first
+  const supabase = await createClient();
+  const { data: customDomain } = await supabase
+    .from('custom_domains')
+    .select('website_id, status')
+    .eq('domain', hostname)
+    .eq('status', 'active')
+    .single();
+
+  if (customDomain) {
+    console.log('Custom domain found:', hostname, 'for website:', customDomain.website_id);
+    // Rewrite to the internal site route
+    return NextResponse.rewrite(
+      new URL(`/sites/${customDomain.website_id}${url.pathname}`, request.url)
+    );
+  }
+
+  // Only handle subdomains for aiwebsitebuilder.tech
+  if (!host.endsWith('.aiwebsitebuilder.tech')) {
+    console.log('Unknown domain:', hostname);
+    return NextResponse.redirect(new URL('https://aiwebsitebuilder.tech'));
   }
 
   // Handle subdomains

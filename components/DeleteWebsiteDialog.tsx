@@ -12,7 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/utils/supabase/client";
 import { useRouter } from "next/navigation";
-import { Trash2 } from "lucide-react";
+import { toast } from "sonner";
 
 interface DeleteWebsiteDialogProps {
   websiteId: string;
@@ -20,11 +20,11 @@ interface DeleteWebsiteDialogProps {
   children: React.ReactNode;
 }
 
-const DeleteWebsiteDialog: React.FC<DeleteWebsiteDialogProps> = ({
+export function DeleteWebsiteDialog({
   websiteId,
   websiteName,
   children,
-}) => {
+}: DeleteWebsiteDialogProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
@@ -33,59 +33,69 @@ const DeleteWebsiteDialog: React.FC<DeleteWebsiteDialogProps> = ({
   const handleDelete = async () => {
     setIsLoading(true);
 
-    // Get user ID
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
+    try {
+      // Get user ID
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
 
-    if (!user) {
-      console.error("No user found");
-      setIsLoading(false);
-      return;
-    }
+      if (!user) {
+        throw new Error("No user found");
+      }
 
-    // Call the delete website API
-    const response = await fetch("/api/delete-website", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        websiteId,
-        userId: user.id,
-      }),
-    });
+      // Call the delete website API
+      const response = await fetch("/api/delete-website", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          websiteId,
+          userId: user.id,
+        }),
+      });
 
-    if (!response.ok) {
-      console.error("Error deleting website");
-    } else {
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Failed to delete website");
+      }
+
+      toast.success("Website deleted successfully");
       router.refresh();
+      router.push("/dashboard"); // Redirect to dashboard after deletion
+    } catch (error) {
+      console.error("Error deleting website:", error);
+      toast.error(
+        error instanceof Error ? error.message : "Failed to delete website"
+      );
+    } finally {
+      setIsLoading(false);
+      setIsOpen(false);
     }
-
-    setIsLoading(false);
-    setIsOpen(false);
   };
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>
-        <Button variant="destructive" size="sm">
-          <Trash2 className="mr-2 h-4 w-4" />
-          Delete
-        </Button>
-      </DialogTrigger>
+      <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Delete Website</DialogTitle>
         </DialogHeader>
         <div className="py-4">
-          <p>
-            Are you sure you want to delete "{websiteName}"? This action cannot
-            be undone.
+          <p className="text-muted-foreground mb-2">
+            Are you sure you want to delete "{websiteName}"?
+          </p>
+          <p className="text-sm text-red-600 font-medium">
+            This action cannot be undone. All website data, including pages,
+            content, and settings will be permanently deleted.
           </p>
         </div>
         <div className="flex justify-end space-x-2">
-          <Button variant="outline" onClick={() => setIsOpen(false)}>
+          <Button
+            variant="outline"
+            onClick={() => setIsOpen(false)}
+            disabled={isLoading}
+          >
             Cancel
           </Button>
           <Button
@@ -99,6 +109,4 @@ const DeleteWebsiteDialog: React.FC<DeleteWebsiteDialogProps> = ({
       </DialogContent>
     </Dialog>
   );
-};
-
-export default DeleteWebsiteDialog;
+}
