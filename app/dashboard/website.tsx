@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import DeleteWebsiteDialog from "@/components/DeleteWebsiteDialog";
+// import DeleteWebsiteDialog from "@/components/DeleteWebsiteDialog";
 import Pagination from "@/components/design/Pagination"; // Adjust the import path as necessary
 import Card from "@/components/design/Card";
 

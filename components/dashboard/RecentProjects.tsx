@@ -3,9 +3,16 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { Eye, Trash2, Edit, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  Eye,
+  Trash2,
+  Edit,
+  ChevronLeft,
+  ChevronRight,
+  Settings,
+} from "lucide-react";
 import Link from "next/link";
-import DeleteWebsiteDialog from "@/components/DeleteWebsiteDialog";
+// import { DeleteWebsiteDialog } from "@/components/DeleteWebsiteDialog";
 
 import { createClient } from "@/utils/supabase/client";
 import { User } from "@supabase/supabase-js";
@@ -240,6 +247,12 @@ const RecentProjects: React.FC<RecentProjectsProps> = ({ websites }) => {
                         Edit
                       </Button>
                     </Link>
+                    <Link href={`/dashboard/settings/${website.id}`}>
+                      <Button variant="outline" size="sm">
+                        <Settings className="w-4 h-4 mr-2" />
+                        Settings
+                      </Button>
+                    </Link>
                     <a
                       href={`https://${website.subdomain}.aiwebsitebuilder.tech`}
                       target="_blank"
@@ -250,7 +263,7 @@ const RecentProjects: React.FC<RecentProjectsProps> = ({ websites }) => {
                         Preview
                       </Button>
                     </a>
-                    <DeleteWebsiteDialog
+                    {/*<DeleteWebsiteDialog
                       websiteId={website.id}
                       websiteName={website.website_name}
                     >
@@ -276,7 +289,7 @@ const RecentProjects: React.FC<RecentProjectsProps> = ({ websites }) => {
                           Regenerate
                         </DropdownMenuItem>
                       </DropdownMenuContent>
-                    </DropdownMenu>
+                    </DropdownMenu> */}
                   </div>
                 </div>
               </div>
@@ -303,14 +316,14 @@ const RecentProjects: React.FC<RecentProjectsProps> = ({ websites }) => {
               >
                 <ChevronRight className="w-4 h-4" />
               </Button>
-              <RegenerateWebsiteDialog
+              {/* <RegenerateWebsiteDialog
                 open={regenerateDialogOpen}
                 onOpenChange={setRegenerateDialogOpen}
                 onConfirm={() => {
                   setRegenerateDialogOpen(false);
                   handleRegenerate(selectedWebsiteId);
                 }}
-              />
+              /> */}
             </div>
           )}
         </>
