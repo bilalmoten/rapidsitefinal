@@ -38,7 +38,7 @@ const MainEditingPanel: React.FC<MainEditingPanelProps> = ({
       {isPickMode && hoveredElement && (
         <div className="absolute top-0 left-0 right-0 bottom-0 pointer-events-none">
           <div
-            className="absolute bg-blue-200 opacity-40 rounded-lg"
+            className="absolute bg-primary-main/20 rounded-lg"
             style={{
               top: `${hoveredElement.getBoundingClientRect().top - 4}px`,
               left: `${hoveredElement.getBoundingClientRect().left - 4}px`,
@@ -47,7 +47,7 @@ const MainEditingPanel: React.FC<MainEditingPanelProps> = ({
             }}
           />
           <div
-            className="border-2 border-blue-500 border-dashed absolute rounded-lg"
+            className="border-2 border-primary-main border-dashed absolute rounded-lg"
             style={{
               top: `${hoveredElement.getBoundingClientRect().top - 4}px`,
               left: `${hoveredElement.getBoundingClientRect().left - 4}px`,
@@ -56,9 +56,9 @@ const MainEditingPanel: React.FC<MainEditingPanelProps> = ({
             }}
           />
           <div
-            className="absolute bg-blue-500 text-white text-xs font-semibold px-1 rounded"
+            className="absolute bg-primary-main text-neutral-90 text-xs font-semibold px-1.5 py-0.5 rounded"
             style={{
-              top: `${hoveredElement.getBoundingClientRect().top - 16}px`,
+              top: `${hoveredElement.getBoundingClientRect().top - 20}px`,
               left: `${hoveredElement.getBoundingClientRect().left}px`,
             }}
           >

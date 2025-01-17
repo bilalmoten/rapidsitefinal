@@ -34,6 +34,9 @@ import {
 import { trackEvent, EVENTS } from "@/utils/analytics";
 // import debounce from "lodash.debounce";
 // import DOMPurify from "dompurify";
+// import EditorSidebar from "./editor/EditorSidebar";
+import DashboardBackground from "./dashboard/DashboardBackground";
+import { cn } from "@/lib/utils";
 
 interface ClientEditorProps {
   initialContent: string;
@@ -781,7 +784,13 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
   };
 
   return (
-    <div className="flex h-screen bg-gray-100 overflow-hidden">
+    <div className="flex h-screen bg-primary-dark overflow-hidden">
+      <div className="absolute inset-0 -z-10">
+        <DashboardBackground />
+      </div>
+
+      {/* <EditorSidebar className="relative z-50" /> */}
+
       <div className="flex-1 flex flex-col relative h-screen">
         <TopBar
           isCodeViewActive={isCodeViewActive}
@@ -801,12 +810,13 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
           }
           onResetViewport={viewport !== "desktop" ? handleReset : undefined}
         />
-        <div className="flex-1 flex items-center justify-center bg-gray-200 p-2 m-2 rounded-lg overflow-hidden">
+        <div className="flex-1 flex items-center justify-center p-2 m-2 rounded-lg overflow-hidden relative z-20">
           <div
             ref={viewportRef}
-            className={`relative bg-white shadow-lg ${
+            className={cn(
+              "relative bg-white shadow-lg",
               viewport !== "desktop" ? "rounded-lg overflow-hidden" : ""
-            }`}
+            )}
             style={{
               width:
                 viewport === "desktop"
@@ -831,8 +841,8 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
             }}
           >
             {viewport !== "desktop" && (
-              <div className="absolute top-0 left-0 right-0 h-6 bg-gray-300 flex items-center justify-center rounded-t-lg">
-                <div className="w-16 h-1 bg-gray-400 rounded-full" />
+              <div className="absolute top-0 left-0 right-0 h-6 bg-neutral-70 flex items-center justify-center rounded-t-lg">
+                <div className="w-16 h-1 bg-neutral-40 rounded-full" />
               </div>
             )}
             <MainEditingPanel
@@ -911,7 +921,7 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
           </div>
         )}
       </div>
-      <ChatWindow />
+      {/* <ChatWindow /> */}
       {isCodeViewActive && (
         <CodeView
           content={siteContent}

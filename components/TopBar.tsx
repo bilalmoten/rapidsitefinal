@@ -39,6 +39,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 
 interface TopBarProps {
   onSave: () => void;
@@ -108,25 +109,26 @@ const TopBar: React.FC<TopBarProps> = ({
   };
 
   return (
-    <header className="border-b bg-white">
-      <div className="flex h-14 items-center px-4">
+    <header className="border rounded-lg border-neutral-70 relative backdrop-blur-xl m-4 bg-neutral-90/5">
+      <div className="absolute inset-0 bg-gradient-to-br from-neutral-90 via-primary-dark to-primary-main opacity-10 rounded-lg" />
+      <div className="flex h-14 items-center px-4 relative">
         {/* Left Section - Back Button and URL */}
         <div className="flex items-center space-x-4">
           <Button
             variant="ghost"
             size="icon"
             onClick={handleBack}
-            className="h-8 w-8"
+            className="h-8 w-8 text-neutral-30 hover:text-neutral-10 hover:bg-neutral-90/50"
           >
             <ChevronLeft className="h-5 w-5" />
           </Button>
 
-          <div className="flex items-center space-x-2 bg-muted px-2 py-1 rounded-md">
-            <span className="text-sm text-muted-foreground">
+          <div className="flex items-center space-x-2 bg-neutral-90/50 px-2 py-1 rounded-md border border-neutral-70">
+            <span className="text-sm text-neutral-30">
               https://{subdomain}.aiwebsitebuilder.tech/
             </span>
             <Input
-              className="h-7 w-[200px] bg-transparent border-none focus-visible:ring-0 focus-visible:ring-offset-0"
+              className="h-7 w-[200px] bg-transparent border-none text-neutral-10 focus-visible:ring-0 focus-visible:ring-offset-0"
               value={pageTitle.replace(".html", "")}
               readOnly
             />
@@ -134,22 +136,30 @@ const TopBar: React.FC<TopBarProps> = ({
               variant="ghost"
               size="icon"
               onClick={handleCopyUrl}
-              className="h-7 w-7 transition-all active:scale-95"
+              className="h-7 w-7 transition-all active:scale-95 text-neutral-30 hover:text-neutral-10 hover:bg-neutral-90/50"
             >
               <Copy className="h-4 w-4" />
             </Button>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="h-7 px-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 px-2 text-neutral-30 hover:text-neutral-10 hover:bg-neutral-90/50"
+                >
                   <ChevronDown className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent>
+              <DropdownMenuContent className="bg-neutral-90 border-neutral-70">
                 {pages.map((page) => (
                   <DropdownMenuItem
                     key={page}
                     onClick={() => onPageChange(page)}
-                    className={pageTitle === page ? "bg-muted" : ""}
+                    className={
+                      pageTitle === page
+                        ? "bg-neutral-80"
+                        : "text-neutral-30 hover:text-neutral-10 hover:bg-neutral-80"
+                    }
                   >
                     {page}
                   </DropdownMenuItem>
@@ -162,13 +172,18 @@ const TopBar: React.FC<TopBarProps> = ({
         {/* Center Section - Device Preview */}
         <div className="flex-1 flex p-6">
           <TooltipProvider>
-            <div className="flex items-center rounded-lg border bg-background p-1">
+            <div className="flex items-center rounded-lg border border-neutral-70 bg-neutral-90/50 p-1">
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button
                     variant={viewport === "desktop" ? "secondary" : "ghost"}
                     size="icon"
-                    className="h-8 w-8"
+                    className={cn(
+                      "h-8 w-8",
+                      viewport === "desktop"
+                        ? "bg-neutral-80 text-neutral-10"
+                        : "text-neutral-30 hover:text-neutral-10 hover:bg-neutral-90/50"
+                    )}
                     onClick={() => onViewportChange("desktop")}
                   >
                     <Monitor className="h-4 w-4" />
@@ -182,7 +197,12 @@ const TopBar: React.FC<TopBarProps> = ({
                   <Button
                     variant={viewport === "tablet" ? "secondary" : "ghost"}
                     size="icon"
-                    className="h-8 w-8"
+                    className={cn(
+                      "h-8 w-8",
+                      viewport === "tablet"
+                        ? "bg-neutral-80 text-neutral-10"
+                        : "text-neutral-30 hover:text-neutral-10 hover:bg-neutral-90/50"
+                    )}
                     onClick={() => onViewportChange("tablet")}
                   >
                     <Tablet className="h-4 w-4" />
@@ -196,7 +216,12 @@ const TopBar: React.FC<TopBarProps> = ({
                   <Button
                     variant={viewport === "mobile" ? "secondary" : "ghost"}
                     size="icon"
-                    className="h-8 w-8"
+                    className={cn(
+                      "h-8 w-8",
+                      viewport === "mobile"
+                        ? "bg-neutral-80 text-neutral-10"
+                        : "text-neutral-30 hover:text-neutral-10 hover:bg-neutral-90/50"
+                    )}
                     onClick={() => onViewportChange("mobile")}
                   >
                     <Smartphone className="h-4 w-4" />
@@ -207,18 +232,18 @@ const TopBar: React.FC<TopBarProps> = ({
 
               {viewport !== "desktop" && viewportDimensions && (
                 <>
-                  <div className="h-4 w-[1px] bg-border mx-2" />
-                  <div className="text-xs text-muted-foreground">
+                  <div className="h-4 w-[1px] bg-neutral-70 mx-2" />
+                  <div className="text-xs text-neutral-30">
                     {viewportDimensions.width} × {viewportDimensions.height}
                   </div>
                   {onResetViewport && (
                     <>
-                      <div className="h-4 w-[1px] bg-border mx-2" />
+                      <div className="h-4 w-[1px] bg-neutral-70 mx-2" />
                       <Button
                         variant="ghost"
                         size="sm"
                         onClick={onResetViewport}
-                        className="text-xs text-muted-foreground hover:text-foreground"
+                        className="text-xs text-neutral-30 hover:text-neutral-10"
                       >
                         Reset
                       </Button>
@@ -232,7 +257,12 @@ const TopBar: React.FC<TopBarProps> = ({
 
         {/* Right Section - Actions */}
         <div className="flex items-center space-x-2">
-          <Button variant="outline" size="sm" onClick={handlePreview}>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handlePreview}
+            className="border-neutral-70 text-neutral-30 hover:text-neutral-10 hover:bg-neutral-90/50"
+          >
             <ExternalLink className="mr-2 h-4 w-4" />
             Preview
           </Button>
@@ -240,47 +270,45 @@ const TopBar: React.FC<TopBarProps> = ({
             variant={isCodeViewActive ? "secondary" : "outline"}
             size="sm"
             onClick={onCodeViewToggle}
+            className={cn(
+              isCodeViewActive
+                ? "bg-neutral-80 text-neutral-10"
+                : "border-neutral-70 text-neutral-30 hover:text-neutral-10 hover:bg-neutral-90/50"
+            )}
           >
             <Code className="mr-2 h-4 w-4" />
             Code
           </Button>
           <Button
             size="sm"
-            className="bg-blue-600 hover:bg-blue-700 text-white"
+            className="bg-primary-main hover:bg-primary-main/90 text-neutral-90"
             onClick={onSave}
           >
             <Save className="mr-2 h-4 w-4" />
-            Publish
+            Save
           </Button>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-8 w-8">
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem>Settings</DropdownMenuItem>
-              <DropdownMenuItem>Help</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
         </div>
       </div>
 
-      {/* Save Confirmation Dialog */}
       <AlertDialog open={showSaveDialog} onOpenChange={setShowSaveDialog}>
-        <AlertDialogContent>
+        <AlertDialogContent className="bg-neutral-90 border-neutral-70">
           <AlertDialogHeader>
-            <AlertDialogTitle>Unsaved Changes</AlertDialogTitle>
-            <AlertDialogDescription>
+            <AlertDialogTitle className="text-neutral-10">
+              Unsaved Changes
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-neutral-30">
               You have unsaved changes. Would you like to save before leaving?
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => router.push("/dashboard")}>
+            <AlertDialogCancel className="border-neutral-70 text-neutral-30 hover:text-neutral-10 hover:bg-neutral-90/50">
               Don't Save
             </AlertDialogCancel>
-            <AlertDialogAction onClick={handleConfirmBack}>
-              Save & Exit
+            <AlertDialogAction
+              className="bg-primary-main hover:bg-primary-main/90 text-neutral-90"
+              onClick={handleConfirmBack}
+            >
+              Save & Leave
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
