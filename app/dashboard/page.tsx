@@ -16,7 +16,9 @@ export default async function DashboardPage() {
 
   const { data: websites, error } = await supabase
     .from("websites")
-    .select("id, website_name, website_description, thumbnail_url, subdomain")
+    .select(
+      "id, website_name, website_description, thumbnail_url, subdomain, is_public, created_at, last_updated_at"
+    )
     .eq("user_id", user.id)
     .neq("isdeleted", "yes");
 

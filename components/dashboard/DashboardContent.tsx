@@ -2,7 +2,6 @@
 
 import React, { useState } from "react";
 import WelcomeSection from "./WelcomeSection";
-import QuickActions from "./QuickActions";
 import RecentProjects from "./RecentProjects";
 import Stats from "./Stats";
 import AIAssistantPopup from "./AIAssistantPopup";
@@ -22,6 +21,9 @@ interface DashboardContentProps {
     website_description: string;
     thumbnail_url: string;
     subdomain: string;
+    is_public: boolean;
+    created_at: string;
+    last_updated_at: string;
   }[];
   projectCount: number;
 }
@@ -70,11 +72,7 @@ const DashboardContent: React.FC<DashboardContentProps> = ({
       >
         <main className="relative z-[1] h-screen overflow-y-auto">
           <div className="container h-full mx-auto p-4 lg:p-8 space-y-8">
-            <QuickActions
-              userId={user.id}
-              toggleAIAssistant={toggleAIAssistant}
-            />
-            <RecentProjects websites={websites} />
+            <RecentProjects websites={websites} userId={user.id} />
           </div>
         </main>
       </div>
@@ -89,10 +87,10 @@ const DashboardContent: React.FC<DashboardContentProps> = ({
             <ChevronLeft className="h-6 w-6" />
           </Button>
         ) : (
-          <aside className="h-full w-[400px] bg-[#0A0A0B] transition-all duration-300 border-l border-neutral-800/30">
+          <aside className="h-full w-[400px] bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 transition-all duration-300 border-l border-border">
             <div className="relative w-full h-full">
               <Button
-                className="fixed bottom-4 right-30 rounded-full h-12 w-12 bg-primary shadow-lg hover:shadow-xl transition-shadow"
+                className="fixed right-[420px] bottom-4 rounded-full h-12 w-12 bg-primary shadow-lg hover:shadow-xl transition-shadow"
                 onClick={toggleRightPanel}
               >
                 <ChevronRight className="h-6 w-6" />
@@ -107,7 +105,7 @@ const DashboardContent: React.FC<DashboardContentProps> = ({
       <div className="lg:hidden fixed bottom-4 right-4 z-10">
         <Sheet>
           <SheetTrigger asChild>
-            <Button className="rounded-full h-12 w-12 bg-primary shadow-lg hover:shadow-xl transition-shadow">
+            <Button className="rounded-full h-12 w-12 shadow-lg hover:shadow-xl transition-shadow">
               <ChevronLeft className="h-6 w-6" />
             </Button>
           </SheetTrigger>

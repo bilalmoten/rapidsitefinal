@@ -64,6 +64,7 @@ export async function POST(request: Request) {
             pages: [],
             is_public: true,
             seo_indexed: requestBody.seoIndexed || false,
+            last_updated_at: new Date().toISOString(),
         })
         .select("id");
 
