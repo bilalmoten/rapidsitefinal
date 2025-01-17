@@ -1,13 +1,21 @@
 import React from "react";
+import { cn } from "@/lib/utils";
 
-const DashboardBackground = () => {
+interface GradientBackgroundProps {
+  className?: string;
+  children: React.ReactNode;
+}
+
+const GradientBackground = ({
+  className,
+  children,
+}: GradientBackgroundProps) => {
   return (
-    <div className="fixed inset-0 z-[1] overflow-hidden blur-[180px]">
-      {/* Base background color */}
-      <div className="absolute inset-0 bg-[#e2e2e2] dark:bg-[#0A0A0B]">
-        {/* Top-left gradient */}
+    <div className={cn("relative", className)}>
+      <div className="absolute inset-0 bg-[#0A0A0B]">
+        {/* Top-right gradient */}
         <div
-          className="absolute -top-[300px] -right-[300px] w-[1200px] h-[1200px] rounded-full opacity-75 "
+          className="absolute -top-[300px] -right-[300px] w-[1200px] h-[1200px] rounded-full opacity-75"
           style={{
             background: `radial-gradient(circle at center, 
               rgba(24, 226, 153, 0.2) 0%,
@@ -19,9 +27,9 @@ const DashboardBackground = () => {
           }}
         />
 
-        {/* Bottom-right gradient */}
+        {/* Bottom-left gradient */}
         <div
-          className="absolute -bottom-[200px] -left-[200px] w-[1000px] h-[1000px] rounded-full opacity-75 "
+          className="absolute -bottom-[200px] -left-[200px] w-[1000px] h-[1000px] rounded-full opacity-75"
           style={{
             background: `radial-gradient(circle at center, 
               rgba(24, 226, 153, 0.15) 0%,
@@ -33,9 +41,9 @@ const DashboardBackground = () => {
           }}
         />
 
-        {/* Center gradient for ambient light */}
+        {/* Center ambient light */}
         <div
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1600px] h-[1600px] rounded-full "
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1600px] h-[1600px] rounded-full"
           style={{
             background: `radial-gradient(circle at center, 
               rgba(24, 226, 153, 0.03) 0%,
@@ -47,8 +55,9 @@ const DashboardBackground = () => {
           }}
         />
       </div>
+      {children}
     </div>
   );
 };
 
-export default DashboardBackground;
+export default GradientBackground;

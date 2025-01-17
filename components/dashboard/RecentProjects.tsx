@@ -177,7 +177,7 @@ const RecentProjects: React.FC<RecentProjectsProps> = ({
         <div className="flex items-center justify-between text-sm text-muted-foreground">
           <div className="flex items-center gap-2">
             <Globe className="w-4 h-4" />
-            <span>{website.subdomain}.rapidsite.app</span>
+            <span>{website.subdomain}.aiwebsitebuilder.tech</span>
           </div>
           <span className="text-xs">
             Updated {new Date(website.last_updated_at).toLocaleDateString()}
