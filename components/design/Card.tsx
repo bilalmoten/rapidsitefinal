@@ -1,6 +1,6 @@
 import React from "react";
 import Link from "next/link";
-import DeleteWebsiteDialog from "@/components/DeleteWebsiteDialog";
+// import DeleteWebsiteDialog from "@/components/DeleteWebsiteDialog";
 
 interface CardProps {
   heading: string;
@@ -44,11 +44,11 @@ const Card: React.FC<CardProps> = ({
         >
           Preview
         </a>
-        <DeleteWebsiteDialog
+        {/* <DeleteWebsiteDialog
           websiteId={website_id}
           websiteName={heading}
           children={undefined}
-        />
+        /> */}
       </div>
     </div>
   );
