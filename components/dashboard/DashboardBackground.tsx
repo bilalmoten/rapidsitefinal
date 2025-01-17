@@ -4,7 +4,7 @@ const DashboardBackground = () => {
   return (
     <div className="fixed inset-0 z-[1] overflow-hidden">
       {/* Base background color */}
-      <div className="absolute inset-0 bg-[#0A0A0B] dark:bg-[#0A0A0B]">
+      <div className="absolute inset-0 bg-[#e2e2e2] dark:bg-[#0A0A0B]">
         {/* Top-left gradient */}
         <div
           className="absolute -top-[300px] -left-[300px] w-[1200px] h-[1200px] rounded-full opacity-75"
