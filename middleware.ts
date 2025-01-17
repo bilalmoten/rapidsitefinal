@@ -7,6 +7,12 @@ export async function middleware(request: NextRequest) {
   const url = request.nextUrl;
   const hostname = request.headers.get('host')!;
 
+  console.log('Incoming request:', {
+    hostname,
+    pathname: url.pathname,
+    url: request.url
+  });
+
   // Check for auth callback at root level and redirect if needed
   const code = url.searchParams.get('code');
   if (code && url.pathname === '/') {
@@ -24,6 +30,8 @@ export async function middleware(request: NextRequest) {
     `.localhost:3000`,
     `.aiwebsitebuilder.tech`
   );
+
+  console.log('Processed host:', host);
 
   // Special case for Vercel preview deployments
   if (
@@ -53,12 +61,18 @@ export async function middleware(request: NextRequest) {
 
   // Check custom domains first
   const supabase = await createClient();
-  const { data: customDomain } = await supabase
+  const { data: customDomain, error: domainError } = await supabase
     .from('custom_domains')
     .select('website_id, status')
     .eq('domain', hostname)
     .eq('status', 'active')
     .single();
+
+  console.log('Custom domain lookup:', {
+    hostname,
+    customDomain,
+    error: domainError
+  });
 
   if (customDomain) {
     console.log('Custom domain found:', hostname, 'for website:', customDomain.website_id);
@@ -70,12 +84,13 @@ export async function middleware(request: NextRequest) {
 
   // Only handle subdomains for aiwebsitebuilder.tech
   if (!host.endsWith('.aiwebsitebuilder.tech')) {
-    console.log('Unknown domain:', hostname);
+    console.log('Unknown domain:', hostname, 'redirecting to main site');
     return NextResponse.redirect(new URL('https://aiwebsitebuilder.tech'));
   }
 
   // Handle subdomains
   const subdomain = host.replace('.aiwebsitebuilder.tech', '');
+  console.log('Processing subdomain:', subdomain);
 
   // Prevent direct access to /sites folder
   if (url.pathname.startsWith(`/sites`)) {
