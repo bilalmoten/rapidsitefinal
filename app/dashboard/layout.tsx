@@ -12,7 +12,7 @@ function DashboardContent({ children }: { children: React.ReactNode }) {
       <DashboardSidebar />
       <main
         className={`flex-1 transition-all duration-300 ${
-          isExpanded ? "ml-[280px]" : "ml-[80px]"
+          isExpanded ? "ml-[256px]" : "ml-[80px]"
         }`}
       >
         {children}
