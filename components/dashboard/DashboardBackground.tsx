@@ -7,7 +7,7 @@ const DashboardBackground = () => {
       <div className="absolute inset-0 bg-[#e2e2e2] dark:bg-[#0A0A0B]">
         {/* Top-left gradient */}
         <div
-          className="absolute -top-[300px] -left-[300px] w-[1200px] h-[1200px] rounded-full opacity-75"
+          className="absolute -top-[300px] -right-[300px] w-[1200px] h-[1200px] rounded-full opacity-75"
           style={{
             background: `radial-gradient(circle at center, 
               rgba(24, 226, 153, 0.2) 0%,
@@ -15,13 +15,13 @@ const DashboardBackground = () => {
               rgba(24, 226, 153, 0.05) 30%,
               rgba(24, 226, 153, 0) 70%
             )`,
-            filter: "blur(80px)",
+            filter: "blur(120px)",
           }}
         />
 
         {/* Bottom-right gradient */}
         <div
-          className="absolute -bottom-[200px] -right-[200px] w-[1000px] h-[1000px] rounded-full opacity-75"
+          className="absolute -bottom-[200px] -left-[200px] w-[1000px] h-[1000px] rounded-full opacity-75"
           style={{
             background: `radial-gradient(circle at center, 
               rgba(24, 226, 153, 0.15) 0%,
@@ -29,7 +29,7 @@ const DashboardBackground = () => {
               rgba(24, 226, 153, 0.02) 50%,
               rgba(24, 226, 153, 0) 70%
             )`,
-            filter: "blur(100px)",
+            filter: "blur(140px)",
           }}
         />
 

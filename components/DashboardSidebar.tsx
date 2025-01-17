@@ -107,18 +107,18 @@ const DashboardSidebar = () => {
   ];
 
   const comingSoonItems = [
-    {
-      icon: BookOpen,
-      label: "Documentation",
-    },
+    // {
+    //   icon: BookOpen,
+    //   label: "Documentation",
+    // },
     {
       icon: Video,
       label: "Tutorials",
     },
-    {
-      icon: HelpCircle,
-      label: "Help & Support",
-    },
+    // {
+    //   icon: HelpCircle,
+    //   label: "Help & Support",
+    // },
   ];
 
   const handleLogout = async () => {

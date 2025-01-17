@@ -9,7 +9,7 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import ChatInterface from "@/components/ChatInterface";
 import { Button } from "@/components/ui/button";
-import Sidebar from "@/components/Sidebar";
+import Sidebar from "@/components/chat-Sidebar";
 import { useChat, Message } from "ai/react";
 import React from "react";
 import { toast } from "react-hot-toast";
