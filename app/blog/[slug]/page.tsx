@@ -56,41 +56,96 @@ export default async function BlogPostPage(props: {
         </Link>
       </Button>
 
-      <article className="prose prose-lg dark:prose-invert max-w-3xl mx-auto">
+      <article className="prose prose-lg dark:prose-invert max-w-3xl mx-auto prose-headings:text-neutral-10 prose-p:text-neutral-30 prose-p:leading-relaxed prose-strong:text-neutral-10 prose-a:text-primary-main hover:prose-a:text-primary-main/80 prose-li:text-neutral-30 prose-code:text-primary-main prose-code:bg-primary-main/10 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:before:content-none prose-code:after:content-none">
         {post.coverImage && (
           <img
             src={post.coverImage}
             alt={post.title}
-            className="w-full aspect-video object-cover rounded-lg mb-6"
+            className="w-full aspect-video object-cover rounded-lg mb-8"
           />
         )}
 
-        <div className="flex items-center space-x-4 mb-6 not-prose">
+        <div className="flex items-center space-x-4 mb-8 not-prose">
           <Avatar>
             <AvatarFallback>{post.author[0]}</AvatarFallback>
           </Avatar>
           <div>
-            <div className="font-semibold">{post.author}</div>
-            <div className="text-sm text-muted-foreground">
+            <div className="font-semibold text-neutral-10">{post.author}</div>
+            <div className="text-sm text-neutral-40 flex items-center">
               <Calendar className="inline h-4 w-4 mr-1" />
               {formatDate(post.date)}
             </div>
           </div>
         </div>
 
-        <div className="mdx-content">
-          <Markdown>{post.content}</Markdown>
+        <div className="mdx-content space-y-6">
+          <Markdown
+            components={{
+              h1: ({ children }) => (
+                <h1 className="text-4xl font-bold mb-8 text-neutral-10">
+                  {children}
+                </h1>
+              ),
+              h2: ({ children }) => (
+                <h2 className="text-2xl font-semibold mt-12 mb-6 text-neutral-10">
+                  {children}
+                </h2>
+              ),
+              h3: ({ children }) => (
+                <h3 className="text-xl font-semibold mt-8 mb-4 text-neutral-10">
+                  {children}
+                </h3>
+              ),
+              p: ({ children }) => (
+                <p className="text-lg leading-relaxed text-neutral-30">
+                  {children}
+                </p>
+              ),
+              ul: ({ children }) => (
+                <ul className="list-disc list-inside space-y-2 ml-4 text-neutral-30">
+                  {children}
+                </ul>
+              ),
+              ol: ({ children }) => (
+                <ol className="list-decimal list-inside space-y-2 ml-4 text-neutral-30">
+                  {children}
+                </ol>
+              ),
+              li: ({ children }) => (
+                <li className="text-lg leading-relaxed">{children}</li>
+              ),
+              blockquote: ({ children }) => (
+                <blockquote className="border-l-4 border-primary-main pl-4 italic text-neutral-30">
+                  {children}
+                </blockquote>
+              ),
+            }}
+          >
+            {post.content}
+          </Markdown>
         </div>
 
-        <div className="flex items-center space-x-4 mt-8 not-prose">
-          <span className="font-semibold">Share:</span>
-          <Button size="icon" variant="outline">
+        <div className="flex items-center space-x-4 mt-12 not-prose">
+          <span className="font-semibold text-neutral-10">Share:</span>
+          <Button
+            size="icon"
+            variant="outline"
+            className="border-neutral-70 text-neutral-30 hover:text-neutral-10 hover:bg-neutral-90/50"
+          >
             <Facebook className="h-4 w-4" />
           </Button>
-          <Button size="icon" variant="outline">
+          <Button
+            size="icon"
+            variant="outline"
+            className="border-neutral-70 text-neutral-30 hover:text-neutral-10 hover:bg-neutral-90/50"
+          >
             <Twitter className="h-4 w-4" />
           </Button>
-          <Button size="icon" variant="outline">
+          <Button
+            size="icon"
+            variant="outline"
+            className="border-neutral-70 text-neutral-30 hover:text-neutral-10 hover:bg-neutral-90/50"
+          >
             <Linkedin className="h-4 w-4" />
           </Button>
         </div>

@@ -28,6 +28,20 @@ import DashboardBackground from "@/components/dashboard/DashboardBackground";
 
 const roadmapFeatures = [
   {
+    title: "AI Assistant Integration",
+    description:
+      "Smart AI assistant to help with website creation and customization",
+    status: "in_progress",
+    eta: "February 2025",
+  },
+  {
+    title: "Website Analytics Dashboard",
+    description:
+      "Comprehensive analytics to track website performance and visitor engagement",
+    status: "in_progress",
+    eta: "February 2025",
+  },
+  {
     title: "Custom Domain Support",
     description:
       "Connect your own domain to your website for a professional branded experience",

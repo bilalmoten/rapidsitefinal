@@ -106,6 +106,16 @@ const DashboardRightPanel: React.FC<DashboardRightPanelProps> = ({
             We're working on bringing you a powerful AI assistant to help with
             your website creation journey.
           </p>
+          <br />
+          <p className="text-neutral-40 text-sm">
+            For any help and/or feedback, please contact us at{" "}
+            <a
+              href="mailto:mbilal@aiwebsitebuilder.tech"
+              className="text-primary-main"
+            >
+              mbilal@aiwebsitebuilder.tech
+            </a>
+          </p>
         </div>
 
         {/* Chat Input - Disabled */}

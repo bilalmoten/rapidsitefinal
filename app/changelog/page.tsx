@@ -28,6 +28,57 @@ interface Update {
 
 const updates: Update[] = [
   {
+    date: "January 18, 2025",
+    title: "Going Live! 🚀",
+    description: "Removing waitlist and opening access to everyone",
+    milestone: true,
+    updates: [
+      {
+        title: "Waitlist Removal",
+        description:
+          "Opened RapidSite to everyone! No more waiting - create your AI-powered website instantly.",
+        type: "milestone",
+      },
+      {
+        title: "Infrastructure Scaling",
+        description:
+          "Significantly scaled our infrastructure to handle thousands of concurrent users with optimal performance.",
+        type: "improvement",
+      },
+      {
+        title: "Waitlist User Benefits",
+        description:
+          "Introduced special benefits for early waitlist supporters including priority support and early feature access.",
+        type: "feature",
+      },
+    ],
+  },
+  {
+    date: "January 18, 2025",
+    title: "Dashboard Refresh & Coming Soon Features 🎨",
+    description: "Major UI improvements and transparency updates",
+    updates: [
+      {
+        title: "Dashboard UI Refresh",
+        description:
+          "Redesigned dashboard with a sleek right panel showing project stats and upcoming features.",
+        type: "improvement",
+      },
+      {
+        title: "Coming Soon Features Preview",
+        description:
+          "Added transparent 'Coming Soon' indicators for upcoming features like website analytics and AI assistant.",
+        type: "improvement",
+      },
+      {
+        title: "Responsive Layout Improvements",
+        description:
+          "Enhanced mobile responsiveness and smoother transitions for panel toggles.",
+        type: "improvement",
+      },
+    ],
+  },
+  {
     date: "January 17, 2025",
     title: "Custom Domains Launch 🌐",
     description: "Introducing custom domain support for premium users",
