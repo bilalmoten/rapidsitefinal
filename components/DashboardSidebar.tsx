@@ -318,7 +318,7 @@ const DashboardSidebar = () => {
             )}
           </Button>
 
-          <div className="flex items-center justify-between rounded-xl bg-neutral-80/20 px-4 py-3">
+          {/* <div className="flex items-center justify-between rounded-xl bg-neutral-80/20 px-4 py-3">
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center">
                 <Moon className="h-6 w-6" />
@@ -333,7 +333,7 @@ const DashboardSidebar = () => {
                 setTheme(theme === "dark" ? "light" : "dark")
               }
             />
-          </div>
+          </div> */}
 
           <Button
             variant="ghost"

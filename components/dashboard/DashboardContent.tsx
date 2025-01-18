@@ -67,7 +67,7 @@ const DashboardContent: React.FC<DashboardContentProps> = ({
         className={cn(
           "flex-auto transition-all duration-300 flex",
           // isExpanded ? "ml-64" : "ml-20",
-          isRightPanelOpen ? "mr-[480px]" : "mr-0"
+          isRightPanelOpen ? "mr-[350px]" : "mr-0"
         )}
       >
         <main className="relative z-[1] h-screen overflow-y-auto">
@@ -87,10 +87,10 @@ const DashboardContent: React.FC<DashboardContentProps> = ({
             <ChevronLeft className="h-6 w-6" />
           </Button>
         ) : (
-          <aside className="h-full w-[400px] bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 transition-all duration-300 border-l border-border">
+          <aside className="h-full w-[350px] bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 transition-all duration-300 border-l border-border">
             <div className="relative w-full h-full">
               <Button
-                className="fixed right-[420px] bottom-4 rounded-full h-12 w-12 bg-primary shadow-lg hover:shadow-xl transition-shadow"
+                className="fixed right-[370px] bottom-4 rounded-full h-12 w-12 bg-primary shadow-lg hover:shadow-xl transition-shadow"
                 onClick={toggleRightPanel}
               >
                 <ChevronRight className="h-6 w-6" />
