@@ -1,4 +1,5 @@
 import { Metadata } from "next";
+import DashboardBackground from "@/components/dashboard/DashboardBackground";
 
 export const metadata: Metadata = {
   title: "Building in Public | RapidSite",
@@ -26,6 +27,57 @@ interface Update {
 }
 
 const updates: Update[] = [
+  {
+    date: "January 18, 2025",
+    title: "Going Live! 🚀",
+    description: "Removing waitlist and opening access to everyone",
+    milestone: true,
+    updates: [
+      {
+        title: "Waitlist Removal",
+        description:
+          "Opened RapidSite to everyone! No more waiting - create your AI-powered website instantly.",
+        type: "milestone",
+      },
+      {
+        title: "Infrastructure Scaling",
+        description:
+          "Significantly scaled our infrastructure to handle thousands of concurrent users with optimal performance.",
+        type: "improvement",
+      },
+      {
+        title: "Waitlist User Benefits",
+        description:
+          "Introduced special benefits for early waitlist supporters including priority support and early feature access.",
+        type: "feature",
+      },
+    ],
+  },
+  {
+    date: "January 18, 2025",
+    title: "Dashboard Refresh & Coming Soon Features 🎨",
+    description: "Major UI improvements and transparency updates",
+    updates: [
+      {
+        title: "Dashboard UI Refresh",
+        description:
+          "Redesigned dashboard with a sleek right panel showing project stats and upcoming features.",
+        type: "improvement",
+      },
+      {
+        title: "Coming Soon Features Preview",
+        description:
+          "Added transparent 'Coming Soon' indicators for upcoming features like website analytics and AI assistant.",
+        type: "improvement",
+      },
+      {
+        title: "Responsive Layout Improvements",
+        description:
+          "Enhanced mobile responsiveness and smoother transitions for panel toggles.",
+        type: "improvement",
+      },
+    ],
+  },
   {
     date: "January 17, 2025",
     title: "Custom Domains Launch 🌐",
@@ -228,88 +280,91 @@ const updates: Update[] = [
 
 export default function Journey() {
   return (
-    <div className="min-h-screen bg-background">
-      <div className="max-w-4xl mx-auto py-16 px-4 sm:px-6 lg:px-8">
-        <div className="text-center">
-          <h1 className="text-4xl font-bold text-foreground">
-            Building in Public
-          </h1>
-          <p className="mt-4 text-lg text-muted-foreground">
-            Follow our journey as we build and improve RapidSite. Every update,
-            no matter how small, is a step forward. 🚀
-          </p>
-        </div>
+    <div>
+      <DashboardBackground />
+      <div className="min-h-screen bg-primary-dark/30 relative z-20">
+        <div className="max-w-4xl mx-auto py-16 px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <h1 className="text-4xl font-bold text-neutral-10">
+              Building in Public
+            </h1>
+            <p className="mt-4 text-lg text-neutral-30">
+              Follow our journey as we build and improve RapidSite. Every
+              update, no matter how small, is a step forward. 🚀
+            </p>
+          </div>
 
-        <div className="mt-16 space-y-16">
-          {updates.map((update, index) => (
-            <div key={index} className="relative">
-              {index !== updates.length - 1 && (
-                <div
-                  className="absolute top-12 left-4 -ml-px h-full w-0.5 bg-border"
-                  aria-hidden="true"
-                />
-              )}
-              <div className="relative flex items-start group">
-                <span className="h-9 flex items-center">
-                  <span
-                    className={`relative z-10 w-8 h-8 flex items-center justify-center ${
-                      update.milestone ? "bg-yellow-500" : "bg-primary"
-                    } rounded-full`}
-                  >
-                    <span className="h-2.5 w-2.5 bg-white rounded-full" />
+          <div className="mt-16 space-y-16">
+            {updates.map((update, index) => (
+              <div key={index} className="relative">
+                {index !== updates.length - 1 && (
+                  <div
+                    className="absolute top-12 left-4 -ml-px h-full w-0.5 bg-neutral-70"
+                    aria-hidden="true"
+                  />
+                )}
+                <div className="relative flex items-start group">
+                  <span className="h-9 flex items-center">
+                    <span
+                      className={`relative z-10 w-8 h-8 flex items-center justify-center ${
+                        update.milestone ? "bg-primary-main" : "bg-primary-dark"
+                      } rounded-full ring-8 ring-[#0a0a0b]`}
+                    >
+                      <span className="h-2.5 w-2.5 bg-neutral-10 rounded-full" />
+                    </span>
                   </span>
-                </span>
-                <div className="ml-4 min-w-0 flex-1">
-                  <div className="text-sm font-semibold text-foreground mb-1">
-                    {update.date}
-                  </div>
-                  <div className="text-xl font-bold text-foreground mb-2">
-                    {update.title}
-                  </div>
-                  <div className="text-muted-foreground mb-4">
-                    {update.description}
-                  </div>
-                  <div className="space-y-4">
-                    {update.updates.map((item, itemIndex) => (
-                      <div
-                        key={itemIndex}
-                        className="bg-card rounded-lg p-4 shadow-sm"
-                      >
-                        <h3 className="text-base font-semibold text-foreground flex items-center">
-                          <span
-                            className={`inline-block w-2 h-2 rounded-full mr-2 ${
-                              item.type === "feature"
-                                ? "bg-green-500"
-                                : item.type === "milestone"
-                                ? "bg-yellow-500"
-                                : "bg-blue-500"
-                            }`}
-                          ></span>
-                          {item.title}
-                        </h3>
-                        <p className="mt-2 text-sm text-muted-foreground">
-                          {item.description}
-                        </p>
-                        {item.links && (
-                          <div className="mt-3 flex gap-3">
-                            {item.links.map((link, i) => (
-                              <a
-                                key={i}
-                                href={link.url}
-                                className="text-sm text-primary hover:text-primary/80"
-                              >
-                                {link.text} →
-                              </a>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    ))}
+                  <div className="ml-4 min-w-0 flex-1">
+                    <div className="text-sm font-semibold text-neutral-30 mb-1">
+                      {update.date}
+                    </div>
+                    <div className="text-xl font-bold text-neutral-10 mb-2">
+                      {update.title}
+                    </div>
+                    <div className="text-neutral-30 mb-4">
+                      {update.description}
+                    </div>
+                    <div className="space-y-4">
+                      {update.updates.map((item, itemIndex) => (
+                        <div
+                          key={itemIndex}
+                          className="bg-neutral-90/50 rounded-lg p-4 border border-neutral-70"
+                        >
+                          <h3 className="text-base font-semibold text-neutral-10 flex items-center">
+                            <span
+                              className={`inline-block w-2 h-2 rounded-full mr-2 ${
+                                item.type === "feature"
+                                  ? "bg-primary-main"
+                                  : item.type === "milestone"
+                                  ? "bg-primary-main"
+                                  : "bg-primary-dark"
+                              }`}
+                            ></span>
+                            {item.title}
+                          </h3>
+                          <p className="mt-2 text-sm text-neutral-30">
+                            {item.description}
+                          </p>
+                          {item.links && (
+                            <div className="mt-3 flex gap-3">
+                              {item.links.map((link, i) => (
+                                <a
+                                  key={i}
+                                  href={link.url}
+                                  className="text-sm text-primary-main hover:text-primary-main/80"
+                                >
+                                  {link.text} →
+                                </a>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
     </div>

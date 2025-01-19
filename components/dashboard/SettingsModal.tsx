@@ -54,6 +54,7 @@ interface SettingsModalProps {
     avatar_url?: string;
   };
   onProfileUpdate?: () => Promise<void>;
+  defaultTab?: "usage" | "subscription" | "account";
 }
 
 const plans = [
@@ -106,8 +107,9 @@ export default function SettingsModal({
   usage,
   user,
   onProfileUpdate,
+  defaultTab = "usage",
 }: SettingsModalProps) {
-  const [activeTab, setActiveTab] = useState("usage");
+  const [activeTab, setActiveTab] = useState(defaultTab);
   const [isUpdating, setIsUpdating] = useState(false);
   const [isLoadingPortal, setIsLoadingPortal] = useState(false);
   const [isYearly, setIsYearly] = useState(false);
@@ -199,7 +201,10 @@ export default function SettingsModal({
         <DialogHeader>
           <DialogTitle>Settings</DialogTitle>
         </DialogHeader>
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
+        <Tabs
+          value={activeTab}
+          onValueChange={(value) => setActiveTab(value as typeof activeTab)}
+        >
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="usage">Usage</TabsTrigger>
             <TabsTrigger value="subscription">Subscription</TabsTrigger>

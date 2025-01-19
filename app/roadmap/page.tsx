@@ -24,8 +24,23 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
+import DashboardBackground from "@/components/dashboard/DashboardBackground";
 
 const roadmapFeatures = [
+  {
+    title: "AI Assistant Integration",
+    description:
+      "Smart AI assistant to help with website creation and customization",
+    status: "in_progress",
+    eta: "February 2025",
+  },
+  {
+    title: "Website Analytics Dashboard",
+    description:
+      "Comprehensive analytics to track website performance and visitor engagement",
+    status: "in_progress",
+    eta: "February 2025",
+  },
   {
     title: "Custom Domain Support",
     description:
@@ -432,254 +447,285 @@ export default function RoadmapPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="text-center mb-12"
-        >
-          <h1 className="text-4xl font-bold text-foreground mb-4">
-            Product Roadmap
-          </h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Track our progress and help shape the future of RapidSite
-          </p>
-        </motion.div>
+    <div>
+      <DashboardBackground />
+      <div className="min-h-screen bg-primary-dark/30 relative z-20">
+        <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8 z-20">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="text-center mb-12"
+          >
+            <h1 className="text-4xl font-bold text-neutral-10 mb-4">
+              Product Roadmap
+            </h1>
+            <p className="text-xl text-neutral-30 max-w-2xl mx-auto">
+              Track our progress and help shape the future of RapidSite
+            </p>
+          </motion.div>
 
-        <div className="space-y-16">
-          {/* Official Roadmap Section */}
-          <section>
-            <div className="flex items-center gap-4 mb-8">
-              <h2 className="text-2xl font-semibold">Official Roadmap</h2>
-              <Separator className="flex-1" />
-            </div>
+          <div className="space-y-16">
+            {/* Official Roadmap Section */}
+            <section>
+              <div className="flex items-center gap-4 mb-8">
+                <h2 className="text-2xl font-semibold text-neutral-10">
+                  Official Roadmap
+                </h2>
+                <Separator className="flex-1 bg-neutral-70" />
+              </div>
 
-            <div className="grid md:grid-cols-3 gap-6">
-              {["planned", "in_progress", "completed"].map((status) => {
-                const features = roadmapFeatures.filter(
-                  (f) => f.status === status
-                );
-                const displayFeatures = showAllRoadmap
-                  ? features
-                  : limitItems(features, 2);
+              <div className="grid md:grid-cols-3 gap-6">
+                {["planned", "in_progress", "completed"].map((status) => {
+                  const features = roadmapFeatures.filter(
+                    (f) => f.status === status
+                  );
+                  const displayFeatures = showAllRoadmap
+                    ? features
+                    : limitItems(features, 2);
 
-                return (
-                  <div key={status} className="space-y-4">
-                    <ColumnHeader
-                      title={
-                        status === "planned"
-                          ? "Planned"
-                          : status === "in_progress"
-                          ? "In Progress"
-                          : "Completed"
-                      }
-                      count={features.length}
-                      color={`bg-gradient-to-br ${
-                        status === "planned"
-                          ? "from-orange-500 to-orange-600"
-                          : status === "in_progress"
-                          ? "from-blue-500 to-blue-600"
-                          : "from-green-500 to-green-600"
-                      }`}
-                    />
-                    <div className="space-y-4">
-                      {displayFeatures.map((feature) => (
-                        <FeatureCard
-                          key={feature.title}
-                          feature={feature}
-                          isRoadmap
-                        />
-                      ))}
+                  return (
+                    <div key={status} className="space-y-4">
+                      <ColumnHeader
+                        title={
+                          status === "planned"
+                            ? "Planned"
+                            : status === "in_progress"
+                            ? "In Progress"
+                            : "Completed"
+                        }
+                        count={features.length}
+                        color={`bg-gradient-to-br ${
+                          status === "planned"
+                            ? "from-orange-500 to-orange-600"
+                            : status === "in_progress"
+                            ? "from-blue-500 to-blue-600"
+                            : "from-green-500 to-green-600"
+                        }`}
+                      />
+                      <div className="space-y-4">
+                        {displayFeatures.map((feature) => (
+                          <FeatureCard
+                            key={feature.title}
+                            feature={feature}
+                            isRoadmap
+                          />
+                        ))}
+                      </div>
                     </div>
+                  );
+                })}
+              </div>
+              {!showAllRoadmap && (
+                <div className="relative mt-8 text-center">
+                  <div className="absolute inset-0 flex items-center">
+                    <div className="w-full border-t border-neutral-70"></div>
                   </div>
-                );
-              })}
-            </div>
-            {!showAllRoadmap && (
-              <div className="relative mt-8 text-center">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-border"></div>
+                  <div className="relative flex justify-center">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="bg-[#0a0a0b] border-neutral-70 text-neutral-30 hover:text-neutral-10 hover:bg-neutral-90/50"
+                      onClick={() => setShowAllRoadmap(true)}
+                    >
+                      View All Features
+                    </Button>
+                  </div>
                 </div>
-                <div className="relative flex justify-center">
+              )}
+              {showAllRoadmap && (
+                <div className="text-center mt-8">
                   <Button
                     variant="outline"
                     size="sm"
-                    className="bg-background"
-                    onClick={() => setShowAllRoadmap(true)}
+                    className="border-neutral-70 text-neutral-30 hover:text-neutral-10 hover:bg-neutral-90/50"
+                    onClick={() => setShowAllRoadmap(false)}
                   >
-                    View All Features
+                    Show Less
                   </Button>
                 </div>
-              </div>
-            )}
-            {showAllRoadmap && (
-              <div className="text-center mt-8">
+              )}
+            </section>
+
+            {/* Community Features Section */}
+            <section>
+              <div className="flex items-center gap-4 mb-8">
+                <h2 className="text-2xl font-semibold text-neutral-10">
+                  Community Features
+                </h2>
+                <Separator className="flex-1 bg-neutral-70" />
                 <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setShowAllRoadmap(false)}
+                  onClick={() => setShowSuggestDialog(true)}
+                  className="bg-primary-main hover:bg-primary-main/90 text-neutral-90"
                 >
-                  Show Less
+                  Suggest Feature
+                  <ArrowRight className="w-4 h-4 ml-2" />
                 </Button>
               </div>
-            )}
-          </section>
 
-          {/* Community Features Section */}
-          <section>
-            <div className="flex items-center gap-4 mb-8">
-              <h2 className="text-2xl font-semibold">Community Features</h2>
-              <Separator className="flex-1" />
-              <Button onClick={() => setShowSuggestDialog(true)}>
-                Suggest Feature
-                <ArrowRight className="w-4 h-4 ml-2" />
-              </Button>
-            </div>
-
-            {error ? (
-              <div className="text-center py-8">
-                <p className="text-red-500">{error}</p>
-                <Button
-                  variant="outline"
-                  onClick={() => window.location.reload()}
-                  className="mt-4"
-                >
-                  Try Again
-                </Button>
-              </div>
-            ) : isLoading ? (
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {[1, 2, 3].map((i) => (
-                  <div
-                    key={i}
-                    className="bg-card p-6 rounded-lg shadow-sm border border-border animate-pulse"
+              {error ? (
+                <div className="text-center py-8">
+                  <p className="text-red-500">{error}</p>
+                  <Button
+                    variant="outline"
+                    onClick={() => window.location.reload()}
+                    className="mt-4 border-neutral-70 text-neutral-30 hover:text-neutral-10 hover:bg-neutral-90/50"
                   >
-                    <div className="h-6 bg-muted rounded w-3/4 mb-4"></div>
-                    <div className="h-4 bg-muted rounded w-full mb-2"></div>
-                    <div className="h-4 bg-muted rounded w-2/3"></div>
-                  </div>
-                ))}
-              </div>
-            ) : communityFeatures.length === 0 ? (
-              <div className="text-center py-8 text-muted-foreground">
-                <p>No feature suggestions yet. Be the first to suggest one!</p>
-              </div>
-            ) : (
-              <div>
+                    Try Again
+                  </Button>
+                </div>
+              ) : isLoading ? (
                 <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {(showAllCommunity
-                    ? communityFeatures
-                    : limitItems(communityFeatures, 6)
-                  ).map((feature) => (
-                    <FeatureCard
-                      key={feature.id}
-                      feature={feature}
-                      onVote={handleVote}
-                    />
+                  {[1, 2, 3].map((i) => (
+                    <div
+                      key={i}
+                      className="bg-neutral-90/50 p-6 rounded-lg border border-neutral-70 animate-pulse"
+                    >
+                      <div className="h-6 bg-neutral-80 rounded w-3/4 mb-4"></div>
+                      <div className="h-4 bg-neutral-80 rounded w-full mb-2"></div>
+                      <div className="h-4 bg-neutral-80 rounded w-2/3"></div>
+                    </div>
                   ))}
                 </div>
-                {communityFeatures.length > 6 && !showAllCommunity && (
-                  <div className="text-center mt-6">
-                    <Button
-                      variant="outline"
-                      onClick={() => setShowAllCommunity(true)}
-                    >
-                      View {communityFeatures.length - 6} more suggestions...
-                    </Button>
+              ) : communityFeatures.length === 0 ? (
+                <div className="text-center py-8 text-neutral-30">
+                  <p>
+                    No feature suggestions yet. Be the first to suggest one!
+                  </p>
+                </div>
+              ) : (
+                <div>
+                  <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {(showAllCommunity
+                      ? communityFeatures
+                      : limitItems(communityFeatures, 6)
+                    ).map((feature) => (
+                      <FeatureCard
+                        key={feature.id}
+                        feature={feature}
+                        onVote={handleVote}
+                      />
+                    ))}
                   </div>
-                )}
-                {showAllCommunity && (
-                  <div className="text-center mt-6">
-                    <Button
-                      variant="outline"
-                      onClick={() => setShowAllCommunity(false)}
-                    >
-                      Show Less
-                    </Button>
-                  </div>
-                )}
-              </div>
-            )}
-          </section>
+                  {communityFeatures.length > 6 && !showAllCommunity && (
+                    <div className="text-center mt-6">
+                      <Button
+                        variant="outline"
+                        className="border-neutral-70 text-neutral-30 hover:text-neutral-10 hover:bg-neutral-90/50"
+                        onClick={() => setShowAllCommunity(true)}
+                      >
+                        View {communityFeatures.length - 6} more suggestions...
+                      </Button>
+                    </div>
+                  )}
+                  {showAllCommunity && (
+                    <div className="text-center mt-6">
+                      <Button
+                        variant="outline"
+                        className="border-neutral-70 text-neutral-30 hover:text-neutral-10 hover:bg-neutral-90/50"
+                        onClick={() => setShowAllCommunity(false)}
+                      >
+                        Show Less
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              )}
+            </section>
+          </div>
         </div>
-      </div>
 
-      <Dialog open={showSuggestDialog} onOpenChange={setShowSuggestDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Suggest a Feature</DialogTitle>
-            <DialogDescription>
-              What would you like to see in RapidSite? Your suggestion will be
-              visible to the community.
-            </DialogDescription>
-          </DialogHeader>
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              handleSuggestFeature();
-            }}
-            className="space-y-4 pt-4"
-          >
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Feature Title</label>
-              <Input
-                placeholder="Enter a clear, concise title"
-                value={newFeature.title}
-                onChange={(e) =>
-                  setNewFeature((prev) => ({ ...prev, title: e.target.value }))
-                }
-                disabled={isSubmitting}
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Description</label>
-              <Textarea
-                placeholder="Describe the feature and its benefits"
-                value={newFeature.description}
-                onChange={(e) =>
-                  setNewFeature((prev) => ({
-                    ...prev,
-                    description: e.target.value,
-                  }))
-                }
-                disabled={isSubmitting}
-                required
-              />
-            </div>
-            <div className="flex justify-end gap-4">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setShowSuggestDialog(false)}
-                disabled={isSubmitting}
-              >
-                Cancel
-              </Button>
-              <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? (
-                  <>
-                    <span className="mr-2">Submitting...</span>
-                    <motion.div
-                      animate={{ rotate: 360 }}
-                      transition={{
-                        duration: 1,
-                        repeat: Infinity,
-                        ease: "linear",
-                      }}
-                      className="w-4 h-4 border-2 border-current border-t-transparent rounded-full"
-                    />
-                  </>
-                ) : (
-                  "Submit Suggestion"
-                )}
-              </Button>
-            </div>
-          </form>
-        </DialogContent>
-      </Dialog>
+        <Dialog open={showSuggestDialog} onOpenChange={setShowSuggestDialog}>
+          <DialogContent className="bg-neutral-90 border-neutral-70 ">
+            <DialogHeader>
+              <DialogTitle className="text-neutral-10">
+                Suggest a Feature
+              </DialogTitle>
+              <DialogDescription className="text-neutral-30">
+                What would you like to see in RapidSite? Your suggestion will be
+                visible to the community.
+              </DialogDescription>
+            </DialogHeader>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleSuggestFeature();
+              }}
+              className="space-y-4 pt-4"
+            >
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-neutral-10">
+                  Feature Title
+                </label>
+                <Input
+                  placeholder="Enter a clear, concise title"
+                  value={newFeature.title}
+                  onChange={(e) =>
+                    setNewFeature((prev) => ({
+                      ...prev,
+                      title: e.target.value,
+                    }))
+                  }
+                  disabled={isSubmitting}
+                  required
+                  className="bg-neutral-90/50 border-neutral-70 text-neutral-10 placeholder:text-neutral-30"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-neutral-10">
+                  Description
+                </label>
+                <Textarea
+                  placeholder="Describe the feature and its benefits"
+                  value={newFeature.description}
+                  onChange={(e) =>
+                    setNewFeature((prev) => ({
+                      ...prev,
+                      description: e.target.value,
+                    }))
+                  }
+                  disabled={isSubmitting}
+                  required
+                  className="bg-neutral-90/50 border-neutral-70 text-neutral-10 placeholder:text-neutral-30"
+                />
+              </div>
+              <div className="flex justify-end gap-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setShowSuggestDialog(false)}
+                  disabled={isSubmitting}
+                  className="border-neutral-70 text-neutral-30 hover:text-neutral-10 hover:bg-neutral-90/50"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="bg-primary-main hover:bg-primary-main/90 text-neutral-90"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <span className="mr-2">Submitting...</span>
+                      <motion.div
+                        animate={{ rotate: 360 }}
+                        transition={{
+                          duration: 1,
+                          repeat: Infinity,
+                          ease: "linear",
+                        }}
+                        className="w-4 h-4 border-2 border-current border-t-transparent rounded-full"
+                      />
+                    </>
+                  ) : (
+                    "Submit Suggestion"
+                  )}
+                </Button>
+              </div>
+            </form>
+          </DialogContent>
+        </Dialog>
+      </div>
     </div>
   );
 }

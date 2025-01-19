@@ -21,14 +21,14 @@ export default function SignupForm({ message }: { message?: string }) {
   return (
     <>
       <div className="text-center">
-        <h2 className="mt-6 text-3xl font-bold text-foreground">
+        <h2 className="mt-6 text-3xl font-bold text-neutral-10">
           Create your account
         </h2>
-        <p className="mt-2 text-sm text-muted-foreground">
+        <p className="mt-2 text-sm text-neutral-30">
           Already have an account?{" "}
           <Link
             href="/login"
-            className="font-medium text-indigo-600 hover:text-indigo-500"
+            className="font-medium text-primary-main hover:text-primary-main/80"
           >
             Sign in
           </Link>
@@ -48,7 +48,7 @@ export default function SignupForm({ message }: { message?: string }) {
               title="Please enter a valid email address"
               autoComplete="email"
               required
-              className="appearance-none rounded-none relative block w-full px-3 py-2 border border-input placeholder-muted-foreground text-foreground rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm bg-background"
+              className="appearance-none rounded-none relative block w-full px-3 py-2 border border-neutral-70 placeholder-neutral-30 text-neutral-10 rounded-t-md focus:outline-none focus:ring-primary-main/20 focus:border-primary-main/50 focus:z-10 sm:text-sm bg-neutral-90/50"
               placeholder="Email address"
             />
           </div>
@@ -64,13 +64,14 @@ export default function SignupForm({ message }: { message?: string }) {
               required
               pattern={PASSWORD_REGEX.source}
               title={PASSWORD_REQUIREMENTS}
-              className="appearance-none rounded-none relative block w-full px-3 py-2 pr-10 border border-input placeholder-muted-foreground text-foreground rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm bg-background"
+              className="appearance-none rounded-none relative block w-full px-3 py-2 pr-10 border border-neutral-70 placeholder-neutral-30 text-neutral-10 rounded-b-md focus:outline-none focus:ring-primary-main/20 focus:border-primary-main/50 focus:z-10 sm:text-sm bg-neutral-90/50"
               placeholder="Password"
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute top-0 right-0 h-[38px] w-[38px] flex items-center justify-center"
+              className="absolute top-0 right-0 h-[38px] w-[38px] flex items-center justify-center
+               text-neutral-30 hover:text-neutral-10"
             >
               {showPassword ? (
                 <EyeOff className="h-4 w-4" />
@@ -78,16 +79,33 @@ export default function SignupForm({ message }: { message?: string }) {
                 <Eye className="h-4 w-4" />
               )}
             </button>
-            <p className="mt-1 text-xs text-muted-foreground">
+            <p className="mt-1 text-xs text-neutral-30">
               {PASSWORD_REQUIREMENTS}
             </p>
+          </div>
+        </div>
+
+        <div className="flex items-start">
+          <div className="flex items-center h-5">
+            <input
+              id="newsletter"
+              name="newsletter"
+              type="checkbox"
+              defaultChecked={true}
+              className="h-4 w-4 text-primary-main border-neutral-70 rounded bg-neutral-90/50 focus:ring-primary-main/20"
+            />
+          </div>
+          <div className="ml-3">
+            <label htmlFor="newsletter" className="text-sm text-neutral-30">
+              Subscribe to our newsletter for updates and new features
+            </label>
           </div>
         </div>
 
         <div>
           <SubmitButton
             formAction={signUp}
-            className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-neutral-90 bg-primary-main hover:bg-primary-main/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-main/20"
             pendingText="Creating account..."
           >
             Sign up
@@ -96,20 +114,27 @@ export default function SignupForm({ message }: { message?: string }) {
       </form>
       <div className="relative my-4">
         <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t border-input"></div>
+          <div className="w-full border-t border-neutral-70"></div>
         </div>
         <div className="relative flex justify-center text-xs uppercase">
-          <span className="bg-card px-2 text-muted-foreground">
+          <span className="bg-neutral-90/50 px-2 text-neutral-30">
             Or continue with
           </span>
         </div>
       </div>
       <button
         onClick={async () => {
-          await signInWithGoogle();
+          const formData = new FormData();
+          const newsletterCheckbox = document.getElementById(
+            "newsletter"
+          ) as HTMLInputElement;
+          if (newsletterCheckbox?.checked) {
+            formData.append("newsletter", "on");
+          }
+          await signInWithGoogle(formData);
         }}
         type="button"
-        className="w-full flex items-center justify-center gap-2 bg-background text-foreground border border-input rounded-md px-4 py-2 text-sm font-medium hover:bg-accent focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+        className="w-full flex items-center justify-center gap-2 bg-neutral-90/50 text-neutral-10 border border-neutral-70 rounded-md px-4 py-2 text-sm font-medium hover:bg-neutral-90/80 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-main/20"
       >
         <img src="/google.svg" alt="Google" className="w-5 h-5" />
         Sign up with Google

@@ -221,9 +221,11 @@ const Sidebar: React.FC<SidebarProps> = ({
   };
 
   return (
-    <div className="w-80 bg-white dark:bg-gray-800 border-l">
-      <div className="p-4 border-b">
-        <h2 className="text-lg font-semibold">Website Details</h2>
+    <div className="w-90 h-full bg-[#0a0a0b00] border-l border-neutral-70 z-20">
+      <div className="p-4 border-b border-neutral-70">
+        <h2 className="text-2xl font-bold text-neutral-10 p-2 ">
+          Website Details
+        </h2>
       </div>
 
       <ScrollArea className="h-[calc(100vh-60px)]">

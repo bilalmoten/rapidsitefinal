@@ -14,18 +14,41 @@ import {
   TableRow,
   TableCell,
 } from "@/components/ui/table";
-import { Copy, Check, RefreshCw } from "lucide-react";
+import { Copy, Check, RefreshCw, Lock } from "lucide-react";
+import { PlanType } from "@/lib/constants/plans";
+import SettingsModal from "@/components/dashboard/SettingsModal";
 
 interface DomainManagerProps {
   websiteId: string;
+  userPlan: "free" | "pro" | "enterprise";
+  usage: {
+    websitesActive: number;
+    websitesGenerated: number;
+    aiEditsCount: number;
+    plan: PlanType;
+    subscription_status?: string;
+    subscription_id?: string;
+  };
+  user?: {
+    email: string;
+    first_name?: string;
+    last_name?: string;
+    avatar_url?: string;
+  };
 }
 
-export function DomainManager({ websiteId }: DomainManagerProps) {
+export function DomainManager({
+  websiteId,
+  userPlan,
+  usage,
+  user,
+}: DomainManagerProps) {
   const [domain, setDomain] = useState("");
   const [loading, setLoading] = useState(false);
   const [currentDomain, setCurrentDomain] = useState<any>(null);
   const [verificationDetails, setVerificationDetails] = useState<any>(null);
   const [copied, setCopied] = useState<string | null>(null);
+  const [showSettings, setShowSettings] = useState(false);
 
   useEffect(() => {
     fetchCurrentDomain();
@@ -45,6 +68,13 @@ export function DomainManager({ websiteId }: DomainManagerProps) {
   };
 
   const addDomain = async () => {
+    if (userPlan === "free") {
+      toast.error(
+        "Custom domains are only available for premium users. Please upgrade to add a custom domain."
+      );
+      return;
+    }
+
     setLoading(true);
     try {
       const response = await fetch("/api/domains", {
@@ -129,104 +159,129 @@ export function DomainManager({ websiteId }: DomainManagerProps) {
   };
 
   return (
-    <Card className="p-6">
-      <h2 className="text-xl font-semibold mb-4">Custom Domain</h2>
+    <>
+      <Card>
+        <div className="p-6">
+          <h2 className="text-xl font-semibold mb-4">Custom Domain</h2>
+          <p className="text-sm text-muted-foreground mb-6">
+            Configure a custom domain for your website. Add your domain and
+            follow the DNS configuration instructions.
+          </p>
 
-      {!currentDomain ? (
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium mb-2">
-              Domain Name
-            </label>
-            <div className="flex gap-2">
-              <Input
-                value={domain}
-                onChange={(e) => setDomain(e.target.value)}
-                placeholder="example.com"
-                disabled={loading}
-              />
-              <Button onClick={addDomain} disabled={loading}>
-                Add Domain
-              </Button>
-            </div>
-          </div>
-        </div>
-      ) : (
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="font-medium">{currentDomain.domain}</p>
-              <p className="text-sm text-muted-foreground capitalize">
-                Status: {currentDomain.status}
+          {userPlan === "free" ? (
+            <div className="text-center p-6 border rounded-lg bg-muted/50">
+              <Lock className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+              <h3 className="text-lg font-medium mb-2">Premium Feature</h3>
+              <p className="text-sm text-muted-foreground mb-4">
+                Custom domains are available for premium users only. Upgrade
+                your plan to use this feature.
               </p>
-            </div>
-            <div className="space-x-2">
-              <Button
-                variant="outline"
-                onClick={checkVerification}
-                disabled={loading || currentDomain.status === "active"}
-              >
-                Check Verification
-              </Button>
-              <Button
-                variant="destructive"
-                onClick={removeDomain}
-                disabled={loading}
-              >
-                Remove
+              <Button onClick={() => setShowSettings(true)} variant="default">
+                Upgrade Plan
               </Button>
             </div>
-          </div>
+          ) : (
+            <>
+              <div className="flex gap-4 mb-6">
+                <Input
+                  placeholder="Enter your domain (e.g., example.com)"
+                  value={domain}
+                  onChange={(e) => setDomain(e.target.value)}
+                  disabled={loading}
+                />
+                <Button onClick={addDomain} disabled={loading}>
+                  {loading ? (
+                    <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                  ) : null}
+                  Add Domain
+                </Button>
+              </div>
 
-          {currentDomain.status === "pending" && (
-            <div className="space-y-4">
-              <h3 className="font-medium">DNS Configuration Required</h3>
-              <p className="text-sm text-muted-foreground">
-                Add the following DNS records to configure your domain. This may
-                take up to 48 hours to propagate.
-              </p>
-
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Type</TableHead>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Value</TableHead>
-                    <TableHead className="w-[100px]">Copy</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  <TableRow>
-                    <TableCell>A</TableCell>
-                    <TableCell>@</TableCell>
-                    <TableCell className="font-mono text-sm">
-                      76.76.21.21
-                    </TableCell>
-                    <TableCell>
+              {currentDomain && (
+                <div className="mt-6">
+                  <h3 className="font-medium mb-2">Current Domain</h3>
+                  <div className="flex items-center justify-between p-4 border rounded-lg">
+                    <span className="font-mono">{currentDomain.domain}</span>
+                    <div className="flex items-center gap-2">
                       <Button
-                        variant="ghost"
+                        variant="outline"
                         size="sm"
-                        onClick={() => copyToClipboard("76.76.21.21", "a")}
+                        onClick={checkVerification}
+                        disabled={loading}
                       >
-                        {copied === "a" ? (
-                          <Check className="w-4 h-4" />
+                        {loading ? (
+                          <RefreshCw className="w-4 h-4 animate-spin" />
                         ) : (
-                          <Copy className="w-4 h-4" />
+                          "Check Status"
                         )}
                       </Button>
-                    </TableCell>
-                  </TableRow>
-                </TableBody>
-              </Table>
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={removeDomain}
+                        disabled={loading}
+                      >
+                        Remove
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              )}
 
-              <div className="mt-6 flex items-center gap-2 text-sm text-muted-foreground">
-                <RefreshCw className="w-4 h-4" />
-                Click "Verify" after adding both DNS records
-              </div>
-            </div>
+              {verificationDetails && currentDomain?.status === "pending" && (
+                <div className="mt-6 space-y-4">
+                  <h3 className="font-medium">DNS Configuration Required</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Add these DNS records to your domain's DNS configuration. It
+                    may take up to 48 hours for DNS changes to propagate.
+                  </p>
+
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Type</TableHead>
+                        <TableHead>Name</TableHead>
+                        <TableHead>Value</TableHead>
+                        <TableHead className="w-[100px]">Copy</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      <TableRow>
+                        <TableCell>A</TableCell>
+                        <TableCell>@</TableCell>
+                        <TableCell className="font-mono text-sm">
+                          76.76.21.21
+                        </TableCell>
+                        <TableCell>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => copyToClipboard("76.76.21.21", "a")}
+                          >
+                            {copied === "a" ? (
+                              <Check className="w-4 h-4" />
+                            ) : (
+                              <Copy className="w-4 h-4" />
+                            )}
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    </TableBody>
+                  </Table>
+                </div>
+              )}
+            </>
           )}
         </div>
-      )}
-    </Card>
+      </Card>
+
+      <SettingsModal
+        isOpen={showSettings}
+        onClose={() => setShowSettings(false)}
+        usage={usage}
+        user={user}
+        defaultTab="subscription"
+      />
+    </>
   );
 }

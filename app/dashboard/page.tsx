@@ -2,6 +2,7 @@ import React from "react";
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
 import DashboardContent from "@/components/dashboard/DashboardContent";
+import NewDashboardContent from "@/components/new_dashboard/NewDashboardContent";
 
 export default async function DashboardPage() {
   const supabase = await createClient();
@@ -15,7 +16,9 @@ export default async function DashboardPage() {
 
   const { data: websites, error } = await supabase
     .from("websites")
-    .select("id, website_name, website_description, thumbnail_url, subdomain")
+    .select(
+      "id, website_name, website_description, thumbnail_url, subdomain, is_public, created_at, last_updated_at"
+    )
     .eq("user_id", user.id)
     .neq("isdeleted", "yes");
 
@@ -32,5 +35,10 @@ export default async function DashboardPage() {
       websites={websites}
       projectCount={projectCount}
     />
+    // <NewDashboardContent
+    //   user={user}
+    //   websites={websites}
+    //   projectCount={projectCount}
+    // />
   );
 }

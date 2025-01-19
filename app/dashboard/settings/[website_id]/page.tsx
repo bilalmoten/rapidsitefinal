@@ -43,6 +43,22 @@ export default async function WebsiteSettingsPage(props: {
     return redirect("/dashboard");
   }
 
+  // Get user's plan
+  const { data: userUsage } = await supabase
+    .from("user_usage")
+    .select("*")
+    .eq("user_id", user.id)
+    .single();
+
+  const userPlan = userUsage?.plan || "free";
+
+  // Get user data
+  const { data: userData } = await supabase
+    .from("users")
+    .select("*")
+    .eq("id", user.id)
+    .single();
+
   return (
     <div className="container mx-auto p-6 max-w-4xl">
       <h1 className="text-2xl font-bold mb-6">Website Settings</h1>
@@ -95,7 +111,19 @@ export default async function WebsiteSettingsPage(props: {
         </Card>
 
         {/* Domain Management */}
-        <DomainManager websiteId={params.website_id} />
+        <DomainManager
+          websiteId={params.website_id}
+          userPlan={userPlan}
+          usage={{
+            websitesActive: userUsage?.websites_active || 0,
+            websitesGenerated: userUsage?.websites_generated || 0,
+            aiEditsCount: userUsage?.ai_edits_count || 0,
+            plan: userPlan,
+            subscription_status: userUsage?.subscription_status,
+            subscription_id: userUsage?.subscription_id,
+          }}
+          user={userData}
+        />
 
         {/* SEO Settings */}
         <SEOSettings

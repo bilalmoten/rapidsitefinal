@@ -29,10 +29,10 @@ export default function LoginForm({ message }: { message?: string }) {
       <div className="w-3/5 flex items-center justify-center bg-background">
         <div className="w-full max-w-md space-y-8 p-10 bg-card rounded-xl shadow-lg">
           <div className="text-center">
-            <h2 className="mt-6 text-3xl font-bold text-foreground">
+            <h2 className="mt-6 text-3xl font-bold text-neutral-10">
               Welcome back
             </h2>
-            <p className="mt-2 text-sm text-muted-foreground">
+            <p className="mt-2 text-sm text-neutral-30">
               Please sign in to your account
             </p>
           </div>
@@ -62,7 +62,7 @@ export default function LoginForm({ message }: { message?: string }) {
                   type="email"
                   autoComplete="email"
                   required
-                  className="appearance-none rounded-none relative block w-full px-3 py-2 border border-input placeholder-muted-foreground text-foreground rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm bg-background"
+                  className="appearance-none rounded-none relative block w-full px-3 py-2 border border-neutral-70 placeholder-neutral-30 text-neutral-10 rounded-t-md focus:outline-none focus:ring-primary-main/20 focus:border-primary-main/50 focus:z-10 sm:text-sm bg-neutral-90/50"
                   placeholder="Email address"
                 />
               </div>
@@ -76,12 +76,12 @@ export default function LoginForm({ message }: { message?: string }) {
                   type={showPassword ? "text" : "password"}
                   autoComplete="current-password"
                   required
-                  className="appearance-none rounded-none relative block w-full px-3 py-2 pr-10 border border-input placeholder-muted-foreground text-foreground rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm bg-background"
+                  className="appearance-none rounded-none relative block w-full px-3 py-2 pr-10 border border-neutral-70 placeholder-neutral-30 text-neutral-10 rounded-b-md focus:outline-none focus:ring-primary-main/20 focus:border-primary-main/50 focus:z-10 sm:text-sm bg-neutral-90/50"
                   placeholder="Password"
                 />
                 <div
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-0 h-full flex items-center px-3 text-muted-foreground hover:text-foreground cursor-pointer"
+                  className="absolute right-0 h-full flex items-center px-3 text-neutral-30 hover:text-neutral-10 cursor-pointer"
                 >
                   {showPassword ? (
                     <EyeOff className="h-4 w-4" />
@@ -98,11 +98,11 @@ export default function LoginForm({ message }: { message?: string }) {
                   id="remember-me"
                   name="remember-me"
                   type="checkbox"
-                  className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                  className="h-4 w-4 text-primary-main focus:ring-primary-main/20 border-neutral-70 rounded"
                 />
                 <label
                   htmlFor="remember-me"
-                  className="ml-2 block text-sm text-foreground"
+                  className="ml-2 block text-sm text-neutral-10"
                 >
                   Remember me
                 </label>
@@ -111,7 +111,7 @@ export default function LoginForm({ message }: { message?: string }) {
               <div className="text-sm">
                 <Link
                   href="/forgot-password"
-                  className="font-medium text-indigo-600 hover:text-indigo-500"
+                  className="font-medium text-primary-main hover:text-primary-main/80"
                 >
                   Forgot your password?
                 </Link>
@@ -121,7 +121,7 @@ export default function LoginForm({ message }: { message?: string }) {
             <div>
               <SubmitButton
                 formAction={signIn}
-                className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-neutral-90 bg-primary-main hover:bg-primary-main/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-main/20"
                 pendingText="Signing in..."
               >
                 Sign in
@@ -129,11 +129,11 @@ export default function LoginForm({ message }: { message?: string }) {
             </div>
           </form>
           <div className="text-center">
-            <p className="mt-2 text-sm text-gray-600">
+            <p className="mt-2 text-sm text-neutral-30">
               Don't have an account?{" "}
               <Link
                 href="/signup"
-                className="font-medium text-indigo-600 hover:text-indigo-500"
+                className="font-medium text-primary-main hover:text-primary-main/80"
               >
                 Sign up
               </Link>
@@ -144,7 +144,7 @@ export default function LoginForm({ message }: { message?: string }) {
               await signInWithGoogle();
             }}
             type="button"
-            className="w-full flex items-center justify-center gap-2 bg-background text-foreground border border-input rounded-md px-4 py-2 text-sm font-medium hover:bg-accent focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            className="w-full flex items-center justify-center gap-2 bg-neutral-90/50 text-neutral-10 border border-neutral-70 rounded-md px-4 py-2 text-sm font-medium hover:bg-neutral-90/80 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-main/20"
           >
             <img src="/google.svg" alt="Google" className="w-5 h-5" />
             Sign in with Google

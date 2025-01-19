@@ -7,11 +7,11 @@ export async function middleware(request: NextRequest) {
   const url = request.nextUrl;
   const hostname = request.headers.get('host')!;
 
-  console.log('Incoming request:', {
-    hostname,
-    pathname: url.pathname,
-    url: request.url
-  });
+  // console.log('Incoming request:', {
+  //   hostname,
+  //   pathname: url.pathname,
+  //   url: request.url
+  // });
 
   // Check for auth callback at root level and redirect if needed
   const code = url.searchParams.get('code');
@@ -31,14 +31,14 @@ export async function middleware(request: NextRequest) {
     `.aiwebsitebuilder.tech`
   );
 
-  console.log('Processed host:', host);
+  // console.log('Processed host:', host);
 
   // Special case for Vercel preview deployments
   if (
-    hostname.includes('---') &&
+    hostname.includes('.vercel.app') ||
     hostname.endsWith('.vercel.app')
   ) {
-    host = `${hostname.split('---')[0]}.aiwebsitebuilder.tech`;
+    host = hostname;
   }
 
   // Don't rewrite paths that should be public
