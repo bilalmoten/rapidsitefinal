@@ -35,10 +35,10 @@ export async function middleware(request: NextRequest) {
 
   // Special case for Vercel preview deployments
   if (
-    hostname.includes('---') &&
+    hostname.includes('.vercel.app') ||
     hostname.endsWith('.vercel.app')
   ) {
-    host = `${hostname.split('---')[0]}.aiwebsitebuilder.tech`;
+    host = hostname;
   }
 
   // Don't rewrite paths that should be public
