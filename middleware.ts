@@ -39,6 +39,7 @@ export async function middleware(request: NextRequest) {
     hostname.endsWith('.vercel.app')
   ) {
     host = hostname;
+    return res; // Return early for Vercel preview deployments
   }
 
   // Don't rewrite paths that should be public
