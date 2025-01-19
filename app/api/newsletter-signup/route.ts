@@ -1,9 +1,11 @@
+import { EmailClient } from "@azure/communication-email";
 import WelcomeEmail from "@/emails/WelcomeEmail";
 import { createClient } from "@/utils/supabase/server";
 import { NextResponse } from "next/server";
-import { Resend } from 'resend';
+import { render } from "@react-email/render";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Initialize the Email Client
+const emailClient = new EmailClient(process.env.AZURE_COMMUNICATION_CONNECTION_STRING || "");
 
 export async function POST(request: Request) {
     try {
@@ -59,26 +61,50 @@ export async function POST(request: Request) {
         // Send welcome email
         try {
             console.log('Attempting to send email...');
-            const data = await resend.emails.send({
-                from: 'AI Website Builder <newsletter@aiwebsitebuilder.tech>',
-                to: email,
-                subject: 'Welcome to AI Website Builder Newsletter!',
-                replyTo: 'support@aiwebsitebuilder.tech',
-                react: WelcomeEmail({ email }),
-                // html: `
-                //     <h1>Welcome to AI Website Builder!</h1>
-                //     <p>Thank you for subscribing to our newsletter. We're excited to share the latest updates in AI-powered web development with you.</p>
-                //     <p>You'll receive updates about:</p>
-                //     <ul>
-                //         <li>New features and improvements</li>
-                //         <li>Tips and tricks for web development</li>
-                //         <li>AI technology insights</li>
-                //         <li>Industry news and trends</li>
-                //     </ul>
-                //     <p>Visit our <a href="${process.env.NEXT_PUBLIC_APP_URL}/blog">blog</a> for more great content!</p>
-                // `
+
+            const plainText = `Welcome to AI Website Builder Newsletter!
+
+Thank you for subscribing to our newsletter. We're excited to share updates about:
+- New features and improvements
+- Tips and tricks for web development
+- AI technology insights
+- Industry news and trends
+
+Best regards,
+The AI Website Builder Team`;
+
+            // Render the email template to HTML
+            const emailHtml = await render(WelcomeEmail({ email }));
+            console.log('Generated HTML:', emailHtml.substring(0, 100));
+
+            const message = {
+                senderAddress: "DoNotReply@aiwebsitebuilder.tech",
+                content: {
+                    subject: "Welcome to AI Website Builder Newsletter!",
+                    html: emailHtml,
+                    plainText
+                },
+                recipients: {
+                    to: [
+                        {
+                            address: email,
+                        },
+                    ],
+                },
+            };
+
+            console.log('Sending email with configuration:', {
+                sender: message.senderAddress,
+                recipient: email,
+                subject: message.content.subject,
+                htmlLength: emailHtml.length
             });
-            console.log('Email sent successfully:', data);
+
+            const poller = await emailClient.beginSend(message);
+            console.log('Email send initiated, waiting for completion...');
+            const result = await poller.pollUntilDone();
+
+            console.log('Email sent successfully, full result:', result);
         } catch (emailError: any) {
             console.error("Failed to send welcome email:", emailError);
             console.error("Error details:", {

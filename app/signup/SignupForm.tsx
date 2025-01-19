@@ -85,6 +85,23 @@ export default function SignupForm({ message }: { message?: string }) {
           </div>
         </div>
 
+        <div className="flex items-start">
+          <div className="flex items-center h-5">
+            <input
+              id="newsletter"
+              name="newsletter"
+              type="checkbox"
+              defaultChecked={true}
+              className="h-4 w-4 text-primary-main border-neutral-70 rounded bg-neutral-90/50 focus:ring-primary-main/20"
+            />
+          </div>
+          <div className="ml-3">
+            <label htmlFor="newsletter" className="text-sm text-neutral-30">
+              Subscribe to our newsletter for updates and new features
+            </label>
+          </div>
+        </div>
+
         <div>
           <SubmitButton
             formAction={signUp}
@@ -107,7 +124,14 @@ export default function SignupForm({ message }: { message?: string }) {
       </div>
       <button
         onClick={async () => {
-          await signInWithGoogle();
+          const formData = new FormData();
+          const newsletterCheckbox = document.getElementById(
+            "newsletter"
+          ) as HTMLInputElement;
+          if (newsletterCheckbox?.checked) {
+            formData.append("newsletter", "on");
+          }
+          await signInWithGoogle(formData);
         }}
         type="button"
         className="w-full flex items-center justify-center gap-2 bg-neutral-90/50 text-neutral-10 border border-neutral-70 rounded-md px-4 py-2 text-sm font-medium hover:bg-neutral-90/80 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-main/20"
