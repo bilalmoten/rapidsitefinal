@@ -14,7 +14,7 @@ import {
   TableRow,
   TableCell,
 } from "@/components/ui/table";
-import { Copy, Check, RefreshCw, Lock } from "lucide-react";
+import { Copy, Check, RefreshCw, Lock, Globe } from "lucide-react";
 import { PlanType } from "@/lib/constants/plans";
 import SettingsModal from "@/components/dashboard/SettingsModal";
 
@@ -136,7 +136,6 @@ export function DomainManager({
 
       const data = await response.json();
 
-      // Check if misconfigured is false, indicating successful verification
       if (data.misconfigured === false) {
         toast.success("Domain verified successfully!");
         await fetchCurrentDomain();
@@ -160,96 +159,122 @@ export function DomainManager({
 
   return (
     <>
-      <Card>
-        <div className="p-6">
-          <h2 className="text-xl font-semibold mb-4">Custom Domain</h2>
-          <p className="text-sm text-muted-foreground mb-6">
-            Configure a custom domain for your website. Add your domain and
-            follow the DNS configuration instructions.
-          </p>
+      <div className="p-6">
+        <h2 className="text-[28px] font-medium text-white mb-6 flex items-center">
+          <Globe className="w-6 h-6 mr-3 text-primary-main" />
+          Custom Domain
+        </h2>
+        <p className="text-neutral-40 text-sm mb-6">
+          Configure a custom domain for your website. Add your domain and follow
+          the DNS configuration instructions.
+        </p>
 
-          {userPlan === "free" ? (
-            <div className="text-center p-6 border rounded-lg bg-muted/50">
-              <Lock className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-              <h3 className="text-lg font-medium mb-2">Premium Feature</h3>
-              <p className="text-sm text-muted-foreground mb-4">
-                Custom domains are available for premium users only. Upgrade
-                your plan to use this feature.
-              </p>
-              <Button onClick={() => setShowSettings(true)} variant="default">
-                Upgrade Plan
+        {userPlan === "free" ? (
+          <div className="border border-neutral-70 rounded-lg px-6 py-8 bg-[#0a0a0b40] backdrop-blur-sm text-center">
+            <Lock className="w-12 h-12 mx-auto mb-4 text-primary-main opacity-50" />
+            <h3 className="text-[20px] font-medium text-white mb-2">
+              Premium Feature
+            </h3>
+            <p className="text-neutral-40 text-sm mb-6">
+              Custom domains are available for premium users only. Upgrade your
+              plan to use this feature.
+            </p>
+            <Button
+              onClick={() => setShowSettings(true)}
+              className="bg-primary-main text-primary-foreground hover:bg-primary-main/90"
+            >
+              Upgrade Plan
+            </Button>
+          </div>
+        ) : (
+          <>
+            <div className="flex gap-4 mb-6">
+              <Input
+                placeholder="Enter your domain (e.g., example.com)"
+                value={domain}
+                onChange={(e) => setDomain(e.target.value)}
+                disabled={loading}
+                className="bg-transparent border-neutral-70 text-neutral-20 placeholder:text-neutral-60"
+              />
+              <Button
+                onClick={addDomain}
+                disabled={loading}
+                className="bg-primary-main text-primary-foreground hover:bg-primary-main/90"
+              >
+                {loading ? (
+                  <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                ) : null}
+                Add Domain
               </Button>
             </div>
-          ) : (
-            <>
-              <div className="flex gap-4 mb-6">
-                <Input
-                  placeholder="Enter your domain (e.g., example.com)"
-                  value={domain}
-                  onChange={(e) => setDomain(e.target.value)}
-                  disabled={loading}
-                />
-                <Button onClick={addDomain} disabled={loading}>
-                  {loading ? (
-                    <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
-                  ) : null}
-                  Add Domain
-                </Button>
-              </div>
 
-              {currentDomain && (
-                <div className="mt-6">
-                  <h3 className="font-medium mb-2">Current Domain</h3>
-                  <div className="flex items-center justify-between p-4 border rounded-lg">
-                    <span className="font-mono">{currentDomain.domain}</span>
-                    <div className="flex items-center gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={checkVerification}
-                        disabled={loading}
-                      >
-                        {loading ? (
-                          <RefreshCw className="w-4 h-4 animate-spin" />
-                        ) : (
-                          "Check Status"
-                        )}
-                      </Button>
-                      <Button
-                        variant="destructive"
-                        size="sm"
-                        onClick={removeDomain}
-                        disabled={loading}
-                      >
-                        Remove
-                      </Button>
-                    </div>
+            {currentDomain && (
+              <div className="border border-neutral-70 rounded-lg px-6 py-4 bg-[#0a0a0b40] backdrop-blur-sm mb-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-neutral-20 text-sm mb-1">
+                      Current Domain
+                    </p>
+                    <p className="text-primary-main text-[20px] font-medium">
+                      {currentDomain.domain}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={checkVerification}
+                      disabled={loading}
+                      className="border-neutral-70 text-neutral-20 hover:bg-neutral-80/10"
+                    >
+                      {loading ? (
+                        <RefreshCw className="w-4 h-4 animate-spin" />
+                      ) : (
+                        "Check Status"
+                      )}
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={removeDomain}
+                      disabled={loading}
+                    >
+                      Remove
+                    </Button>
                   </div>
                 </div>
-              )}
+              </div>
+            )}
 
-              {verificationDetails && currentDomain?.status === "pending" && (
-                <div className="mt-6 space-y-4">
-                  <h3 className="font-medium">DNS Configuration Required</h3>
-                  <p className="text-sm text-muted-foreground">
+            {verificationDetails && currentDomain?.status === "pending" && (
+              <div className="space-y-4">
+                <div className="border border-neutral-70 rounded-lg px-6 py-4 bg-[#0a0a0b40] backdrop-blur-sm">
+                  <h3 className="text-neutral-20 text-sm mb-1">
+                    DNS Configuration Required
+                  </h3>
+                  <p className="text-neutral-40 text-sm">
                     Add these DNS records to your domain's DNS configuration. It
                     may take up to 48 hours for DNS changes to propagate.
                   </p>
+                </div>
 
+                <div className="border border-neutral-70 rounded-lg overflow-hidden">
                   <Table>
                     <TableHeader>
-                      <TableRow>
-                        <TableHead>Type</TableHead>
-                        <TableHead>Name</TableHead>
-                        <TableHead>Value</TableHead>
-                        <TableHead className="w-[100px]">Copy</TableHead>
+                      <TableRow className="border-neutral-70 hover:bg-neutral-80/10">
+                        <TableHead className="text-neutral-20">Type</TableHead>
+                        <TableHead className="text-neutral-20">Name</TableHead>
+                        <TableHead className="text-neutral-20">Value</TableHead>
+                        <TableHead className="w-[100px] text-neutral-20">
+                          Copy
+                        </TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      <TableRow>
-                        <TableCell>A</TableCell>
-                        <TableCell>@</TableCell>
-                        <TableCell className="font-mono text-sm">
+                      <TableRow className="border-neutral-70 hover:bg-neutral-80/10">
+                        <TableCell className="text-neutral-20">A</TableCell>
+                        <TableCell className="text-neutral-20">@</TableCell>
+                        <TableCell className="font-mono text-sm text-neutral-20">
                           76.76.21.21
                         </TableCell>
                         <TableCell>
@@ -257,6 +282,7 @@ export function DomainManager({
                             variant="ghost"
                             size="sm"
                             onClick={() => copyToClipboard("76.76.21.21", "a")}
+                            className="text-neutral-20 hover:text-primary-main hover:bg-transparent"
                           >
                             {copied === "a" ? (
                               <Check className="w-4 h-4" />
@@ -269,11 +295,11 @@ export function DomainManager({
                     </TableBody>
                   </Table>
                 </div>
-              )}
-            </>
-          )}
-        </div>
-      </Card>
+              </div>
+            )}
+          </>
+        )}
+      </div>
 
       <SettingsModal
         isOpen={showSettings}
