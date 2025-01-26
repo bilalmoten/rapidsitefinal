@@ -1,0 +1,162 @@
+Getting Started with RapidSite AI Website Builder
+==========================================
+
+QUICK START GUIDE
+----------------
+Time to complete: ~15 minutes
+No coding experience required
+
+1. SIGNING UP
+------------
+a) Visit aiwebsitebuilder.tech
+b) Click "Start Building for Free" button
+c) Choose your signup method:
+   - Email and password
+   - Google account
+d) Verify your email if using email signup
+
+2. CREATING YOUR FIRST WEBSITE
+----------------------------
+Step 1: Initial Setup
+- Click "Create New Website" button
+- Enter your website name
+- Choose website type (e.g., business, portfolio, blog)
+- Select your industry/niche
+
+Step 2: Describe Your Website
+- Use the AI chat interface
+- Describe your website's purpose
+- Include key details like:
+  * Color preferences
+  * Style preferences (modern, minimal, bold, etc.)
+  * Key features needed
+  * Number of pages required
+Example: "I need a modern portfolio website with a dark theme, showcasing my photography work. I want 5 pages including home, gallery, about, services, and contact."
+
+Step 3: AI Generation
+- Review the AI's clarifying questions
+- Provide additional details if requested
+- Wait for initial generation (usually 1-2 minutes)
+- Preview your generated website
+
+3. CUSTOMIZING YOUR WEBSITE
+-------------------------
+Step 1: Basic Customization
+- Click any element to edit
+- Use natural language to describe changes
+- Common commands:
+  * "Make the heading larger"
+  * "Change the button color to blue"
+  * "Add more space between sections"
+  * "Update this image"
+
+Step 2: Page Management
+- Use the Pages panel on the left
+- Add new pages through the + button
+- Rearrange pages via drag and drop
+- Delete pages using the trash icon
+
+Step 3: Content Editing
+- Click any text to edit directly
+- Use the media library for images
+- Add new sections through the + button
+- Drag sections to reorder
+
+Step 4: Style Customization
+- Access the Style panel on the right
+- Modify:
+  * Color scheme
+  * Typography
+  * Spacing
+  * Layout options
+
+4. ADDING FUNCTIONALITY
+---------------------
+Step 1: Basic Elements
+- Click the + button to add:
+  * Contact forms
+  * Image galleries
+  * Social media links
+  * Maps
+  * Videos
+
+Step 2: Advanced Features (Pro/Enterprise)
+- Enable features like:
+  * Custom code
+  * Analytics
+  * Form submissions
+  * Custom domains
+
+5. MOBILE OPTIMIZATION
+--------------------
+- Click the device preview icons (desktop/tablet/mobile)
+- Review your site on each device
+- Make device-specific adjustments
+- Test all interactive elements
+
+6. PUBLISHING YOUR WEBSITE
+------------------------
+Step 1: Preview
+- Click "Preview" to see your site
+- Test all links and features
+- Review all pages
+
+Step 2: Domain Setup
+- Choose your free subdomain
+  * Format: yourname.aiwebsitebuilder.tech
+- Or connect custom domain (Pro/Enterprise)
+
+Step 3: Go Live
+- Click "Publish" button
+- Review publishing checklist
+- Confirm publication
+
+7. POST-LAUNCH
+------------
+Immediate Steps:
+1. Test your live site
+2. Share your website URL
+3. Set up Google Analytics (if available)
+4. Create a backup of your site
+
+Regular Maintenance:
+- Update content regularly
+- Monitor performance
+- Check for broken links
+- Review analytics (when available)
+
+TIPS FOR SUCCESS
+---------------
+1. Planning
+- List all required pages
+- Gather content beforehand
+- Prepare images and media
+- Define clear goals
+
+2. Content
+- Use clear, concise text
+- Optimize images before uploading
+- Maintain consistent tone
+- Include calls-to-action
+
+3. Design
+- Stick to 2-3 main colors
+- Use consistent spacing
+- Keep navigation simple
+- Ensure readable text
+
+4. Testing
+- Check all forms
+- Test on different devices
+- Verify all links work
+- Review loading speed
+
+GETTING HELP
+-----------
+If you get stuck:
+1. Use the AI chat support
+2. Check documentation
+3. Email support@aiwebsitebuilder.tech
+4. Join community forum (coming soon)
+
+Remember: You can always undo changes with the undo button, and your work is automatically saved as you edit. 

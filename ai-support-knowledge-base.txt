@@ -1,0 +1,192 @@
+RapidSite AI Website Builder - Support Knowledge Base
+==============================================
+
+1. CORE PRODUCT OVERVIEW
+-----------------------
+- AI-powered website builder that creates websites through natural language conversations
+- No coding knowledge required
+- Real-time preview of changes
+- Modern, responsive designs for all devices
+- Built on Next.js with enterprise-grade security
+
+2. PLANS AND PRICING
+-------------------
+FREE PLAN:
+- 1 website
+- 3 AI website generations/month
+- 10 AI edits/month
+- 5 image generations/month
+- Up to 5 pages per site
+- Free subdomain publishing
+- 1GB storage
+- 10GB bandwidth
+- SSL included
+
+PRO PLAN ($10/month or $7.50/month billed yearly):
+- 5 websites
+- 20 AI website generations/month
+- Unlimited AI edits
+- 50 image generations/month
+- Up to 20 pages per site
+- Custom domain support
+- 10GB storage
+- 100GB bandwidth
+- Premium SSL
+- Analytics (coming soon)
+- 100 form responses/month (coming soon)
+- Code export
+- Live support
+
+ENTERPRISE PLAN ($39/month or $29/month billed yearly):
+- Unlimited websites
+- Unlimited AI generations
+- Unlimited AI edits
+- Unlimited image generations
+- Unlimited pages
+- Priority custom domain support
+- 100GB storage
+- Unlimited bandwidth
+- Premium SSL
+- Advanced analytics (coming soon)
+- Unlimited form responses (coming soon)
+- Code export
+- Live support
+- Priority access to new features
+
+3. KEY FEATURES
+--------------
+Current Features:
+- AI-Powered Chat for website creation
+- Easy customization through natural language
+- Code export functionality
+- One-click publishing
+- Multi-page website support
+- Smart layout engine for responsive design
+- Custom domain support
+- SSL certificates
+- Real-time preview
+- SEO optimization
+
+Coming Soon Features:
+- AI Brand Designer (logos, colors, typography)
+- Voice-based AI editing
+- AI Conversion Optimization
+- Advanced SEO tools
+- Instant Translation
+- E-commerce Integration
+- Website Analytics
+- Form submissions
+- Advanced analytics
+
+4. TECHNICAL SPECIFICATIONS
+-------------------------
+- Built with Next.js 15 and TypeScript
+- Enterprise-grade security with Supabase
+- Hosted on Vercel's edge network
+- Regular backups
+- Automatic SSL certificates
+- 99.9% uptime guarantee
+
+5. COMMON OPERATIONS
+------------------
+Website Creation:
+- Average time to create: 10-15 minutes
+- Process: Chat with AI → Generate → Customize → Publish
+- Can make changes after generation
+- Supports natural language commands for editing
+
+Customization Options:
+- Edit text and images
+- Modify colors and styles
+- Adjust layouts
+- Add/remove sections
+- Custom code injection (Pro/Enterprise)
+
+Domain Setup:
+- Free subdomain available for all plans
+- Custom domain support for Pro/Enterprise
+- Automatic SSL certificate provisioning
+- DNS configuration assistance available
+
+6. CURRENT LIMITATIONS
+--------------------
+- No complex e-commerce functionality yet
+- Limited dynamic content management
+- No user authentication system
+- Form submissions coming soon
+- Analytics coming soon
+
+7. TROUBLESHOOTING GUIDE
+----------------------
+Common Issues:
+1. Website Generation:
+   - Retry if first generation doesn't match requirements
+   - Use more specific descriptions for better results
+   - Check plan limits for generations
+
+2. Customization:
+   - Use clear, specific instructions for AI edits
+   - Check plan limits for AI edits
+   - Save changes regularly
+
+3. Domain Setup:
+   - Verify DNS records
+   - Allow up to 48 hours for propagation
+   - Contact support for custom domain issues
+
+4. Performance:
+   - Optimize images for faster loading
+   - Minimize custom code
+   - Check bandwidth usage
+
+8. SUPPORT CHANNELS
+-----------------
+- AI Chat Support (24/7)
+- Email: support@aiwebsitebuilder.tech
+- Priority Support for Pro/Enterprise users
+- Documentation and Guides available
+- Community Forum (coming soon)
+
+9. BEST PRACTICES
+---------------
+- Start with clear website requirements
+- Use specific descriptions for AI generation
+- Test on multiple devices
+- Regular content updates
+- Monitor analytics (when available)
+- Keep backups of exported code
+- Follow SEO recommendations
+
+10. SECURITY & PRIVACY
+--------------------
+- SSL encryption for all websites
+- Regular security updates
+- Data backup systems
+- GDPR compliance
+- Privacy-first approach
+- Secure payment processing
+
+11. UPGRADE & BILLING
+-------------------
+- Monthly/Annual billing options
+- 20% discount on annual plans
+- Upgrade/downgrade anytime
+- Pro-rated billing for upgrades
+- Automatic renewal
+- Cancel anytime
+
+12. ROADMAP & UPDATES
+-------------------
+Current Focus:
+- Analytics implementation
+- Form submission system
+- E-commerce features
+- Mobile app development
+- Advanced SEO tools
+- AI improvements
+
+Regular Updates:
+- Feature releases
+- Security patches
+- Performance improvements
+- UI/UX enhancements 
