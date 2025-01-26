@@ -1,7 +1,6 @@
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
 import { DomainManager } from "@/components/domains/DomainManager";
-import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Globe, RefreshCw, Search, Lock, Trash2 } from "lucide-react";
@@ -31,7 +30,7 @@ export default async function WebsiteSettingsPage(props: {
 
   if (websiteError || !website) {
     return (
-      <div className="p-4">
+      <div className="p-4 text-white">
         Error fetching website information:{" "}
         {websiteError?.message || "Website not found"}
       </div>
@@ -60,21 +59,19 @@ export default async function WebsiteSettingsPage(props: {
     .single();
 
   return (
-    <div className="container mx-auto p-6 max-w-4xl">
-      <h1 className="text-2xl font-bold mb-6">Website Settings</h1>
-
-      <div className="space-y-6">
-        {/* General Settings */}
-        <Card className="p-6">
-          <h2 className="text-xl font-semibold mb-4 flex items-center">
-            <Globe className="w-5 h-5 mr-2" />
-            General
+    <div className="space-y-6">
+      {/* General Settings */}
+      <div className="w-full bg-[#0a0a0b00] border border-neutral-70 rounded-lg backdrop-blur-md">
+        <div className="p-6">
+          <h2 className="text-[28px] font-medium text-white mb-6 flex items-center">
+            <Globe className="w-6 h-6 mr-3 text-primary-main" />
+            General Settings
           </h2>
           <div className="space-y-4">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between border border-neutral-70 rounded-lg px-6 py-4 bg-[#0a0a0b40] backdrop-blur-sm">
               <div>
-                <p className="font-medium">Website Name</p>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-neutral-20 text-sm mb-1">Website Name</p>
+                <p className="text-primary-main text-[20px] font-medium">
                   {website.website_name}
                 </p>
               </div>
@@ -84,15 +81,19 @@ export default async function WebsiteSettingsPage(props: {
                 currentSubdomain={website.subdomain}
                 type="name"
               >
-                <Button variant="outline" size="sm">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="border-neutral-70 text-neutral-20 hover:bg-neutral-80/10"
+                >
                   Edit
                 </Button>
               </EditWebsiteDialog>
             </div>
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between border border-neutral-70 rounded-lg px-6 py-4 bg-[#0a0a0b40] backdrop-blur-sm">
               <div>
-                <p className="font-medium">Subdomain</p>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-neutral-20 text-sm mb-1">Subdomain</p>
+                <p className="text-primary-main text-[20px] font-medium">
                   {website.subdomain}.aiwebsitebuilder.tech
                 </p>
               </div>
@@ -102,15 +103,21 @@ export default async function WebsiteSettingsPage(props: {
                 currentSubdomain={website.subdomain}
                 type="subdomain"
               >
-                <Button variant="outline" size="sm">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="border-neutral-70 text-neutral-20 hover:bg-neutral-80/10"
+                >
                   Edit
                 </Button>
               </EditWebsiteDialog>
             </div>
           </div>
-        </Card>
+        </div>
+      </div>
 
-        {/* Domain Management */}
+      {/* Domain Management */}
+      <div className="w-full bg-[#0a0a0b00] border border-neutral-70 rounded-lg backdrop-blur-md">
         <DomainManager
           websiteId={params.website_id}
           userPlan={userPlan}
@@ -124,25 +131,31 @@ export default async function WebsiteSettingsPage(props: {
           }}
           user={userData}
         />
+      </div>
 
-        {/* SEO Settings */}
+      {/* SEO Settings */}
+      <div className="w-full bg-[#0a0a0b00] border border-neutral-70 rounded-lg backdrop-blur-md">
         <SEOSettings
           websiteId={params.website_id}
           initialSeoIndexed={website.seo_indexed}
           initialIsPublic={website.is_public}
         />
+      </div>
 
-        {/* Danger Zone */}
-        <Card className="p-6 border-red-200">
-          <h2 className="text-xl font-semibold mb-4 flex items-center text-red-600">
-            <Lock className="w-5 h-5 mr-2" />
+      {/* Danger Zone */}
+      <div className="w-full bg-[#0a0a0b00] border border-red-500/20 rounded-lg backdrop-blur-md">
+        <div className="p-6">
+          <h2 className="text-[28px] font-medium text-red-500 mb-6 flex items-center">
+            <Lock className="w-6 h-6 mr-3" />
             Danger Zone
           </h2>
-          <div className="space-y-6">
-            <div className="flex items-center justify-between border-b border-gray-200 pb-4">
+          <div className="space-y-4">
+            <div className="flex items-center justify-between border border-neutral-70 rounded-lg px-6 py-4 bg-[#0a0a0b40] backdrop-blur-sm">
               <div>
-                <p className="font-medium">Regenerate Website</p>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-neutral-20 text-sm mb-1">
+                  Regenerate Website
+                </p>
+                <p className="text-neutral-40 text-sm">
                   Delete all current pages and regenerate the website from
                   scratch using the original chat. Use this if there were errors
                   in the generation process.
@@ -150,10 +163,10 @@ export default async function WebsiteSettingsPage(props: {
               </div>
               <RegenerateWebsiteButton websiteId={params.website_id} />
             </div>
-            <div className="flex items-center justify-between pt-2">
+            <div className="flex items-center justify-between border border-neutral-70 rounded-lg px-6 py-4 bg-[#0a0a0b40] backdrop-blur-sm">
               <div>
-                <p className="font-medium">Delete Website</p>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-neutral-20 text-sm mb-1">Delete Website</p>
+                <p className="text-neutral-40 text-sm">
                   Permanently delete this website and all its data
                 </p>
               </div>
@@ -168,7 +181,7 @@ export default async function WebsiteSettingsPage(props: {
               </DeleteWebsiteDialog>
             </div>
           </div>
-        </Card>
+        </div>
       </div>
     </div>
   );
