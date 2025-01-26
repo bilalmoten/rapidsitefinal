@@ -3,11 +3,9 @@ import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
 import ClientEditor from "@/components/ClientEditor";
 
-export default async function EditorPage(
-  props: {
-    params: Promise<{ website_id: string }>;
-  }
-) {
+export default async function EditorPage(props: {
+  params: Promise<{ website_id: string }>;
+}) {
   const params = await props.params;
   const supabase = await createClient();
   const {
@@ -60,6 +58,32 @@ export default async function EditorPage(
     return <div>No content found for this page.</div>;
   }
 
+  // Get user's plan and usage data
+  const { data: userUsage, error: userUsageError } = await supabase
+    .from("user_usage")
+    .select("*")
+    .eq("user_id", user.id)
+    .single();
+
+  if (userUsageError) {
+    console.error("Error fetching user plan:", userUsageError);
+    return <div>Error fetching user plan: {userUsageError.message}</div>;
+  }
+
+  // Get user's profile data
+  const { data: userData, error: userDataError } = await supabase
+    .from("users")
+    .select("*")
+    .eq("id", user.id)
+    .single();
+
+  if (userDataError) {
+    console.error("Error fetching user data:", userDataError);
+    return <div>Error fetching user data: {userDataError.message}</div>;
+  }
+
+  const userPlan = userUsage?.plan || "free";
+
   console.log("Rendering ClientEditor");
   return (
     <ClientEditor
@@ -69,6 +93,9 @@ export default async function EditorPage(
       websiteId={params.website_id}
       subdomain={website.subdomain}
       pages={website.pages}
+      userPlan={userPlan}
+      usage={userUsage}
+      user={userData}
     />
   );
 }

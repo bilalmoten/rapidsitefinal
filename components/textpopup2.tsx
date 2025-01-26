@@ -82,7 +82,7 @@ const TextPopup: React.FC<TextPopupProps> = ({
         left: `${left}px`,
         transform: "translate(5%, 37%)",
       }}
-      className={`bg-white/95 backdrop-blur-sm p-6 rounded-xl shadow-2xl border border-gray-200 w-[420px] text-black transition-opacity duration-200 ${
+      className={`bg-white/95 backdrop-blur-sm p-6 rounded-xl shadow-2xl border border-gray-200 w-[420px] text-black transition-opacity duration-200 z-20 ${
         isProcessing ? "opacity-90" : ""
       }`}
     >

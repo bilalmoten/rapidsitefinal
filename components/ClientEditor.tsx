@@ -37,6 +37,7 @@ import { trackEvent, EVENTS } from "@/utils/analytics";
 // import EditorSidebar from "./editor/EditorSidebar";
 import DashboardBackground from "./dashboard/DashboardBackground";
 import { cn } from "@/lib/utils";
+import { PlanType } from "@/lib/constants/plans";
 
 interface ClientEditorProps {
   initialContent: string;
@@ -45,6 +46,21 @@ interface ClientEditorProps {
   initialPageTitle: string; // Page title to identify the page
   subdomain: string;
   pages: string[];
+  userPlan: "free" | "pro" | "enterprise";
+  usage: {
+    websitesActive: number;
+    websitesGenerated: number;
+    aiEditsCount: number;
+    plan: PlanType;
+    subscription_status?: string;
+    subscription_id?: string;
+  };
+  user?: {
+    email: string;
+    first_name?: string;
+    last_name?: string;
+    avatar_url?: string;
+  };
 }
 
 const ClientEditor: React.FC<ClientEditorProps> = ({
@@ -54,6 +70,9 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
   initialPageTitle,
   subdomain,
   pages,
+  userPlan,
+  usage,
+  user,
 }) => {
   // const [siteContent, setSiteContent] = useState<string>(initialContent);
   const [zoom, setZoom] = useState(100);
@@ -809,6 +828,9 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
             viewport !== "desktop" ? viewportDimensions : undefined
           }
           onResetViewport={viewport !== "desktop" ? handleReset : undefined}
+          userPlan={userPlan}
+          usage={usage}
+          user={user}
         />
         <div className="flex-1 flex items-center justify-center p-2 m-2 rounded-lg overflow-hidden relative z-20">
           <div
@@ -822,14 +844,14 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
                 viewport === "desktop"
                   ? "100%"
                   : viewport === "tablet"
-                  ? "768px"
-                  : "375px",
+                    ? "768px"
+                    : "375px",
               height:
                 viewport === "desktop"
                   ? "100%"
                   : viewport === "tablet"
-                  ? "1024px"
-                  : "667px",
+                    ? "1024px"
+                    : "667px",
               maxWidth: viewport === "desktop" ? "100%" : "none",
               maxHeight:
                 viewport === "desktop" ? "100%" : "calc(100vh - 160px)",
