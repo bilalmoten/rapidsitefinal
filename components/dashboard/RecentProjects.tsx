@@ -105,7 +105,7 @@ const RecentProjects: React.FC<RecentProjectsProps> = ({
             </Button>
           </Link>
           <Link
-            href={`https://${website.subdomain}.rapidsite.app`}
+            href={`https://${website.subdomain}.aiwebsitebuilder.tech`}
             target="_blank"
           >
             <Button size="sm" variant="secondary">
@@ -138,7 +138,9 @@ const RecentProjects: React.FC<RecentProjectsProps> = ({
         <div className="flex items-center justify-between text-sm text-muted-foreground">
           <div className="flex items-center gap-2">
             <Globe className="w-4 h-4" />
-            <span className="truncate">{website.subdomain}.rapidsite.app</span>
+            <span className="truncate">
+              {website.subdomain}.aiwebsitebuilder.tech
+            </span>
           </div>
           <span className="text-xs">
             Updated {new Date(website.last_updated_at).toLocaleDateString()}
@@ -193,7 +195,7 @@ const RecentProjects: React.FC<RecentProjectsProps> = ({
           </Button>
         </Link>
         <Link
-          href={`https://${website.subdomain}.rapidsite.app`}
+          href={`https://${website.subdomain}.aiwebsitebuilder.tech`}
           target="_blank"
         >
           <Button size="sm" variant="outline">

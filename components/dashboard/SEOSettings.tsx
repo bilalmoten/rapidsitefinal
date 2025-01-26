@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { Card } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Search } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
@@ -59,16 +58,18 @@ export function SEOSettings({
   };
 
   return (
-    <Card className="p-6">
-      <h2 className="text-xl font-semibold mb-4 flex items-center">
-        <Search className="w-5 h-5 mr-2" />
+    <div className="p-6">
+      <h2 className="text-[28px] font-medium text-white mb-6 flex items-center">
+        <Search className="w-6 h-6 mr-3 text-primary-main" />
         SEO & Visibility
       </h2>
       <div className="space-y-4">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between border border-neutral-70 rounded-lg px-6 py-4 bg-[#0a0a0b40] backdrop-blur-sm">
           <div>
-            <p className="font-medium">Search Engine Indexing</p>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-neutral-20 text-sm mb-1">
+              Search Engine Indexing
+            </p>
+            <p className="text-neutral-40 text-sm">
               Allow search engines to index your website
             </p>
           </div>
@@ -77,16 +78,16 @@ export function SEOSettings({
             onCheckedChange={handleSeoIndexedChange}
           />
         </div>
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between border border-neutral-70 rounded-lg px-6 py-4 bg-[#0a0a0b40] backdrop-blur-sm">
           <div>
-            <p className="font-medium">Website Visibility</p>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-neutral-20 text-sm mb-1">Website Visibility</p>
+            <p className="text-neutral-40 text-sm">
               Make your website public or private
             </p>
           </div>
           <Switch checked={isPublic} onCheckedChange={handleVisibilityChange} />
         </div>
       </div>
-    </Card>
+    </div>
   );
 }

@@ -55,7 +55,9 @@ export default function Footer() {
               >
                 <Star className="h-8 w-8 text-purple-500" />
               </motion.div>
-              <span className="text-xl font-bold">AI Builder</span>
+              <span className="text-xl font-bold">
+                RapidSite AI Website Builder
+              </span>
             </Link>
             <p className="text-gray-400">
               Empowering creators to build their digital dreams.
@@ -97,7 +99,7 @@ export default function Footer() {
           className="border-t border-gray-800 mt-8 pt-8 flex flex-col sm:flex-row justify-between items-center"
         >
           <p className="text-gray-400 text-sm">
-            © 2024 AI Builder. All rights reserved.
+            © 2024 RapidSite AI Website Builder. All rights reserved.
           </p>
           <div className="flex space-x-4 mt-4 sm:mt-0">
             {socialLinks.map((item) => (

@@ -4,10 +4,10 @@ const DashboardBackground = () => {
   return (
     <div className="fixed inset-0 z-[1] overflow-hidden blur-[180px]">
       {/* Base background color */}
-      <div className="absolute inset-0 bg-[#e2e2e2] dark:bg-[#0A0A0B]">
+      <div className="absolute inset-0 bg-[#e2e2e2] dark:bg-primary-dark">
         {/* Top-left gradient */}
         <div
-          className="absolute -top-[300px] -right-[300px] w-[1200px] h-[1200px] rounded-full opacity-75 "
+          className="absolute -top-[300px] -right-[300px] w-[1200px] h-[1200px] rounded-full opacity-99 "
           style={{
             background: `radial-gradient(circle at center, 
               rgba(24, 226, 153, 0.2) 0%,
@@ -21,7 +21,7 @@ const DashboardBackground = () => {
 
         {/* Bottom-right gradient */}
         <div
-          className="absolute -bottom-[200px] -left-[200px] w-[1000px] h-[1000px] rounded-full opacity-75 "
+          className="absolute -bottom-[200px] -left-[200px] w-[1000px] h-[1000px] rounded-full opacity-99 "
           style={{
             background: `radial-gradient(circle at center, 
               rgba(24, 226, 153, 0.15) 0%,

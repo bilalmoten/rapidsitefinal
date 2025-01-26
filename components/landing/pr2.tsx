@@ -10,7 +10,7 @@ const plans = [
   {
     name: "Free",
     price: { monthly: 0, yearly: 0 },
-    description: "Perfect for trying out our AI builder",
+    description: "Perfect for trying out our RapidSite AI Website Builder",
     features: [
       "1 website",
       "Basic AI editing",
@@ -28,7 +28,7 @@ const plans = [
       "Advanced AI editing",
       "Priority support",
       "Custom domain",
-      "Remove AI Builder branding",
+      "Remove RapidSite AI Website Builder branding",
       "Advanced analytics",
       "Team collaboration",
       "Custom CSS injection",

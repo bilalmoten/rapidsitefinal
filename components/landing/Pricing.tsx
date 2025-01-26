@@ -57,7 +57,7 @@ export default function Pricing() {
         { icon: Zap, text: "Unlimited AI edits" },
         { icon: Image, text: "50 image generations/month" },
         { icon: FileText, text: "Up to 20 pages per site" },
-        { icon: Globe, text: "Custom domain (coming soon)" },
+        { icon: Globe, text: "Custom domain support" },
         { icon: HardDrive, text: "10GB storage" },
         { icon: Wifi, text: "100GB bandwidth" },
         { icon: Shield, text: "Premium SSL included" },

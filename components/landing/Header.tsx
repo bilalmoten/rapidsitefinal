@@ -49,7 +49,7 @@ export default function Header() {
               className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-cyan-500 to-violet-700"
               whileHover={{ scale: 1.05 }}
             >
-              AI Builder
+              RapidSite AI Website Builder
             </motion.span>
           </Link>
 

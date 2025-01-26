@@ -76,7 +76,7 @@ export default function ValueProposition() {
           transition={{ duration: 0.5 }}
           className="text-3xl md:text-5xl font-bold text-center mb-16"
         >
-          The Only AI Builder That Delivers{" "}
+          The Only RapidSite AI Website Builder That Delivers{" "}
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-500 via-blue-600 to-violet-700">
             Your Vision
           </span>
@@ -84,10 +84,10 @@ export default function ValueProposition() {
         </motion.h2>
 
         <div className="grid md:grid-cols-2 gap-12">
-          {/* Typical AI Builders */}
+          {/* Typical RapidSite AI Website Builders */}
           <div className="space-y-6">
             <h3 className="text-2xl font-semibold mb-8 text-red-500/80">
-              Typical AI Builders
+              Typical RapidSite AI Website Builders
             </h3>
             {comparisonData.typical.map((item, index) => (
               <motion.div
@@ -129,10 +129,10 @@ export default function ValueProposition() {
             ))}
           </div>
 
-          {/* Our AI Builder */}
+          {/* Our RapidSite AI Website Builder */}
           <div className="space-y-6">
             <h3 className="text-2xl font-semibold mb-8 text-cyan-500/80">
-              Our AI Builder
+              Our RapidSite AI Website Builder
             </h3>
             {comparisonData.ours.map((item, index) => (
               <motion.div
