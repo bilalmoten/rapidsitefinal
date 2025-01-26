@@ -1,7 +1,5 @@
-"use client";
-
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { usePathname, useRouter } from "next/navigation";
+import Link from "next/link";
 import { Card } from "@/components/ui/card";
 import {
   Settings,
@@ -13,17 +11,14 @@ import {
 } from "lucide-react";
 import DashboardBackground from "@/components/dashboard/DashboardBackground";
 
-export default function SettingsLayout({
+export default async function SettingsLayout({
   children,
   params,
 }: {
   children: React.ReactNode;
-  params: { website_id: string };
+  params: Promise<{ website_id: string }>;
 }) {
-  const pathname = usePathname();
-  const router = useRouter();
-  const currentTab = pathname?.split("/").pop() || "";
-
+  const resolvedParams = await params;
   const tabs = [
     { id: "", label: "Settings", icon: Settings },
     { id: "forms", label: "Forms", icon: FormInput },
@@ -38,29 +33,29 @@ export default function SettingsLayout({
       <div className="relative z-10">
         <div className="container mx-auto py-6 px-4 space-y-6">
           <div className="border border-neutral-70 rounded-lg bg-[#0a0a0b00] backdrop-blur-sm">
-            <Tabs value={currentTab} className="w-full">
+            <Tabs defaultValue="" className="w-full">
               <TabsList className="w-full justify-start gap-2 bg-transparent p-2">
                 {tabs.map((tab) => (
                   <TabsTrigger
                     key={tab.id}
                     value={tab.id}
-                    onClick={() =>
-                      router.push(
-                        `/dashboard/settings/${params.website_id}${tab.id ? `/${tab.id}` : ""}`
-                      )
-                    }
-                    className="flex items-center gap-2 relative data-[state=active]:bg-primary-main data-[state=active]:text-primary-foreground text-neutral-20"
+                    asChild
                     disabled={tab.comingSoon}
                   >
-                    <tab.icon className="w-4 h-4" />
-                    <span>{tab.label}</span>
-                    {tab.comingSoon && (
-                      <div className="absolute -top-2 -right-2">
-                        <span className="text-xs px-2 py-1 bg-primary-main bg-opacity-10 text-primary-main rounded">
-                          Soon
-                        </span>
-                      </div>
-                    )}
+                    <Link
+                      href={`/dashboard/settings/${resolvedParams.website_id}${tab.id ? `/${tab.id}` : ""}`}
+                      className="flex items-center gap-2 relative data-[state=active]:bg-primary-main data-[state=active]:text-primary-foreground text-neutral-20"
+                    >
+                      <tab.icon className="w-4 h-4" />
+                      <span>{tab.label}</span>
+                      {tab.comingSoon && (
+                        <div className="absolute -top-2 -right-2">
+                          <span className="text-xs px-2 py-1 bg-primary-main bg-opacity-10 text-primary-main rounded">
+                            Soon
+                          </span>
+                        </div>
+                      )}
+                    </Link>
                   </TabsTrigger>
                 ))}
               </TabsList>
