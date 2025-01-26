@@ -63,14 +63,36 @@ export default async function SitePage(props: SitePageProps) {
       }
     });
 
+    // Inject website ID first
+    const websiteIdScript = document.createElement("script");
+    websiteIdScript.textContent = `window.__WEBSITE_ID__ = ${website.id};`;
+    websiteIdScript.id = "website-id-script";
+
+    // Add form capture script after website ID
+    const formCaptureScript = document.createElement("script");
+    formCaptureScript.src = "/form-capture.js";
+    formCaptureScript.defer = true;
+    formCaptureScript.id = "form-capture-script";
+
+    // Find the first script in head, or append to head if none exists
+    const firstScript = document.head.querySelector("script");
+    if (firstScript) {
+      firstScript.parentNode?.insertBefore(websiteIdScript, firstScript);
+      firstScript.parentNode?.insertBefore(formCaptureScript, firstScript);
+    } else {
+      document.head.appendChild(websiteIdScript);
+      document.head.appendChild(formCaptureScript);
+    }
+
     return {
+      headContent: document.head.innerHTML,
       bodyContent: document.body.innerHTML,
     };
   };
 
-  const { bodyContent } = processContent(page.content);
+  const { headContent, bodyContent } = processContent(page.content);
 
-  return <SiteContent content={bodyContent} />;
+  return <SiteContent content={bodyContent} headContent={headContent} />;
 }
 
 export async function generateMetadata(props: {

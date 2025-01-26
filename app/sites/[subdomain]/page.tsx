@@ -61,6 +61,16 @@ export default async function SubdomainPage(props: {
       }
     });
 
+    // Add form capture script and website ID
+    const script = document.createElement("script");
+    script.src = "/form-capture.js";
+    document.body.appendChild(script);
+
+    // Inject website ID
+    const websiteIdScript = document.createElement("script");
+    websiteIdScript.textContent = `window.__WEBSITE_ID__ = ${website.id};`;
+    document.body.appendChild(websiteIdScript);
+
     return {
       bodyContent: document.body.innerHTML,
     };
