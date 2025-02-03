@@ -7,6 +7,7 @@ import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import ClientTawkWrapper from "@/components/ClientTawkWrapper";
+import { PostHogProvider } from "./providers";
 
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
@@ -28,20 +29,22 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <head />
       <body className={`${GeistSans.className} antialiased`}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="dark"
-          enableSystem
-          // storageKey="rapidsite-theme"
-          disableTransitionOnChange
-        >
-          <div className="min-h-screen bg-background">{children}</div>
-          <Toaster richColors />
-        </ThemeProvider>
-        <Analytics />
-        <SpeedInsights />
-        <GoogleAnalytics gaId="G-6CS8ZP8T4K" />
-        <ClientTawkWrapper />
+        <PostHogProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="dark"
+            enableSystem
+            // storageKey="rapidsite-theme"
+            disableTransitionOnChange
+          >
+            <div className="min-h-screen bg-background">{children}</div>
+            <Toaster richColors />
+          </ThemeProvider>
+          <Analytics />
+          <SpeedInsights />
+          <GoogleAnalytics gaId="G-6CS8ZP8T4K" />
+          <ClientTawkWrapper />
+        </PostHogProvider>
       </body>
     </html>
   );
