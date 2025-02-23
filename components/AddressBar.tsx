@@ -13,7 +13,7 @@ const AddressBar: React.FC<AddressBarProps> = ({
   pages,
   onPageChange,
 }) => {
-  const baseUrl = `https://${subdomain}.aiwebsitebuilder.tech/`;
+  const baseUrl = `https://${subdomain}.rapidai.website/`;
 
   return (
     <div className="bg-gray-100 border border-gray-300 rounded-md p-2 mb-2 flex items-center">

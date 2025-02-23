@@ -37,10 +37,10 @@ export default function ContactPage() {
                 <div>
                   <h3 className="font-medium mb-1">Email</h3>
                   <a
-                    href="mailto:bilal@aiwebsitebuilder.tech"
+                    href="mailto:bilal@rapidai.website"
                     className="text-muted-foreground hover:text-primary"
                   >
-                    bilal@aiwebsitebuilder.tech
+                    bilal@rapidai.website
                   </a>
                 </div>
               </div>

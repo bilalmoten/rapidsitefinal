@@ -7,7 +7,7 @@ import { redirect } from "next/navigation";
 export async function signUp(formData: FormData) {
     const siteUrl = process.env.NODE_ENV === 'development'
         ? 'http://localhost:3000'
-        : 'https://aiwebsitebuilder.tech';
+        : 'https://rapidai.website';
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
     const newsletter = formData.get("newsletter") === "on";
@@ -71,7 +71,7 @@ export async function signInWithGoogle(formData?: FormData) {
     const supabase = await createClient();
     const siteUrl = process.env.NODE_ENV === 'development'
         ? 'http://localhost:3000'
-        : 'https://aiwebsitebuilder.tech';
+        : 'https://rapidai.website';
 
     const newsletter = formData?.get("newsletter") === "on";
 

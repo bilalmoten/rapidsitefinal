@@ -5,8 +5,8 @@ import { NextResponse } from 'next/server';
 
 // Initialize Supabase client with service role key for admin access
 const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
 const isProd = process.env.NODE_ENV === 'production';
@@ -40,15 +40,15 @@ export async function POST(req: Request): Promise<Response> {
           process.platform === 'darwin'
             ? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
             : process.platform === 'win32'
-            ? 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe'
-            : '/usr/bin/google-chrome',
+              ? 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe'
+              : '/usr/bin/google-chrome',
       });
     }
     console.log("Puppeteer browser launched successfully.");
 
     // Step 3: Open Page and Navigate to URL
     const page = await browser.newPage();
-    const url = `https://${subdomain}.aiwebsitebuilder.tech`;
+    const url = `https://${subdomain}.rapidai.website`;
     console.log("Navigating to URL:", url);
 
     try {
@@ -89,16 +89,16 @@ export async function POST(req: Request): Promise<Response> {
 
     // Step 6: Generate Public URL
     const { data } = supabase.storage
-  .from('website-thumbnails')
-  .getPublicUrl(`${websiteId}/thumbnail.jpg`);
+      .from('website-thumbnails')
+      .getPublicUrl(`${websiteId}/thumbnail.jpg`);
 
-if (!data || !data.publicUrl) {
-  console.error("Failed to retrieve public URL for:", websiteId);
-  throw new Error("Failed to retrieve public URL");
-}
+    if (!data || !data.publicUrl) {
+      console.error("Failed to retrieve public URL for:", websiteId);
+      throw new Error("Failed to retrieve public URL");
+    }
 
-const publicUrl = data.publicUrl;
-console.log("Public URL for screenshot:", publicUrl);
+    const publicUrl = data.publicUrl;
+    console.log("Public URL for screenshot:", publicUrl);
 
     // Step 7: Update Database with Public URL
     const { error: updateError } = await supabase

@@ -121,10 +121,10 @@ export default function Terms() {
             <p>
               For any questions about these Terms, please contact us at:{" "}
               <a
-                href="mailto:support@aiwebsitebuilder.tech"
+                href="mailto:support@rapidai.website"
                 className="text-indigo-600 hover:text-indigo-500"
               >
-                support@aiwebsitebuilder.tech
+                support@rapidai.website
               </a>
             </p>
           </section>

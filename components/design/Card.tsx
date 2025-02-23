@@ -37,7 +37,7 @@ const Card: React.FC<CardProps> = ({
           </a>
         </Link>
         <a
-          href={`https://${subdomain}.aiwebsitebuilder.tech`}
+          href={`https://${subdomain}.rapidai.website`}
           target="_blank"
           rel="noopener noreferrer"
           className="bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600"

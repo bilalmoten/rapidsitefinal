@@ -146,15 +146,15 @@ export default function NewWebsiteDialog({
         websiteTitle.trim() === ""
           ? "Title is required"
           : websiteTitle.trim().length <= 3
-          ? "Title must be more than 3 characters"
-          : "",
+            ? "Title must be more than 3 characters"
+            : "",
       subdomain: validateSubdomain(subdomain),
       description:
         description.trim() === ""
           ? "Description is required"
           : description.trim().length <= 10
-          ? "Description must be more than 10 characters"
-          : "",
+            ? "Description must be more than 10 characters"
+            : "",
     };
 
     // If any errors exist, set them and return
@@ -272,7 +272,7 @@ export default function NewWebsiteDialog({
                   placeholder="my-site"
                 />
                 <span className="bg-neutral-20 dark:bg-neutral-80 border-neutral-20 dark:border-neutral-70 text-neutral-60 dark:text-neutral-40 px-4 py-2 border border-l-0 rounded-r-md flex items-center">
-                  .aiwebsitebuilder.tech
+                  .rapidai.website
                 </span>
               </div>
               {subdomain && (

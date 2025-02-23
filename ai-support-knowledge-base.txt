@@ -142,7 +142,7 @@ Common Issues:
 8. SUPPORT CHANNELS
 -----------------
 - AI Chat Support (24/7)
-- Email: support@aiwebsitebuilder.tech
+- Email: support@rapidai.website
 - Priority Support for Pro/Enterprise users
 - Documentation and Guides available
 - Community Forum (coming soon)

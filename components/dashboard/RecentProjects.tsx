@@ -105,7 +105,7 @@ const RecentProjects: React.FC<RecentProjectsProps> = ({
             </Button>
           </Link>
           <Link
-            href={`https://${website.subdomain}.aiwebsitebuilder.tech`}
+            href={`https://${website.subdomain}.rapidai.website`}
             target="_blank"
           >
             <Button size="sm" variant="secondary">
@@ -139,7 +139,7 @@ const RecentProjects: React.FC<RecentProjectsProps> = ({
           <div className="flex items-center gap-2">
             <Globe className="w-4 h-4" />
             <span className="truncate">
-              {website.subdomain}.aiwebsitebuilder.tech
+              {website.subdomain}.rapidai.website
             </span>
           </div>
           <span className="text-xs">
@@ -179,7 +179,7 @@ const RecentProjects: React.FC<RecentProjectsProps> = ({
         <div className="flex items-center justify-between text-sm text-muted-foreground">
           <div className="flex items-center gap-2">
             <Globe className="w-4 h-4" />
-            <span>{website.subdomain}.aiwebsitebuilder.tech</span>
+            <span>{website.subdomain}.rapidai.website</span>
           </div>
           <span className="text-xs">
             Updated {new Date(website.last_updated_at).toLocaleDateString()}
@@ -195,7 +195,7 @@ const RecentProjects: React.FC<RecentProjectsProps> = ({
           </Button>
         </Link>
         <Link
-          href={`https://${website.subdomain}.aiwebsitebuilder.tech`}
+          href={`https://${website.subdomain}.rapidai.website`}
           target="_blank"
         >
           <Button size="sm" variant="outline">

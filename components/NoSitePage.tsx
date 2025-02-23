@@ -11,7 +11,7 @@ export default function NoSitePage({ subdomain }: { subdomain: string }) {
 
           <p className="text-xl text-gray-600">
             <span className="font-semibold text-indigo-600">
-              {subdomain}.aiwebsitebuilder.tech
+              {subdomain}.rapidai.website
             </span>{" "}
             could be your new website.
           </p>
@@ -75,7 +75,7 @@ export default function NoSitePage({ subdomain }: { subdomain: string }) {
 
           <div className="space-y-4">
             <Link
-              href="https://aiwebsitebuilder.tech/signup"
+              href="https://rapidai.website/signup"
               className="inline-block bg-indigo-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-indigo-700 transition-colors duration-200"
             >
               Create Your Website Now

@@ -9,7 +9,7 @@ export async function signInWithGoogle() {
     console.log("NODE_ENV:", process.env.NODE_ENV);
     const siteUrl = process.env.NODE_ENV === 'development'
         ? 'http://localhost:3000'
-        : 'https://aiwebsitebuilder.tech';
+        : 'https://rapidai.website';
     console.log("Site URL:", siteUrl);
     console.log("Starting OAuth flow with options:", {
         redirectTo: `${siteUrl}/auth/callback`,

@@ -123,7 +123,7 @@ export function EditWebsiteDialog({
             placeholder="my-website"
           />
           <span className="bg-muted px-3 py-2 border border-l-0 rounded-r-md text-muted-foreground">
-            .aiwebsitebuilder.tech
+            .rapidai.website
           </span>
         </div>
       );

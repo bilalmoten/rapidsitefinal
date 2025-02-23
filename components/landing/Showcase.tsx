@@ -51,49 +51,49 @@ const websites = {
     image: "https://picsum.photos/seed/charity/800/2000",
     prompt:
       "Create a modern charity website with a hero section showing community impact. Include statistics about volunteers and donations. Use warm, inviting colors with purple accents. Add sections for current projects, success stories, and a prominent donation button. The design should be emotionally engaging but professional.",
-    url: "https://demo1.aiwebsitebuilder.tech",
+    url: "https://demo1.rapidai.website",
   },
   restaurant: {
     title: "Bistro Nouveau",
     image: "https://picsum.photos/seed/restaurant/1200/3000",
     prompt:
       "Design an elegant restaurant website with a full-width hero featuring signature dishes. Include an online reservation system, menu showcase with beautiful typography, and chef's special section. Use dark theme with gold accents. Add Instagram feed integration and customer testimonials.",
-    url: "https://demo2.aiwebsitebuilder.tech",
+    url: "https://demo2.rapidai.website",
   },
   portfolio: {
     title: "Creative Vision Studio",
     image: "https://picsum.photos/seed/portfolio/1200/3000",
     prompt:
       "Build a minimal portfolio website for a photographer with a masonry grid gallery. Include smooth transitions between images, category filtering, and full-screen preview mode. Use a dark theme with subtle animations. Add client testimonials and a contact form with booking functionality.",
-    url: "https://demo3.aiwebsitebuilder.tech",
+    url: "https://demo3.rapidai.website",
   },
   saas: {
     title: "DataFlow Analytics",
     image: "https://picsum.photos/seed/saas/1200/3000",
     prompt:
       "Create a modern SaaS website with a gradient hero section and floating 3D elements. Include feature highlights with icons, pricing tables, and integration logos. Use a professional color scheme with blue and purple gradients. Add customer testimonials and a live demo section.",
-    url: "https://demo4.aiwebsitebuilder.tech",
+    url: "https://demo4.rapidai.website",
   },
   ecommerce: {
     title: "Artisan Market",
     image: "https://picsum.photos/seed/ecommerce/1200/3000",
     prompt:
       "Design a clean e-commerce website for handmade products. Include a hero with featured products, collection grid with hover effects, and quick view functionality. Use a light theme with pastel accents. Add wishlist feature, size guide, and customer reviews section.",
-    url: "https://demo5.aiwebsitebuilder.tech",
+    url: "https://demo5.rapidai.website",
   },
   agency: {
     title: "Digital Pulse Agency",
     image: "https://picsum.photos/seed/agency/1200/3000",
     prompt:
       "Build a bold agency website with full-screen video background. Include case studies grid, team showcase, and service offerings. Use dark theme with neon accents. Add animated statistics, client logos, and a dynamic contact section with office locations.",
-    url: "https://demo6.aiwebsitebuilder.tech",
+    url: "https://demo6.rapidai.website",
   },
   blog: {
     title: "Tech Insights Blog",
     image: "https://picsum.photos/seed/blog/1200/3000",
     prompt:
       "Create a blog website with a masonry grid of posts. Include a search bar, category filters, and a detailed post view with comments.",
-    url: "https://demo7.aiwebsitebuilder.tech",
+    url: "https://demo7.rapidai.website",
   },
 };
 

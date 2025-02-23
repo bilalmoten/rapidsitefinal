@@ -7,7 +7,7 @@ Disallow: /login/
 Disallow: /signup/
 
 # Sitemap
-Sitemap: https://aiwebsitebuilder.tech/sitemap.xml
+Sitemap: https://rapidai.website/sitemap.xml
 
 # Host
-Host: https://aiwebsitebuilder.tech
+Host: https://rapidai.website

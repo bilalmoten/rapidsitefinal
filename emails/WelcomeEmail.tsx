@@ -30,7 +30,7 @@ export const WelcomeEmail = ({ email }: WelcomeEmailProps) => (
         {/* Header */}
         <Section style={header}>
           <Img
-            src="https://aiwebsitebuilder.tech/logo.png"
+            src="https://rapidai.website/logo.png"
             width="150"
             height="40"
             alt="AI Website Builder"
@@ -63,7 +63,7 @@ export const WelcomeEmail = ({ email }: WelcomeEmailProps) => (
             <Row>
               <Column style={featureColumn}>
                 <Img
-                  src="https://aiwebsitebuilder.tech/email-assets/feature-updates.png"
+                  src="https://rapidai.website/email-assets/feature-updates.png"
                   width="32"
                   height="32"
                   alt="Updates"
@@ -76,7 +76,7 @@ export const WelcomeEmail = ({ email }: WelcomeEmailProps) => (
               </Column>
               <Column style={featureColumn}>
                 <Img
-                  src="https://aiwebsitebuilder.tech/email-assets/tips.png"
+                  src="https://rapidai.website/email-assets/tips.png"
                   width="32"
                   height="32"
                   alt="Tips"
@@ -91,7 +91,7 @@ export const WelcomeEmail = ({ email }: WelcomeEmailProps) => (
             <Row>
               <Column style={featureColumn}>
                 <Img
-                  src="https://aiwebsitebuilder.tech/email-assets/community.png"
+                  src="https://rapidai.website/email-assets/community.png"
                   width="32"
                   height="32"
                   alt="Community"
@@ -104,7 +104,7 @@ export const WelcomeEmail = ({ email }: WelcomeEmailProps) => (
               </Column>
               <Column style={featureColumn}>
                 <Img
-                  src="https://aiwebsitebuilder.tech/email-assets/insights.png"
+                  src="https://rapidai.website/email-assets/insights.png"
                   width="32"
                   height="32"
                   alt="Insights"
@@ -121,7 +121,7 @@ export const WelcomeEmail = ({ email }: WelcomeEmailProps) => (
 
           {/* CTA Section */}
           <Section style={ctaSection}>
-            <Button style={button} href="https://aiwebsitebuilder.tech/blog">
+            <Button style={button} href="https://rapidai.website/blog">
               Explore Our Blog
             </Button>
           </Section>

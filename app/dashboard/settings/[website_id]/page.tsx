@@ -94,7 +94,7 @@ export default async function WebsiteSettingsPage(props: {
               <div>
                 <p className="text-neutral-20 text-sm mb-1">Subdomain</p>
                 <p className="text-primary-main text-[20px] font-medium">
-                  {website.subdomain}.aiwebsitebuilder.tech
+                  {website.subdomain}.rapidai.website
                 </p>
               </div>
               <EditWebsiteDialog

@@ -8,7 +8,7 @@ No coding experience required
 
 1. SIGNING UP
 ------------
-a) Visit aiwebsitebuilder.tech
+a) Visit rapidai.website
 b) Click "Start Building for Free" button
 c) Choose your signup method:
    - Email and password
@@ -103,7 +103,7 @@ Step 1: Preview
 
 Step 2: Domain Setup
 - Choose your free subdomain
-  * Format: yourname.aiwebsitebuilder.tech
+  * Format: yourname.rapidai.website
 - Or connect custom domain (Pro/Enterprise)
 
 Step 3: Go Live
@@ -156,7 +156,7 @@ GETTING HELP
 If you get stuck:
 1. Use the AI chat support
 2. Check documentation
-3. Email support@aiwebsitebuilder.tech
+3. Email support@rapidai.website
 4. Join community forum (coming soon)
 
 Remember: You can always undo changes with the undo button, and your work is automatically saved as you edit. 

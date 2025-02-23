@@ -78,7 +78,7 @@ The AI Website Builder Team`;
             console.log('Generated HTML:', emailHtml.substring(0, 100));
 
             const message = {
-                senderAddress: "DoNotReply@aiwebsitebuilder.tech",
+                senderAddress: "DoNotReply@rapidai.website",
                 content: {
                     subject: "Welcome to AI Website Builder Newsletter!",
                     html: emailHtml,

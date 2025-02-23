@@ -52,7 +52,7 @@ export default function SiteContent({
       />
       <Script src="https://cdn.tailwindcss.com" strategy="afterInteractive" />
       <Script
-        src="https://aiwebsitebuilder.tech/form-capture.js"
+        src="https://rapidai.website/form-capture.js"
         strategy="afterInteractive"
       />
 

@@ -88,7 +88,7 @@ export function EditorInterface() {
                 <span className="text-sm text-muted-foreground">https://</span>
                 <Input
                   className="h-7 w-[300px] bg-transparent border-none focus-visible:ring-0 focus-visible:ring-offset-0"
-                  defaultValue="mywebsite.aiwebsitebuilder.tech"
+                  defaultValue="mywebsite.rapidai.website"
                 />
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>

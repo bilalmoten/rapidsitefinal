@@ -115,10 +115,10 @@ export default function PrivacyPolicy() {
               If you have any questions about this Privacy Policy, please
               contact us at:{" "}
               <a
-                href="mailto:support@aiwebsitebuilder.tech"
+                href="mailto:support@rapidai.website"
                 className="text-indigo-600 hover:text-indigo-500"
               >
-                support@aiwebsitebuilder.tech
+                support@rapidai.website
               </a>
             </p>
           </section>

@@ -54,7 +54,7 @@ export default function SubdomainLayout({ children, params }: LayoutProps) {
             <p className="text-sm">
               Built with{" "}
               <Link
-                href="https://aiwebsitebuilder.tech"
+                href="https://rapidai.website"
                 className="font-semibold hover:text-indigo-200"
               >
                 AI Website Builder
@@ -62,7 +62,7 @@ export default function SubdomainLayout({ children, params }: LayoutProps) {
               - Create your own AI-powered website in minutes!
             </p>
             <Link
-              href="https://aiwebsitebuilder.tech/signup"
+              href="https://rapidai.website/signup"
               className="bg-white text-indigo-600 px-4 py-1.5 rounded-full text-sm font-semibold hover:bg-indigo-50 transition-colors"
             >
               Get Started Free

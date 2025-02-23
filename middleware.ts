@@ -25,10 +25,10 @@ export async function middleware(request: NextRequest) {
   const res = NextResponse.next();
   await updateSession(request);
 
-  // Get hostname (e.g. subdomain.aiwebsitebuilder.tech)
+  // Get hostname (e.g. subdomain.rapidai.website)
   let host = hostname.replace(
     `.localhost:3000`,
-    `.aiwebsitebuilder.tech`
+    `.rapidai.website`
   );
 
   // console.log('Processed host:', host);
@@ -52,8 +52,8 @@ export async function middleware(request: NextRequest) {
 
   // If it's the main domain, just return the session-updated response
   if (
-    host === 'aiwebsitebuilder.tech' ||
-    host === 'www.aiwebsitebuilder.tech' ||
+    host === 'rapidai.website' ||
+    host === 'www.rapidai.website' ||
     host === 'localhost:3000' ||
     host.endsWith('.localhost:3000')
   ) {
@@ -104,14 +104,14 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  // Only handle subdomains for aiwebsitebuilder.tech
-  if (!host.endsWith('.aiwebsitebuilder.tech')) {
+  // Only handle subdomains for rapidai.website
+  if (!host.endsWith('.rapidai.website')) {
     console.log('Unknown domain:', hostname, 'redirecting to main site');
-    return NextResponse.redirect(new URL('https://aiwebsitebuilder.tech'));
+    return NextResponse.redirect(new URL('https://rapidai.website'));
   }
 
   // Handle subdomains
-  const subdomain = host.replace('.aiwebsitebuilder.tech', '');
+  const subdomain = host.replace('.rapidai.website', '');
   console.log('Processing subdomain:', subdomain);
 
   // Prevent direct access to /sites folder

@@ -112,7 +112,7 @@ const TopBar: React.FC<TopBarProps> = ({
   };
 
   const handleCopyUrl = () => {
-    const url = `https://${subdomain}.aiwebsitebuilder.tech/${pageTitle.replace(
+    const url = `https://${subdomain}.rapidai.website/${pageTitle.replace(
       ".html",
       ""
     )}`;
@@ -124,7 +124,7 @@ const TopBar: React.FC<TopBarProps> = ({
   };
 
   const handlePreview = () => {
-    const url = `https://${subdomain}.aiwebsitebuilder.tech/${pageTitle.replace(
+    const url = `https://${subdomain}.rapidai.website/${pageTitle.replace(
       ".html",
       ""
     )}`;
@@ -157,7 +157,7 @@ const TopBar: React.FC<TopBarProps> = ({
 
             <div className="flex items-center space-x-2 bg-neutral-90/50 px-2 py-1 rounded-md border border-neutral-70">
               <span className="text-sm text-neutral-30">
-                https://{subdomain}.aiwebsitebuilder.tech/
+                https://{subdomain}.rapidai.website/
               </span>
               <Input
                 className="h-7 w-[200px] bg-transparent border-none text-neutral-10 focus-visible:ring-0 focus-visible:ring-offset-0"

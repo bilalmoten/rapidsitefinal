@@ -2,7 +2,7 @@ import { MetadataRoute } from 'next'
 import { createClient } from "@/utils/supabase/server"
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-    const baseUrl = 'https://aiwebsitebuilder.tech'
+    const baseUrl = 'https://rapidai.website'
     const supabase = await createClient()
 
     // Get blog posts for dynamic routes
@@ -64,7 +64,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
     // User website routes
     const websiteRoutes = (publicWebsites || []).map((site) => ({
-        url: `https://${site.subdomain}.aiwebsitebuilder.tech`,
+        url: `https://${site.subdomain}.rapidai.website`,
         // lastModified: new Date(site.updated_at),
         changeFrequency: 'daily' as const,
         priority: 0.5,

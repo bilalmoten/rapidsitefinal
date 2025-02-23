@@ -549,7 +549,7 @@ export default function SettingsModal({
                         const supabase = createClient();
                         const siteUrl =
                           process.env.NEXT_PUBLIC_SITE_URL ||
-                          "https://aiwebsitebuilder.tech";
+                          "https://rapidai.website";
 
                         const { error } =
                           await supabase.auth.resetPasswordForEmail(

@@ -375,7 +375,7 @@ export const EditorInterface = ({ progress }: { progress: number }) => {
           <div className="flex items-center gap-2 bg-black/20 rounded-md px-3 py-1.5 flex-1 max-w-md">
             <Globe className="w-4 h-4 text-muted-foreground" />
             <span className="text-sm text-muted-foreground">
-              yoursubdomain.aiwebsitebuilder.tech/
+              yoursubdomain.rapidai.website/
             </span>
             <span className="text-sm">page</span>
           </div>
@@ -384,7 +384,7 @@ export const EditorInterface = ({ progress }: { progress: number }) => {
             size="icon"
             onClick={async () => {
               await navigator.clipboard.writeText(
-                "yoursubdomain.aiwebsitebuilder.tech/page"
+                "yoursubdomain.rapidai.website/page"
               );
               toast.success("Copied to clipboard");
             }}
@@ -569,7 +569,7 @@ export const EditorInterface = ({ progress }: { progress: number }) => {
                 <div className="flex items-center justify-center gap-2 bg-black/20 rounded-md px-3 py-2">
                   <Globe className="w-4 h-4 text-muted-foreground" />
                   <span className="text-sm">
-                    landingdemo.aiwebsitebuilder.tech/page
+                    landingdemo.rapidai.website/page
                   </span>
                 </div>
                 <div className="flex justify-center gap-4 mt-4">
@@ -578,7 +578,7 @@ export const EditorInterface = ({ progress }: { progress: number }) => {
                     size="sm"
                     onClick={() =>
                       window.open(
-                        "https://landingdemo.aiwebsitebuilder.tech/page",
+                        "https://landingdemo.rapidai.website/page",
                         "_blank"
                       )
                     }
@@ -590,7 +590,7 @@ export const EditorInterface = ({ progress }: { progress: number }) => {
                     size="sm"
                     onClick={async () => {
                       await navigator.clipboard.writeText(
-                        "https://landingdemo.aiwebsitebuilder.tech/page"
+                        "https://landingdemo.rapidai.website/page"
                       );
                       toast.success("URL copied to clipboard");
                     }}

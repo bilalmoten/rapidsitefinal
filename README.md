@@ -10,7 +10,7 @@ RapidSite is a powerful AI-powered website builder that helps you create beautif
 - Easy DNS configuration with clear instructions
 - Automatic SSL certificates
 
-[Follow Our Journey →](https://aiwebsitebuilder.tech/journey)
+[Follow Our Journey →](https://rapidai.website/journey)
 
 ## ✨ Why RapidSite?
 
@@ -47,8 +47,8 @@ RapidSite is a powerful AI-powered website builder that helps you create beautif
 
 ## 🌟 Get Started
 
-Visit [aiwebsitebuilder.tech](https://aiwebsitebuilder.tech) to start building your website today!
+Visit [rapidai.website](https://rapidai.website) to start building your website today!
 
 ## 📧 Support
 
-Need help? Contact us at support@aiwebsitebuilder.tech
+Need help? Contact us at support@rapidai.website

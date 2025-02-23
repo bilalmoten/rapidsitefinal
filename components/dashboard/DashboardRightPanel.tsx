@@ -110,10 +110,10 @@ const DashboardRightPanel: React.FC<DashboardRightPanelProps> = ({
           <p className="text-neutral-40 text-sm">
             For any help and/or feedback, please contact us at{" "}
             <a
-              href="mailto:mbilal@aiwebsitebuilder.tech"
+              href="mailto:mbilal@rapidai.website"
               className="text-primary-main"
             >
-              mbilal@aiwebsitebuilder.tech
+              mbilal@rapidai.website
             </a>
           </p>
         </div>
