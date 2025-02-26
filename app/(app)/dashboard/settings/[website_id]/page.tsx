@@ -3,11 +3,12 @@ import { redirect } from "next/navigation";
 import { DomainManager } from "@/components/domains/DomainManager";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { Globe, RefreshCw, Search, Lock, Trash2 } from "lucide-react";
+import { Globe, RefreshCw, Search, Lock, Trash2, BarChart } from "lucide-react";
 import { RegenerateWebsiteButton } from "@/components/dashboard/RegenerateWebsiteButton";
 import { EditWebsiteDialog } from "@/components/dashboard/EditWebsiteDialog";
 import { DeleteWebsiteDialog } from "@/components/DeleteWebsiteDialog";
 import { SEOSettings } from "@/components/dashboard/SEOSettings";
+import SiteAnalytics from "@/components/dashboard/SiteAnalytics";
 
 export default async function WebsiteSettingsPage(props: {
   params: Promise<{ website_id: string }>;
@@ -60,6 +61,17 @@ export default async function WebsiteSettingsPage(props: {
 
   return (
     <div className="space-y-6">
+      {/* Analytics Section */}
+      <div className="w-full bg-[#0a0a0b00] border border-neutral-70 rounded-lg backdrop-blur-md">
+        <div className="p-6">
+          <h2 className="text-[28px] font-medium text-white mb-6 flex items-center">
+            <BarChart className="w-6 h-6 mr-3 text-primary-main" />
+            Analytics
+          </h2>
+          <SiteAnalytics subdomain={website.subdomain} />
+        </div>
+      </div>
+
       {/* General Settings */}
       <div className="w-full bg-[#0a0a0b00] border border-neutral-70 rounded-lg backdrop-blur-md">
         <div className="p-6">
