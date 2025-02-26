@@ -13,9 +13,14 @@ export default function SiteContent({
   headContent,
 }: SiteContentProps) {
   useEffect(() => {
-    // Initialize Alpine.js when the component mounts
-    if (window.Alpine) {
+    // Initialize Alpine.js only if it hasn't been initialized
+    if (
+      typeof window !== "undefined" &&
+      window.Alpine &&
+      !window.Alpine.initialized
+    ) {
       window.Alpine.start();
+      window.Alpine.initialized = true;
     }
   }, []);
 
@@ -48,13 +53,9 @@ export default function SiteContent({
       <Script
         src="https://cdnjs.cloudflare.com/ajax/libs/alpinejs/3.13.5/cdn.min.js"
         strategy="afterInteractive"
-        defer
+        id="alpine-js"
       />
-      <Script src="https://cdn.tailwindcss.com" strategy="afterInteractive" />
-      <Script
-        src="https://rapidai.website/form-capture.js"
-        strategy="afterInteractive"
-      />
+      <Script src="https://cdn.tailwindcss.com" strategy="beforeInteractive" />
 
       {headContent && (
         <div
@@ -62,11 +63,16 @@ export default function SiteContent({
           suppressHydrationWarning
         />
       )}
-
       <div
         dangerouslySetInnerHTML={{ __html: content }}
         suppressHydrationWarning
       />
     </>
   );
+}
+
+declare global {
+  interface Window {
+    Alpine: any;
+  }
 }

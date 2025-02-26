@@ -50,6 +50,8 @@ export default async function SubdomainPage(props: {
   const processContent = (content: string) => {
     const dom = new JSDOM(content);
     const document = dom.window.document;
+
+    // Process links
     document.querySelectorAll("a").forEach((a: HTMLAnchorElement) => {
       const href = a.getAttribute("href");
       if (href && !href.startsWith("http") && !href.startsWith("#")) {
@@ -61,24 +63,28 @@ export default async function SubdomainPage(props: {
       }
     });
 
-    // Add form capture script and website ID
-    const script = document.createElement("script");
-    script.src = "/form-capture.js";
-    document.body.appendChild(script);
-
     // Inject website ID
     const websiteIdScript = document.createElement("script");
     websiteIdScript.textContent = `window.__WEBSITE_ID__ = ${website.id};`;
-    document.body.appendChild(websiteIdScript);
+    websiteIdScript.id = "website-id-script";
+    document.head.appendChild(websiteIdScript);
+
+    // Add form capture script
+    const formCaptureScript = document.createElement("script");
+    formCaptureScript.src = "/form-capture.js";
+    formCaptureScript.defer = true;
+    formCaptureScript.id = "form-capture-script";
+    document.head.appendChild(formCaptureScript);
 
     return {
+      headContent: document.head.innerHTML,
       bodyContent: document.body.innerHTML,
     };
   };
 
-  const { bodyContent } = processContent(page.content);
+  const { headContent, bodyContent } = processContent(page.content);
 
-  return <SiteContent content={bodyContent} />;
+  return <SiteContent content={bodyContent} headContent={headContent} />;
 }
 
 export async function generateMetadata(props: {
