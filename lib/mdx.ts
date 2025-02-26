@@ -2,7 +2,7 @@ import path from 'path'
 import fs from 'fs'
 import matter from 'gray-matter'
 
-const POSTS_PATH = path.join(process.cwd(), 'app/blog/posts')
+const POSTS_PATH = path.join(process.cwd(), 'app/(app)/blog/posts')
 
 export interface Post {
     slug: string
