@@ -9,7 +9,9 @@ import {
   Mail,
   Layout,
   Calendar,
+  BookOpen,
 } from "lucide-react";
+import InspirationStats from "@/components/admin/InspirationStats";
 
 export default async function AdminDashboard() {
   const supabase = await createClient();
@@ -160,7 +162,7 @@ export default async function AdminDashboard() {
         </div>
 
         {/* Quick Actions */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <Link
             href="/admin/newsletter"
             className="block p-6 bg-gray-800 rounded-lg hover:bg-gray-750 transition-colors"
@@ -194,6 +196,35 @@ export default async function AdminDashboard() {
             </h3>
             <p className="text-gray-400">Manage users and permissions</p>
           </Link>
+
+          <Link
+            href="/admin/inspiration"
+            className="block p-6 bg-gray-800 rounded-lg hover:bg-gray-750 transition-colors"
+          >
+            <h3 className="text-lg font-semibold text-white mb-2">
+              Inspiration Gallery
+            </h3>
+            <p className="text-gray-400">Manage featured sites and analytics</p>
+          </Link>
+        </div>
+
+        {/* Inspiration Gallery Stats Section */}
+        <div className="bg-gray-800 rounded-lg p-6 mb-8">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-xl font-semibold text-white flex items-center">
+              <BookOpen className="w-5 h-5 mr-2" /> Inspiration Gallery
+            </h2>
+            <Link
+              href="/admin/inspiration"
+              className="text-sm text-blue-400 hover:text-blue-300 transition-colors"
+            >
+              View Full Dashboard →
+            </Link>
+          </div>
+
+          <div className="text-white">
+            <InspirationStats />
+          </div>
         </div>
 
         {/* Recent Activity */}

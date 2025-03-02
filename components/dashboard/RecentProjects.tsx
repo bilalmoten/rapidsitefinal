@@ -316,31 +316,27 @@ const RecentProjects: React.FC<RecentProjectsProps> = ({
                 </div>
               </NewWebsiteDialog>
 
-              <div className="bg-card hover:bg-accent/50 rounded-xl border border-border shadow-sm transition-all duration-200 group cursor-pointer">
-                <div className="relative aspect-video w-full overflow-hidden rounded-t-xl border-b border-border bg-gradient-to-br from-purple-500/20 to-purple-500/10">
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="h-16 w-16 rounded-full bg-purple-500/20 flex items-center justify-center">
-                      <Sparkles className="h-8 w-8 text-purple-500" />
+              <Link href="/inspiration" className="block">
+                <div className="bg-card hover:bg-accent/50 rounded-xl border border-border shadow-sm transition-all duration-200 group cursor-pointer">
+                  <div className="relative aspect-video w-full overflow-hidden rounded-t-xl border-b border-border bg-gradient-to-br from-purple-500/20 to-purple-500/10">
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="h-16 w-16 rounded-full bg-purple-500/20 flex items-center justify-center">
+                        <Sparkles className="h-8 w-8 text-purple-500" />
+                      </div>
                     </div>
                   </div>
-                </div>
-                <div className="p-4">
-                  <div className="flex items-center gap-2 mb-2">
-                    <h3 className="text-lg font-semibold text-foreground">
-                      Inspiration
-                    </h3>
-                    <Badge
-                      variant="outline"
-                      className="text-purple-500 border-purple-500"
-                    >
-                      Coming Soon
-                    </Badge>
+                  <div className="p-4">
+                    <div className="flex items-center gap-2 mb-2">
+                      <h3 className="text-lg font-semibold text-foreground">
+                        Inspiration
+                      </h3>
+                    </div>
+                    <p className="text-muted-foreground text-sm">
+                      Browse and clone from our gallery of AI-created websites
+                    </p>
                   </div>
-                  <p className="text-muted-foreground text-sm">
-                    Browse and clone from our gallery of AI-created websites
-                  </p>
                 </div>
-              </div>
+              </Link>
 
               {websites.map((website) => (
                 <ProjectCard key={website.id} website={website} />
@@ -357,18 +353,12 @@ const RecentProjects: React.FC<RecentProjectsProps> = ({
                 New Project
               </Button>
             </NewWebsiteDialog>
-            <Button
-              className="flex-1 gap-2"
-              size="lg"
-              variant="outline"
-              disabled
-            >
-              <Sparkles className="h-5 w-5" />
-              Inspiration
-              <Badge variant="outline" className="ml-2">
-                Coming Soon
-              </Badge>
-            </Button>
+            <Link href="/inspiration" className="flex-1">
+              <Button className="w-full gap-2" size="lg" variant="outline">
+                <Sparkles className="h-5 w-5" />
+                Inspiration
+              </Button>
+            </Link>
           </div>
 
           {websites.length === 0 && !isLoading ? (
