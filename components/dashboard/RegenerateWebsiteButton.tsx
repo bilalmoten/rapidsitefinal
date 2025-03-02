@@ -19,7 +19,7 @@ export function RegenerateWebsiteButton({
   const handleRegenerate = async () => {
     try {
       const response = await fetch(
-        `https://api2.azurewebsites.net/api/code_website?website_id=${websiteId}&model=o1-mini`,
+        `https://api2.azurewebsites.net/api/code_website?website_id=${websiteId}&model=gemini-2.0-flash-001`,
         {
           method: "POST",
         }

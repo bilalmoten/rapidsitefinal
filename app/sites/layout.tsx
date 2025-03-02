@@ -24,13 +24,23 @@ export default function SitesLayout({ children, params }: SitesLayoutProps) {
 
     // Initialize PostHog if not already initialized
     if (!posthog.__loaded) {
-      console.log("📥 [SitesLayout] Initializing PostHog");
+      console.log("📥 [SitesLayout] Initializing PostHog with config:", {
+        key: process.env.NEXT_PUBLIC_POSTHOG_KEY?.substring(0, 8) + "...",
+        host: process.env.NEXT_PUBLIC_POSTHOG_HOST,
+        loaded: posthog.__loaded,
+        distinctId: posthog.get_distinct_id(),
+      });
       posthog.init(process.env.NEXT_PUBLIC_POSTHOG_KEY!, {
         api_host: process.env.NEXT_PUBLIC_POSTHOG_HOST!,
         capture_pageview: false,
         capture_pageleave: true,
+        debug: true, // Enable debug mode to see PostHog logs
       });
-      console.log("✅ [SitesLayout] PostHog initialized:", posthog.__loaded);
+      console.log("✅ [SitesLayout] PostHog initialized. Status:", {
+        loaded: posthog.__loaded,
+        distinctId: posthog.get_distinct_id(),
+        config: posthog.config,
+      });
     } else {
       console.log("ℹ️ [SitesLayout] PostHog already initialized");
     }
@@ -68,26 +78,120 @@ export default function SitesLayout({ children, params }: SitesLayoutProps) {
       viewport_height: window.innerHeight,
       language: navigator.language,
       is_returning: posthog.get_distinct_id() ? true : false,
+      posthog_status: {
+        loaded: posthog.__loaded,
+        distinctId: posthog.get_distinct_id(),
+        config: posthog.config,
+      },
     };
 
-    console.log("📊 [SitesLayout] Capturing pageview event:", eventData);
+    console.log(
+      "📊 [SitesLayout] Attempting to capture pageview event:",
+      eventData
+    );
 
     // Only capture if we have a subdomain
     if (subdomain) {
-      // Capture detailed pageview data
-      posthog.capture("site_pageview", eventData);
+      try {
+        // Log the full PostHog state
+        console.log("🔍 [SitesLayout] Full PostHog state:", {
+          loaded: posthog.__loaded,
+          config: posthog.config,
+          distinctId: posthog.get_distinct_id(),
+          host: process.env.NEXT_PUBLIC_POSTHOG_HOST,
+          hasKey: !!process.env.NEXT_PUBLIC_POSTHOG_KEY,
+          currentUrl: window.location.href,
+        });
 
-      // Track time spent on page when user leaves
-      return () => {
-        const timeSpent = Date.now() - performance.now();
-        const leaveData = {
-          subdomain: subdomain,
+        // Capture standard pageview with more properties
+        const pageviewEvent = {
+          $current_url: window.location.href,
+          $referrer: document.referrer,
+          $browser: navigator.userAgent,
+          $device_type:
+            window.innerWidth <= 768
+              ? "mobile"
+              : window.innerWidth <= 1024
+                ? "tablet"
+                : "desktop",
+          $screen_height: window.screen.height,
+          $screen_width: window.screen.width,
+          $viewport_height: window.innerHeight,
+          $viewport_width: window.innerWidth,
+          $browser_language: navigator.language,
+          site_subdomain: subdomain,
           path: fullPath,
-          time_spent_ms: timeSpent,
+          title: document.title,
         };
-        console.log("👋 [SitesLayout] Capturing page leave event:", leaveData);
-        posthog.capture("site_pageleave", leaveData);
-      };
+
+        console.log("📤 [SitesLayout] Sending pageview event:", pageviewEvent);
+        posthog.capture("$pageview", pageviewEvent);
+        console.log("✅ [SitesLayout] Successfully sent $pageview event");
+
+        // Also capture our custom event with additional properties
+        const siteVisitEvent = {
+          ...pageviewEvent,
+          event_type: "site_visit",
+          visit_timestamp: new Date().toISOString(),
+          is_returning: posthog.get_distinct_id() ? true : false,
+          distinct_id: posthog.get_distinct_id(),
+          $set: {
+            last_visit: new Date().toISOString(),
+            device_type: pageviewEvent.$device_type,
+            browser: pageviewEvent.$browser,
+          },
+        };
+
+        console.log(
+          "📤 [SitesLayout] Sending site_visit event:",
+          siteVisitEvent
+        );
+        posthog.capture("site_visit", siteVisitEvent);
+        console.log("✅ [SitesLayout] Successfully sent site_visit event");
+
+        // Debug PostHog status
+        console.log("📋 [SitesLayout] PostHog status:", {
+          loaded: posthog.__loaded,
+          distinctId: posthog.get_distinct_id(),
+          config: posthog.config,
+        });
+
+        // Track time spent on page when user leaves
+        return () => {
+          const timeSpent = Date.now() - performance.now();
+          const leaveData = {
+            $current_url: window.location.href,
+            site_subdomain: subdomain,
+            path: fullPath,
+            time_spent_ms: timeSpent,
+            distinct_id: posthog.get_distinct_id(),
+            $set: {
+              last_page_leave: new Date().toISOString(),
+              last_time_spent: timeSpent,
+            },
+          };
+          console.log(
+            "👋 [SitesLayout] Attempting to capture page leave event:",
+            leaveData
+          );
+          try {
+            posthog.capture("site_pageleave", leaveData);
+            console.log(
+              "✅ [SitesLayout] Successfully captured page leave event"
+            );
+          } catch (error) {
+            console.error(
+              "❌ [SitesLayout] Error capturing page leave event:",
+              error
+            );
+          }
+        };
+      } catch (error) {
+        console.error(
+          "❌ [SitesLayout] Error capturing pageview event:",
+          error
+        );
+      }
     } else {
       console.warn(
         "⚠️ [SitesLayout] No subdomain found, skipping analytics capture"
