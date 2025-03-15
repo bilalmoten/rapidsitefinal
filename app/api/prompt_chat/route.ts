@@ -4,11 +4,14 @@ export async function POST(request: Request) {
     try {
         const { prompt } = await request.json();
 
-        const apiKey = "523a50ed7a7444468d1ae5a384f032bf";
+        // const apiKey = "523a50ed7a7444468d1ae5a384f032bf";
+
+        const apiKey = "d67fc89afb7a44aeb2fd7800aa3cadab";
         // const deploymentName = "o1-mini";
         const deploymentName = "gpt-4o-mini";
         // const deploymentName = "o1-preview";
-        const endpoint = `https://answerai-bilal.openai.azure.com/openai/deployments/${deploymentName}/chat/completions?api-version=2024-09-01-preview`;
+        // const endpoint = `https://answerai-bilal.openai.azure.com/openai/deployments/${deploymentName}/chat/completions?api-version=2024-09-01-preview`;
+        const endpoint = "https://ai-wbmulticrew715014556590.openai.azure.com/openai/deployments/gpt-4o-mini/chat/completions?api-version=2024-02-15-preview"
         const enhanced_prompt = `Please make a plan for the website of the user. A simple short plan detailing the website's purpose, pages, sections, design, color scheme, and any other relevant details. 1 page max.
     USER REQUEST: ${prompt}`;
 

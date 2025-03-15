@@ -6,7 +6,7 @@ import { createClient } from "@/utils/supabase/client";
 import { User } from "@supabase/supabase-js";
 import { useInterval } from "react-use";
 import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, ChevronLeft, MessageSquare, Lightbulb } from "lucide-react";
 import ChatInterface from "@/components/ChatInterface";
 import { Button } from "@/components/ui/button";
 import Sidebar from "@/components/chat-Sidebar";
@@ -22,6 +22,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import { GenerationExperience } from "@/components/website-generation/GenerationExperience";
 // import { useSidebar } from "@/contexts/SidebarContext";
 
 interface ChatPageProps {
@@ -55,6 +56,7 @@ export default function ChatPage(props: ChatPageProps) {
   const [industry, setIndustry] = useState("");
   const [chatMode, setChatMode] = useState<"prompt" | "conversation">("prompt");
   const [promptInput, setPromptInput] = useState("");
+  const [debugMode, setDebugMode] = useState(false);
 
   const {
     messages,
@@ -99,10 +101,12 @@ export default function ChatPage(props: ChatPageProps) {
         router.push("/login");
       } else {
         setUser(user);
+        console.log("User authenticated:", user.id);
       }
     };
 
     checkUser();
+    console.log("Initial chat mode:", chatMode);
   }, [router]);
 
   useEffect(() => {
@@ -208,7 +212,7 @@ export default function ChatPage(props: ChatPageProps) {
       }
 
       const response = await fetch(
-        `https://api2.azurewebsites.net/api/code_website?user_id=${user?.id}&website_id=${websiteId}&model=gemini-2.0-flash-001`,
+        `https://rapidsite-new.azurewebsites.net/api/start_website_generation?user_id=${user?.id}&website_id=${websiteId}&model=gemini-2.0-flash-001`,
         // `http://localhost:7071/api/code_website?user_id=${user?.id}&website_id=${params.website_id}&model=o1-mini`,
         {
           method: "POST",
@@ -420,7 +424,7 @@ export default function ChatPage(props: ChatPageProps) {
   const handleBuildWebsite = () => {
     setIsGenerating(true);
     setGenerationStartTime(Date.now());
-    // You can add any additional logic here for starting the website build process
+    // startWebsiteGeneration();
   };
 
   const formatPreferences = () => {
@@ -616,138 +620,261 @@ export default function ChatPage(props: ChatPageProps) {
     }
   };
 
-  if (isProcessing || isGenerating) {
-    return (
-      <div className="flex flex-col justify-center items-center h-full w-full px-4">
-        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-blue-500"></div>
-        <p className="mt-4">
-          {isGenerating
-            ? "Generating your website..."
-            : "Processing your request..."}
-        </p>
-        <p className="mt-2 text-sm text-gray-500">
-          This may take a few minutes. You'll be redirected when it's ready.
-        </p>
-      </div>
-    );
-  }
+  // Add toggleChatMode function to easily switch between modes
+  const toggleChatMode = () => {
+    const newMode = chatMode === "prompt" ? "conversation" : "prompt";
+    console.log("Toggling chat mode from", chatMode, "to", newMode);
+    setChatMode(newMode);
+  };
+
+  // Toggle debug mode
+  const toggleDebugMode = () => {
+    console.log("Toggling debug mode from", debugMode, "to", !debugMode);
+    setDebugMode(!debugMode);
+  };
 
   return (
-    <div className="h-full w-full relative">
-      <div className="absolute inset-0 z-[0]">
-        <DashboardBackground />
-      </div>
-
-      <div className="flex h-full z-20">
-        <div className="flex-1 flex flex-col">
-          <header className="relative z-20 border-b border-neutral-70 bg-neutral-90/50 backdrop-blur-xl p-4">
-            <div className="container mx-auto flex justify-between items-center">
-              <div className="flex items-center gap-2">
-                <Breadcrumb>
-                  <BreadcrumbList>
-                    <BreadcrumbItem>
-                      <BreadcrumbLink
-                        href="/dashboard"
-                        className="text-neutral-30 hover:text-neutral-10"
-                      >
-                        Dashboard
-                      </BreadcrumbLink>
-                    </BreadcrumbItem>
-                    <BreadcrumbSeparator />
-                    <BreadcrumbItem>
-                      <BreadcrumbPage className="text-neutral-10">
-                        Chat
-                      </BreadcrumbPage>
-                    </BreadcrumbItem>
-                  </BreadcrumbList>
-                </Breadcrumb>
-              </div>
-              <h1 className="text-2xl font-bold text-neutral-10">
-                AI Website Builder Chat
-              </h1>
+    <div className="flex flex-col bg-[#0A0A0A] w-full h-screen overflow-hidden relative">
+      <div className="flex-1 flex z-10">
+        <div className="flex-1 flex flex-col h-full overflow-hidden">
+          {/* Top Navigation */}
+          <div className="border-b border-neutral-800 flex items-center justify-between p-4">
+            <div className="flex items-center">
+              <Button variant="ghost" size="icon" asChild>
+                <Link href="/dashboard">
+                  <ChevronLeft className="h-5 w-5" />
+                  <span className="sr-only">Back</span>
+                </Link>
+              </Button>
+              <span className="ml-2 text-lg font-semibold">
+                Website Generator
+              </span>
             </div>
-          </header>
 
-          {chatMode === "prompt" ? (
-            <div className="flex-1 p-4 relative z-20">
-              <div className="max-w-2xl mx-auto space-y-4">
-                <form onSubmit={handlePromptSubmit} className="space-y-4">
-                  <textarea
-                    value={promptInput}
-                    onChange={(e) => setPromptInput(e.target.value)}
-                    placeholder="Describe your website idea in a few sentences..."
-                    className="w-full p-4 bg-neutral-90/50 backdrop-blur-sm border border-neutral-70 rounded-xl text-neutral-10 placeholder:text-neutral-40"
-                    rows={4}
-                  />
-                  <Button
-                    type="submit"
-                    className="w-full bg-primary-main text-neutral-90 hover:bg-primary-light"
-                  >
-                    Generate Website
-                  </Button>
-                </form>
+            <div className="flex items-center gap-2">
+              {showBuildButton && !isGenerating && !isProcessing && (
                 <Button
-                  onClick={() => setChatMode("conversation")}
-                  variant="outline"
-                  className="w-full border-neutral-70 text-neutral-30 hover:text-neutral-10"
+                  onClick={handleBuildWebsite}
+                  className="bg-gradient-to-r from-blue-500 to-violet-500 hover:from-blue-600 hover:to-violet-600 text-white"
                 >
-                  Start a Detailed Conversation Instead
+                  Build Website
                 </Button>
-              </div>
+              )}
             </div>
-          ) : (
-            <div className="flex-1 flex flex-col">
-              <div className="p-4 relative z-20 border-b border-neutral-70 bg-neutral-90/50 backdrop-blur-xl">
-                <div className="max-w-2xl mx-auto">
-                  <Button
-                    onClick={() => setChatMode("prompt")}
-                    variant="outline"
-                    className="w-full border-neutral-70 text-neutral-30 hover:text-neutral-10"
-                  >
-                    Switch to Quick Prompt Mode
-                  </Button>
+          </div>
+
+          {/* Fixed UI elements */}
+          {/* Mode switcher button with higher z-index */}
+          <div className="fixed right-8 top-24 z-[100]">
+            <Button
+              onClick={toggleChatMode}
+              className="bg-gradient-to-r from-blue-500 to-violet-500 hover:from-blue-600 hover:to-violet-600 text-white font-medium shadow-lg"
+            >
+              {chatMode === "prompt"
+                ? "Switch to Chat Mode"
+                : "Switch to Prompt Mode"}
+            </Button>
+          </div>
+
+          {/* Debug button */}
+          <div className="fixed right-8 top-40 z-[100]">
+            <Button
+              onClick={toggleDebugMode}
+              className="bg-amber-500 hover:bg-amber-600 text-white font-medium shadow-lg"
+            >
+              {debugMode ? "Disable Debug" : "Enable Debug"}
+            </Button>
+          </div>
+
+          {/* Debug overlay to highlight z-index issues */}
+          {debugMode && (
+            <div className="fixed inset-0 pointer-events-none z-[5]">
+              <div className="absolute inset-0 bg-red-500 bg-opacity-10 flex items-center justify-center">
+                <div className="bg-black bg-opacity-70 p-4 rounded text-white">
+                  Debug Mode: Highlighting all layers
                 </div>
               </div>
-              {/* <div className="flex-1"> */}
-              <ChatInterface
-                messages={messages}
-                input={input}
-                isLoading={isLoading || localIsLoading}
-                isListening={isListening}
-                onInputChange={handleInputChange}
-                onSubmit={customHandleSubmit}
-                onVoiceInput={handleVoiceInput}
-                isChatActive={isChatActive}
-              />
-              {/* </div> */}
-              {showBuildButton && (
-                <div className="p-4 relative z-20 border-t border-neutral-70 bg-neutral-90/50 backdrop-blur-xl">
-                  <div className="max-w-2xl mx-auto">
-                    <Button
-                      onClick={handleBuildWebsite}
-                      className="w-full bg-primary-main text-neutral-90 hover:bg-primary-light"
+            </div>
+          )}
+
+          <div className="flex-1 flex">
+            {/* Sidebar */}
+            <Sidebar
+              colorScheme={colorScheme}
+              logo={logo}
+              inspirationImages={inspirationImages}
+              inspirationLinks={inspirationLinks}
+              industry={industry}
+              onLogoUpload={handleLogoUpload}
+              onInspirationUpload={handleInspirationUpload}
+              onAddLink={handleAddLink}
+              onIndustryChange={setIndustry}
+              onColorSchemeChange={handleColorSchemeChange}
+            />
+
+            {/* Main content */}
+            <div className="flex-1 relative">
+              {isGenerating ? (
+                <div className="absolute inset-0">
+                  <GenerationExperience
+                    websiteData={{
+                      websiteName: "SaaS App",
+                      designPreferences: {
+                        colorScheme: {
+                          primaryColors: colorScheme,
+                          accentColors: ["#F9FAFB", "#F3F4F6", "#E5E7EB"],
+                        },
+                      },
+                      websiteStructure: {
+                        pages: [
+                          {
+                            name: "Home",
+                            sections: [
+                              {
+                                sectionName: "Hero Section",
+                                contentType: "hero",
+                              },
+                              {
+                                sectionName: "Features Section",
+                                contentType: "features",
+                              },
+                              {
+                                sectionName: "Testimonials",
+                                contentType: "testimonials",
+                              },
+                              {
+                                sectionName: "Pricing",
+                                contentType: "pricing",
+                              },
+                              { sectionName: "Footer", contentType: "footer" },
+                            ],
+                          },
+                          {
+                            name: "Features",
+                            sections: [
+                              {
+                                sectionName: "Features Overview",
+                                contentType: "features",
+                              },
+                              {
+                                sectionName: "Feature Details",
+                                contentType: "content",
+                              },
+                            ],
+                          },
+                        ],
+                      },
+                      contentRequirements: {
+                        features: [
+                          {
+                            title: "Easy Integration",
+                            description:
+                              "Seamlessly connect with your existing tools",
+                          },
+                          {
+                            title: "Advanced Security",
+                            description:
+                              "Enterprise-grade security for your peace of mind",
+                          },
+                          {
+                            title: "Lightning Fast",
+                            description:
+                              "Optimized performance for speed and reliability",
+                          },
+                          {
+                            title: "Time-Saving",
+                            description:
+                              "Automate workflows and save valuable time",
+                          },
+                        ],
+                        testimonials: [
+                          {
+                            name: "John Smith",
+                            role: "CEO, TechCorp",
+                            quote:
+                              "This solution transformed our business operations completely.",
+                          },
+                          {
+                            name: "Sarah Lee",
+                            role: "CMO, GrowthCo",
+                            quote:
+                              "We've seen a 200% increase in productivity since implementing this platform.",
+                          },
+                          {
+                            name: "Michael Chen",
+                            role: "CTO, Innovate Inc",
+                            quote:
+                              "The technical support and robust features are unmatched in the market.",
+                          },
+                        ],
+                        integrations: [
+                          { name: "Slack", icon: "slack" },
+                          { name: "GitHub", icon: "github" },
+                          { name: "Dropbox", icon: "cloud" },
+                          { name: "Google Drive", icon: "drive" },
+                          { name: "Notion", icon: "file-text" },
+                          { name: "Trello", icon: "trello" },
+                        ],
+                      },
+                    }}
+                  />
+                </div>
+              ) : (
+                <div className="flex-1 overflow-auto">
+                  {chatMode === "conversation" ? (
+                    <ChatInterface
+                      messages={messages}
+                      input={input}
+                      onInputChange={handleInputChange}
+                      onSubmit={customHandleSubmit}
+                      isLoading={localIsLoading || isLoading || isProcessing}
+                      onVoiceInput={handleVoiceInput}
+                      isListening={isListening}
+                      isChatActive={isChatActive}
+                    />
+                  ) : (
+                    <form
+                      onSubmit={handlePromptSubmit}
+                      className="h-full flex flex-col p-6"
                     >
-                      Start Building My Website...
-                    </Button>
-                  </div>
+                      <div className="flex-1 overflow-y-auto mb-6">
+                        <div className="max-w-3xl mx-auto p-8 bg-card border rounded-lg shadow-sm">
+                          <h2 className="text-2xl font-bold mb-4">
+                            What would you like to build?
+                          </h2>
+                          <p className="text-muted-foreground mb-6">
+                            Describe your website in detail. The more
+                            information you provide, the better we can tailor
+                            your website to your needs.
+                          </p>
+                          <div className="relative w-full">
+                            <textarea
+                              className="w-full h-64 p-4 border rounded-md bg-background resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+                              placeholder="For example: I need a professional e-commerce website for my handmade jewelry business. It should have a modern, elegant design with a light color scheme. I want to showcase my products with high-quality images and include customer testimonials. I need pages for Shop, About, Contact, and a Blog."
+                              value={promptInput}
+                              onChange={(e) => setPromptInput(e.target.value)}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex justify-center">
+                        <Button
+                          type="submit"
+                          className="bg-gradient-to-r from-blue-500 to-violet-500 hover:from-blue-600 hover:to-violet-600 text-white px-8 py-2 rounded-md"
+                          disabled={isProcessing || !promptInput.trim()}
+                        >
+                          {isProcessing ? "Processing..." : "Generate Website"}
+                        </Button>
+                      </div>
+                    </form>
+                  )}
                 </div>
               )}
             </div>
-          )}
+          </div>
         </div>
-        <Sidebar
-          colorScheme={colorScheme}
-          logo={logo}
-          inspirationImages={inspirationImages}
-          inspirationLinks={inspirationLinks}
-          industry={industry}
-          onLogoUpload={handleLogoUpload}
-          onInspirationUpload={handleInspirationUpload}
-          onAddLink={handleAddLink}
-          onIndustryChange={setIndustry}
-          onColorSchemeChange={handleColorSchemeChange}
-        />
       </div>
+      <DashboardBackground />
     </div>
   );
 }

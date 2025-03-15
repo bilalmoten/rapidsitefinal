@@ -173,7 +173,10 @@ export default async function WebsiteSettingsPage(props: {
                   in the generation process.
                 </p>
               </div>
-              <RegenerateWebsiteButton websiteId={params.website_id} />
+              <RegenerateWebsiteButton
+                websiteId={params.website_id}
+                userID={user.id}
+              />
             </div>
             <div className="flex items-center justify-between border border-neutral-70 rounded-lg px-6 py-4 bg-[#0a0a0b40] backdrop-blur-sm">
               <div>

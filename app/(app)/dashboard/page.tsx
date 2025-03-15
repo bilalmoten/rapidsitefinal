@@ -2,7 +2,6 @@ import React from "react";
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
 import DashboardContent from "@/components/dashboard/DashboardContent";
-import NewDashboardContent from "@/components/new_dashboard/NewDashboardContent";
 
 export default async function DashboardPage() {
   const supabase = await createClient();
@@ -35,10 +34,5 @@ export default async function DashboardPage() {
       websites={websites}
       projectCount={projectCount}
     />
-    // <NewDashboardContent
-    //   user={user}
-    //   websites={websites}
-    //   projectCount={projectCount}
-    // />
   );
 }

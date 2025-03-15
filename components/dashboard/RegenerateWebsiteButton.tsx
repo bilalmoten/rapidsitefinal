@@ -8,10 +8,12 @@ import { RefreshCw } from "lucide-react";
 
 interface RegenerateWebsiteButtonProps {
   websiteId: string;
+  userID: string;
 }
 
 export function RegenerateWebsiteButton({
   websiteId,
+  userID,
 }: RegenerateWebsiteButtonProps) {
   const [open, setOpen] = useState(false);
   const router = useRouter();
@@ -19,7 +21,7 @@ export function RegenerateWebsiteButton({
   const handleRegenerate = async () => {
     try {
       const response = await fetch(
-        `https://api2.azurewebsites.net/api/code_website?website_id=${websiteId}&model=gemini-2.0-flash-001`,
+        `https://rapidsite-new.azurewebsites.net/api/start_website_generation?user_id=${userID}&website_id=${websiteId}&model=gemini-2.0-flash-001`,
         {
           method: "POST",
         }

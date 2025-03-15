@@ -76,100 +76,45 @@ const ColorPicker: React.FC<ColorPickerProps> = ({
   color,
   onChange,
   onRemove,
-  showRemove = true,
+  showRemove = false,
 }) => {
-  const [open, setOpen] = useState(false);
-  const [tempColor, setTempColor] = useState(color);
-
-  // Apply color only when popover closes or Apply is clicked
-  useEffect(() => {
-    if (!open) {
-      if (tempColor !== color) {
-        onChange(tempColor);
-      }
-    }
-  }, [open]);
-
-  // Update temp color when main color changes
-  useEffect(() => {
-    setTempColor(color);
-  }, [color]);
+  const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className="relative group">
-      <Popover open={open} onOpenChange={setOpen}>
+    <div className="relative">
+      <Popover open={isOpen} onOpenChange={setIsOpen}>
         <PopoverTrigger asChild>
-          <div
-            className="w-12 h-12 rounded-xl border cursor-pointer shadow-sm hover:shadow-md transition-shadow"
+          <button
+            className="w-14 h-14 rounded-xl cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 border border-neutral-700 shadow-lg"
             style={{ backgroundColor: color }}
-          >
-            {showRemove && (
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onRemove();
-                }}
-                className="absolute -top-1 -right-1 h-5 w-5 bg-red-500 rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity shadow-sm"
-              >
-                <X className="h-3.5 w-3.5" />
-              </button>
-            )}
-          </div>
+            onClick={() => setIsOpen(true)}
+          />
         </PopoverTrigger>
-        <PopoverContent className="w-[280px] p-4" sideOffset={5}>
-          <div className="space-y-4">
-            <div className="p-1 bg-secondary/20 rounded-lg">
-              <HexColorPicker
-                color={tempColor}
-                onChange={setTempColor}
-                style={{
-                  width: "100%",
-                  height: "240px",
-                  backgroundColor: "transparent",
-                }}
-              />
-            </div>
-            <div className="flex items-center gap-2">
-              <div
-                className="w-10 h-10 rounded-lg border"
-                style={{ backgroundColor: tempColor }}
-              />
-              <Input
-                value={tempColor}
-                onChange={(e) => {
-                  const val = e.target.value;
-                  if (/^#[0-9A-Fa-f]{0,6}$/.test(val)) {
-                    setTempColor(val);
-                  }
-                }}
-                maxLength={7}
-                className="font-mono text-sm h-10 bg-secondary/20"
-              />
-            </div>
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                className="flex-1"
-                onClick={() => {
-                  setTempColor(color);
-                  setOpen(false);
-                }}
-              >
-                Cancel
-              </Button>
-              <Button
-                className="flex-1"
-                onClick={() => {
-                  onChange(tempColor);
-                  setOpen(false);
-                }}
-              >
-                Apply
-              </Button>
-            </div>
-          </div>
+        <PopoverContent className="w-auto p-3 z-[150]">
+          <HexColorPicker
+            color={color}
+            onChange={(newColor) => {
+              onChange(newColor);
+            }}
+          />
+          <Input
+            value={color}
+            onChange={(e) => onChange(e.target.value)}
+            className="mt-2"
+          />
         </PopoverContent>
       </Popover>
+      {showRemove && (
+        <button
+          className="absolute -top-2 -right-2 rounded-full w-5 h-5 bg-white flex items-center justify-center shadow-md hover:bg-red-100 transition-colors z-[120]"
+          onClick={(e) => {
+            e.stopPropagation();
+            onRemove();
+          }}
+        >
+          <X className="w-3 h-3 text-red-500" />
+        </button>
+      )}
     </div>
   );
 };
@@ -186,6 +131,8 @@ const Sidebar: React.FC<SidebarProps> = ({
   onIndustryChange,
   onColorSchemeChange,
 }) => {
+  const [linkInput, setLinkInput] = useState("");
+
   const handleColorChange = (index: number, newColor: string) => {
     const newColors = [...colorScheme];
     newColors[index] = newColor;
@@ -202,26 +149,25 @@ const Sidebar: React.FC<SidebarProps> = ({
     }
   };
 
-  const handleAddLink = () => {
-    const link = prompt(
-      "Enter a link to your current website, social media, or reference images:"
-    );
-    if (link) {
-      try {
-        const url = new URL(link);
-        if (url.protocol === "http:" || url.protocol === "https:") {
-          onAddLink(link);
-        } else {
-          alert("Please enter a valid http or https URL");
-        }
-      } catch (e) {
-        alert("Please enter a valid URL (e.g., https://example.com)");
+  const handleAddLinkSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!linkInput) return;
+
+    try {
+      const url = new URL(linkInput);
+      if (url.protocol === "http:" || url.protocol === "https:") {
+        onAddLink(linkInput);
+        setLinkInput("");
+      } else {
+        alert("Please enter a valid http or https URL");
       }
+    } catch (e) {
+      alert("Please enter a valid URL (e.g., https://example.com)");
     }
   };
 
   return (
-    <div className="w-90 h-full bg-[#0a0a0b00] border-l border-neutral-70 z-20">
+    <div className="w-90 h-full bg-[#0a0a0b00] border-l border-neutral-70 z-[90]">
       <div className="p-4 border-b border-neutral-70">
         <h2 className="text-2xl font-bold text-neutral-10 p-2 ">
           Website Details
@@ -243,7 +189,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                       <Paintbrush className="h-5 w-5" />
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuContent align="end" className="w-56 z-[150]">
                     {Object.entries(PRESET_THEMES).map(([name, colors]) => (
                       <DropdownMenuItem
                         key={name}
@@ -364,11 +310,15 @@ const Sidebar: React.FC<SidebarProps> = ({
                 onChange={(e) => handleFileUpload(e, onInspirationUpload)}
                 accept="image/*"
                 className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                id="inspiration-upload"
+                id="inspiration-reference-upload"
               />
-              <Button variant="outline" className="w-full pointer-events-none">
-                <Upload className="h-4 w-4 mr-2" />
-                Add Image
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full flex items-center gap-2 pointer-events-none"
+              >
+                <Upload className="h-4 w-4" />
+                Add a Reference Image
               </Button>
             </div>
           </div>
@@ -376,44 +326,56 @@ const Sidebar: React.FC<SidebarProps> = ({
           <Separator />
 
           <div>
-            <h3 className="text-sm font-medium mb-3">Useful Links</h3>
-            <p className="text-xs text-muted-foreground mb-3">
-              Add links to your current website, social media, or any reference
-              images that will help build your website.
-            </p>
+            <h3 className="text-sm font-medium flex items-center gap-2 mb-3">
+              <LinkIcon className="h-5 w-5" />
+              Useful Links
+            </h3>
+
+            <form onSubmit={handleAddLinkSubmit} className="flex gap-2 mb-3">
+              <Input
+                placeholder="https://example.com"
+                value={linkInput}
+                onChange={(e) => setLinkInput(e.target.value)}
+                className="flex-1"
+              />
+              <Button type="submit" size="sm">
+                Add
+              </Button>
+            </form>
+
             {inspirationLinks.length > 0 ? (
-              <div className="space-y-2 mb-3">
+              <div className="space-y-2">
                 {inspirationLinks.map((link, index) => (
                   <div
                     key={index}
-                    className="group relative p-2 text-sm bg-gray-100 dark:bg-gray-900 rounded hover:bg-gray-200 dark:hover:bg-gray-800"
+                    className="flex items-center justify-between"
                   >
-                    <p className="truncate pr-6">{link}</p>
-                    <button
-                      onClick={() => {
-                        const newLinks = inspirationLinks.filter(
-                          (_, i) => i !== index
-                        );
-                        onAddLink(newLinks.join(","));
-                      }}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity"
+                    <a
+                      href={link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm text-blue-400 hover:text-blue-300 truncate max-w-[200px]"
                     >
-                      <X className="h-4 w-4 text-gray-500 hover:text-red-500" />
-                    </button>
+                      {link}
+                    </a>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-6 w-6 p-0"
+                      onClick={() => {
+                        const newLinks = [...inspirationLinks];
+                        newLinks.splice(index, 1);
+                        onColorSchemeChange(newLinks);
+                      }}
+                    >
+                      <X className="h-3 w-3" />
+                    </Button>
                   </div>
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-gray-500 mb-3">No links added</p>
+              <p className="text-sm text-neutral-500">No links added.</p>
             )}
-            <Button
-              onClick={handleAddLink}
-              variant="outline"
-              className="w-full"
-            >
-              <LinkIcon className="h-4 w-4 mr-2" />
-              Add Link
-            </Button>
           </div>
 
           <Separator />
@@ -421,14 +383,15 @@ const Sidebar: React.FC<SidebarProps> = ({
           <div>
             <h3 className="text-sm font-medium mb-3">Industry</h3>
             <Select value={industry} onValueChange={onIndustryChange}>
-              <SelectTrigger>
+              <SelectTrigger className="w-full">
                 <SelectValue placeholder="Select an industry" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="z-[150]">
+                <SelectItem value="none">Select an industry</SelectItem>
                 <SelectItem value="ecommerce">E-commerce</SelectItem>
-                <SelectItem value="blog">Blog</SelectItem>
-                <SelectItem value="portfolio">Portfolio</SelectItem>
                 <SelectItem value="business">Business</SelectItem>
+                <SelectItem value="portfolio">Portfolio</SelectItem>
+                <SelectItem value="blog">Blog</SelectItem>
                 <SelectItem value="education">Education</SelectItem>
                 <SelectItem value="restaurant">Restaurant</SelectItem>
                 <SelectItem value="healthcare">Healthcare</SelectItem>
