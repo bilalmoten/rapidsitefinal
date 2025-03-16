@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import { motion, useAnimation, useInView } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Sparkles, ArrowRight } from "lucide-react";
+import { Sparkles, ArrowRight, Zap, Check } from "lucide-react";
 import { redirect } from "next/navigation";
 
 // Particle animation component
@@ -53,17 +53,18 @@ export default function CTA() {
   };
 
   const handleGetStarted = () => {
-    redirect("/dashboard");
+    // Will redirect to signup for Pro
+    window.location.href = "/signup";
   };
 
   const handleWatchDemo = () => {
-    // Scroll to Showcase section
-    const showcaseSection = document.getElementById("showcase");
-    showcaseSection?.scrollIntoView({ behavior: "smooth" });
+    // Scroll to Comparison section
+    const comparisonSection = document.getElementById("comparison");
+    comparisonSection?.scrollIntoView({ behavior: "smooth" });
   };
 
   return (
-    <section className="py-20 bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 relative overflow-hidden">
+    <section className="py-20 bg-gradient-to-r from-violet-600 via-purple-600 to-blue-600 relative overflow-hidden">
       {/* Animated background patterns */}
       <div className="absolute inset-0">
         <div className="absolute inset-0 bg-black/10" />
@@ -90,16 +91,18 @@ export default function CTA() {
             variants={itemVariants}
             className="text-4xl md:text-6xl font-bold mb-6"
           >
-            Stop Compromising.
+            Take Your Website to the
             <br />
-            Start Building Your Vision.
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-cyan-300 to-white">
+              Professional Level
+            </span>
           </motion.h2>
 
           <motion.p
             variants={itemVariants}
             className="text-xl md:text-2xl mb-12 text-white/90"
           >
-            Join thousands of creators building websites that truly stand out.
+            Build beautiful, custom websites with our Pro Mode experience
           </motion.p>
 
           <motion.div
@@ -109,9 +112,9 @@ export default function CTA() {
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <Button
                 onClick={handleGetStarted}
-                className="bg-white text-purple-500 hover:bg-gray-100 text-lg px-8 py-6 rounded-full w-full sm:w-auto"
+                className="bg-white text-violet-600 hover:bg-gray-100 text-lg px-8 py-6 rounded-full w-full sm:w-auto"
               >
-                <span>Get Started Free</span>
+                <span>Start with Pro Mode</span>
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
             </motion.div>
@@ -122,21 +125,55 @@ export default function CTA() {
                 onClick={handleWatchDemo}
                 className="border-white text-white hover:bg-white/10 text-lg px-8 py-6 rounded-full w-full sm:w-auto"
               >
-                Watch Demo
+                <Zap className="mr-2 w-5 h-5" />
+                See the Difference
               </Button>
             </motion.div>
+          </motion.div>
+
+          <motion.div
+            variants={itemVariants}
+            className="mt-10 max-w-2xl mx-auto bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20"
+          >
+            <h3 className="text-xl font-semibold mb-3">Pro Mode Features</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-left">
+              <div className="flex items-start gap-2">
+                <div className="text-cyan-300 mt-1">
+                  <Check />
+                </div>
+                <p>Custom image integration</p>
+              </div>
+              <div className="flex items-start gap-2">
+                <div className="text-cyan-300 mt-1">
+                  <Check />
+                </div>
+                <p>Sophisticated animations</p>
+              </div>
+              <div className="flex items-start gap-2">
+                <div className="text-cyan-300 mt-1">
+                  <Check />
+                </div>
+                <p>Tailored content</p>
+              </div>
+              <div className="flex items-start gap-2">
+                <div className="text-cyan-300 mt-1">
+                  <Check />
+                </div>
+                <p>Brand-aligned color schemes</p>
+              </div>
+            </div>
           </motion.div>
 
           <motion.p
             variants={itemVariants}
             className="mt-8 text-white/80 text-sm"
           >
-            No credit card required • Free plan available • Cancel anytime
+            Free trial available • Cancel anytime • Technical support included
           </motion.p>
 
           {/* Floating elements */}
           <motion.div
-            className="absolute -left-12 top-1/2 w-24 h-24 bg-gradient-to-br from-purple-400 to-pink-400 rounded-full opacity-50 blur-xl"
+            className="absolute -left-12 top-1/2 w-24 h-24 bg-gradient-to-br from-violet-400 to-blue-400 rounded-full opacity-50 blur-xl"
             animate={{
               y: [0, 20, 0],
               rotate: [0, 180, 360],
@@ -148,7 +185,7 @@ export default function CTA() {
             }}
           />
           <motion.div
-            className="absolute -right-12 bottom-1/4 w-32 h-32 bg-gradient-to-br from-pink-400 to-red-400 rounded-full opacity-50 blur-xl"
+            className="absolute -right-12 bottom-1/4 w-32 h-32 bg-gradient-to-br from-blue-400 to-cyan-400 rounded-full opacity-50 blur-xl"
             animate={{
               y: [0, -30, 0],
               rotate: [360, 180, 0],

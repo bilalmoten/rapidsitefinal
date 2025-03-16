@@ -25,6 +25,46 @@ type FAQ = {
 
 const faqs: FAQ[] = [
   {
+    id: "express-vs-pro",
+    question: "What's the difference between Express and Pro modes?",
+    answer:
+      "Express Mode generates websites quickly (in about 2 minutes) with a single prompt. It's perfect for quickly visualizing your idea or creating simple websites. Pro Mode involves a guided conversation to understand your needs in detail, allowing for custom imagery, animations, and tailored content. Pro Mode takes 5-10 minutes but produces more sophisticated, personalized websites.",
+    category: "Features",
+    relatedQuestions: ["which-mode-right-for-me", "pro-mode-features"],
+  },
+  {
+    id: "which-mode-right-for-me",
+    question: "Which mode is right for my business?",
+    answer:
+      "Express Mode is ideal for simple informational websites, quick prototypes, or when you need something fast. Pro Mode is better suited for businesses that need a more custom, polished web presence with brand alignment, specific features, and higher engagement. If your website is central to your business, Pro Mode will typically deliver better results.",
+    category: "Features",
+    relatedQuestions: ["express-vs-pro", "pro-mode-features"],
+  },
+  {
+    id: "pro-mode-features",
+    question: "What exclusive features does Pro Mode offer?",
+    answer:
+      "Pro Mode offers several exclusive features including: custom image integration, enhanced animations and interactions, tailored content aligned to your brand voice, more sophisticated design elements, color scheme customization based on your preferences, and multi-page websites with better organization.",
+    category: "Features",
+    relatedQuestions: ["express-vs-pro", "which-mode-right-for-me"],
+  },
+  {
+    id: "express-mode-upgrades",
+    question: "Can I upgrade from an Express site to a Pro site later?",
+    answer:
+      "Currently, direct upgrading from Express to Pro Mode isn't available. However, we're working on a feature that will allow you to use your Express site URL as input for a Pro Mode generation. This will be available soon, enabling you to build upon your Express site with the enhanced capabilities of Pro Mode.",
+    category: "Features",
+    relatedQuestions: ["express-vs-pro", "pro-mode-features"],
+  },
+  {
+    id: "free-tier-modes",
+    question: "Which modes are available in the free tier?",
+    answer:
+      "The free tier gives you access to Express Mode only. To unlock Pro Mode and create more sophisticated, tailored websites, you'll need to upgrade to one of our paid plans. All paid plans provide full access to both Express and Pro modes.",
+    category: "Pricing",
+    relatedQuestions: ["express-vs-pro", "upgrade-now"],
+  },
+  {
     id: "customization",
     question: "How customizable are the AI-generated websites?",
     answer:

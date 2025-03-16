@@ -12,36 +12,43 @@ const industries = [
     id: "charity",
     label: "Charity",
     description: "Non-profit and cause-focused websites",
+    mode: "pro",
   },
   {
     id: "restaurant",
     label: "Restaurant",
     description: "Food service and dining establishments",
+    mode: "pro",
   },
   {
     id: "portfolio",
     label: "Portfolio",
     description: "Creative professionals and artists",
+    mode: "pro",
   },
   {
     id: "saas",
     label: "SaaS",
     description: "Software and tech companies",
+    mode: "pro",
   },
   {
     id: "ecommerce",
     label: "E-commerce",
     description: "Online stores and marketplaces",
+    mode: "express",
   },
   {
     id: "agency",
     label: "Agency",
     description: "Service-based businesses",
+    mode: "express",
   },
   {
     id: "blog",
     label: "Blog",
     description: "Personal or news-based websites",
+    mode: "express",
   },
 ];
 
@@ -133,7 +140,19 @@ export default function Showcase() {
                 )}
                 whileHover={{ x: 5 }}
               >
-                <p className="font-medium text-gray-200">{industry.label}</p>
+                <div className="flex justify-between items-center">
+                  <p className="font-medium text-gray-200">{industry.label}</p>
+                  <span
+                    className={cn(
+                      "text-xs px-2 py-0.5 rounded-full",
+                      industry.mode === "pro"
+                        ? "bg-violet-500/20 text-violet-400 border border-violet-500/30"
+                        : "bg-blue-500/20 text-blue-400 border border-blue-500/30"
+                    )}
+                  >
+                    {industry.mode === "pro" ? "Pro" : "Express"}
+                  </span>
+                </div>
                 <p className="text-sm text-gray-400">{industry.description}</p>
               </motion.button>
             ))}
@@ -155,6 +174,27 @@ export default function Showcase() {
                   <div className="w-3 h-3 rounded-full bg-red-500/50" />
                   <div className="w-3 h-3 rounded-full bg-yellow-500/50" />
                   <div className="w-3 h-3 rounded-full bg-green-500/50" />
+
+                  {/* Add site title and mode badge */}
+                  <div className="flex-1 flex justify-center items-center gap-3">
+                    <span className="text-xs text-gray-400">
+                      {
+                        websites[selectedIndustry as keyof typeof websites]
+                          .title
+                      }
+                    </span>
+
+                    {industries.find((i) => i.id === selectedIndustry)?.mode ===
+                    "pro" ? (
+                      <span className="text-xs px-2 py-0.5 rounded-full bg-violet-500/20 text-violet-400 border border-violet-500/30">
+                        Pro Mode
+                      </span>
+                    ) : (
+                      <span className="text-xs px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-400 border border-blue-500/30">
+                        Express Mode
+                      </span>
+                    )}
+                  </div>
                 </div>
 
                 {/* Scrollable Content */}
@@ -206,6 +246,33 @@ export default function Showcase() {
                               .prompt
                           }
                         </p>
+
+                        {/* Add mode indicator */}
+                        <div className="mt-4">
+                          <span
+                            className={cn(
+                              "text-xs px-2 py-0.5 rounded-full",
+                              industries.find((i) => i.id === selectedIndustry)
+                                ?.mode === "pro"
+                                ? "bg-violet-500/20 text-violet-400 border border-violet-500/30"
+                                : "bg-blue-500/20 text-blue-400 border border-blue-500/30"
+                            )}
+                          >
+                            {industries.find((i) => i.id === selectedIndustry)
+                              ?.mode === "pro"
+                              ? "Built with Pro Mode"
+                              : "Built with Express Mode"}
+                          </span>
+
+                          {industries.find((i) => i.id === selectedIndustry)
+                            ?.mode === "pro" && (
+                            <p className="text-xs text-gray-400 mt-2">
+                              This website was created using our Pro Mode with
+                              additional conversation to refine details and
+                              design choices.
+                            </p>
+                          )}
+                        </div>
                       </motion.div>
                     )}
                   </AnimatePresence>

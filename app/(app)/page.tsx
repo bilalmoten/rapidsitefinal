@@ -12,6 +12,7 @@ import CTA from "@/components/landing/CTA";
 import ThemePreview from "@/components/landing/ThemePreview";
 import EditorShowcase from "@/components/landing/EditorShowcase/index";
 import Testimonials from "@/components/landing/Testimonials";
+import Comparison from "@/components/landing/Comparison";
 
 export default function LandingPage() {
   return (
@@ -20,6 +21,7 @@ export default function LandingPage() {
       {/* <ThemePreview /> */}
       <HowItWorks />
       <Showcase />
+      <Comparison />
       <EditorShowcase />
       <Testimonials />
       <FAQ />

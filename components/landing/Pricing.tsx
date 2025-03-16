@@ -31,9 +31,13 @@ export default function Pricing() {
       price: "0",
       period: "Forever free",
       description:
-        "Perfect for trying out Rapid Site AI website builder in minutes",
+        "Quick website creation with Express Mode for trying out Rapid Site AI",
+      availableModes: [
+        { mode: "Express Mode", available: true },
+        { mode: "Pro Mode", available: false },
+      ],
       features: [
-        { icon: Building2, text: "1 website" },
+        { icon: Building2, text: "1 Express Mode website" },
         { icon: Sparkles, text: "3 AI website generations/month" },
         { icon: Zap, text: "10 AI edits/month" },
         { icon: Image, text: "5 image generations/month" },
@@ -43,16 +47,21 @@ export default function Pricing() {
         { icon: Wifi, text: "10GB bandwidth" },
         { icon: Shield, text: "SSL included" },
       ],
-      cta: "Start Free Trial",
+      cta: "Start for Free",
     },
     {
       name: "Pro",
       price: isYearly ? "7.5" : "10",
-      period: "billed monthly",
-      saveText: "Save $38 annually",
-      description: "For serious creators ready to build amazing websites",
+      period: isYearly ? "billed yearly" : "billed monthly",
+      saveText: isYearly ? "Save $38 annually" : "",
+      description:
+        "For serious creators ready to build amazing websites with Pro Mode",
+      availableModes: [
+        { mode: "Express Mode", available: true },
+        { mode: "Pro Mode", available: true },
+      ],
       features: [
-        { icon: Building2, text: "5 websites" },
+        { icon: Building2, text: "5 websites (any mode)" },
         { icon: Sparkles, text: "20 AI website generations/month" },
         { icon: Zap, text: "Unlimited AI edits" },
         { icon: Image, text: "50 image generations/month" },
@@ -75,9 +84,13 @@ export default function Pricing() {
     {
       name: "Enterprise",
       price: isYearly ? "29" : "39",
-      period: "billed monthly",
+      period: isYearly ? "billed yearly" : "billed monthly",
       description:
         "Custom solutions for growing businesses" + " and enterprises",
+      availableModes: [
+        { mode: "Express Mode", available: true },
+        { mode: "Pro Mode", available: true },
+      ],
       features: [
         { icon: Building2, text: "Unlimited websites" },
         { icon: Sparkles, text: "Unlimited AI generations" },
@@ -140,7 +153,7 @@ export default function Pricing() {
             <div
               key={plan.name}
               className={cn(
-                "rounded-2xl bg-white/5 p-8 relative",
+                "rounded-2xl bg-white/5 p-8 relative flex flex-col h-full",
                 plan.popular
                   ? "border-2 border-cyan-400"
                   : "border border-gray-800"
@@ -152,28 +165,71 @@ export default function Pricing() {
                 </div>
               )}
 
-              <h3 className="text-2xl font-bold mb-2">{plan.name}</h3>
-              <div className="flex items-baseline gap-1 mb-1">
-                <span className="text-5xl font-bold">${plan.price}</span>
-                <span className="text-gray-400">/month</span>
-              </div>
-              <div className="text-sm text-gray-400">{plan.period}</div>
-              {plan.saveText && isYearly && (
-                <div className="text-purple-400 text-sm mt-1">
-                  {plan.saveText}
+              <div className="flex-grow">
+                <h3 className="text-2xl font-bold mb-2">{plan.name}</h3>
+                <div className="flex items-baseline gap-1 mb-1">
+                  <span className="text-5xl font-bold">${plan.price}</span>
+                  <span className="text-gray-400">/month</span>
                 </div>
-              )}
+                <div className="text-sm text-gray-400">{plan.period}</div>
+                {plan.saveText && isYearly && (
+                  <div className="text-purple-400 text-sm mt-1">
+                    {plan.saveText}
+                  </div>
+                )}
 
-              <p className="text-gray-400 mt-6 mb-8">{plan.description}</p>
+                <p className="text-gray-400 mt-6 mb-8">{plan.description}</p>
 
-              <ul className="space-y-4 text-sm">
-                {plan.features.map((feature, idx) => (
-                  <li key={idx} className="flex items-center gap-3">
-                    <feature.icon className="h-5 w-5 text-cyan-400" />
-                    <span>{feature.text}</span>
-                  </li>
-                ))}
-              </ul>
+                {/* Available Modes */}
+                <div className="mb-6 p-3 rounded-lg bg-black/20 border border-gray-700">
+                  <p className="text-sm font-medium mb-2">Available Modes:</p>
+                  {plan.availableModes.map((mode, idx) => (
+                    <div
+                      key={idx}
+                      className="flex items-center gap-2 text-sm mb-1"
+                    >
+                      {mode.available ? (
+                        <Check className="h-4 w-4 text-green-400" />
+                      ) : (
+                        <span className="h-4 w-4 text-gray-500 text-center">
+                          -
+                        </span>
+                      )}
+                      <span
+                        className={cn(
+                          mode.available
+                            ? mode.mode === "Express Mode"
+                              ? "text-blue-400"
+                              : "text-violet-400"
+                            : "text-gray-500"
+                        )}
+                      >
+                        {mode.mode}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+
+                <ul className="space-y-4 text-sm mb-8">
+                  {plan.features.map((feature, idx) => (
+                    <li key={idx} className="flex items-center gap-3">
+                      <feature.icon className="h-5 w-5 text-cyan-400 shrink-0" />
+                      <span>{feature.text}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <button
+                className={cn(
+                  "w-full py-3 rounded-lg transition-colors font-medium h-12 flex items-center justify-center mt-auto",
+                  plan.popular
+                    ? "bg-gradient-to-r from-cyan-500 to-violet-700 hover:from-cyan-600 hover:to-violet-800 text-white"
+                    : "bg-white/10 hover:bg-white/20 text-white"
+                )}
+              >
+                {plan.cta}
+              </button>
             </div>
           ))}
         </div>
