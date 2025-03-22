@@ -2,6 +2,7 @@
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
 import ClientEditor from "@/components/ClientEditor";
+import AnonymousUserBanner from "@/components/AnonymousUserBanner";
 
 export default async function EditorPage(props: {
   params: Promise<{ website_id: string }>;
@@ -20,7 +21,7 @@ export default async function EditorPage(props: {
   console.log("Fetching website data for ID:", params.website_id);
   const { data: website, error: websiteError } = await supabase
     .from("websites")
-    .select("subdomain, pages")
+    .select("subdomain, pages, user_id")
     .eq("id", params.website_id)
     .single();
 
@@ -31,25 +32,44 @@ export default async function EditorPage(props: {
     );
   }
 
-  if (!website || !website.pages || website.pages.length === 0) {
-    console.error("No pages found for website");
+  // Check if this website belongs to the current user
+  const isOwner = website.user_id === user.id;
+
+  // Anonymous users can only view their own websites
+  const isAnonymous = !user.email;
+  if (isAnonymous && !isOwner) {
+    console.log("Anonymous user trying to access someone else's website");
+    return redirect("/dashboard");
+  }
+
+  // Validate pages array and filter out any empty strings
+  if (!website.pages || !Array.isArray(website.pages)) {
+    console.error("No pages array found for website");
     return <div>No pages found for this website.</div>;
   }
 
-  const initialPageTitle = website.pages[0];
+  // Filter out empty page names
+  const validPages = website.pages.filter((page) => page && page.trim() !== "");
+
+  if (validPages.length === 0) {
+    console.error("No valid pages found for website");
+    return <div>No valid pages found for this website.</div>;
+  }
+
+  const initialPageTitle = validPages[0];
   console.log("Initial page title:", initialPageTitle);
 
   console.log("Fetching page content");
   const { data: page, error: pageError } = await supabase
     .from("pages")
     .select("content")
-    .eq("user_id", user.id)
+    .eq("user_id", website.user_id)
     .eq("website_id", params.website_id)
     .eq("title", initialPageTitle)
     .single();
 
   if (pageError) {
-    console.error("Error fetching page content:", pageError);
+    console.error("Error fetching page:", pageError);
     return <div>Error fetching page content: {pageError.message}</div>;
   }
 
@@ -59,43 +79,38 @@ export default async function EditorPage(props: {
   }
 
   // Get user's plan and usage data
-  const { data: userUsage, error: userUsageError } = await supabase
-    .from("user_usage")
-    .select("*")
-    .eq("user_id", user.id)
-    .single();
-
-  if (userUsageError) {
-    console.error("Error fetching user plan:", userUsageError);
-    return <div>Error fetching user plan: {userUsageError.message}</div>;
-  }
-
-  // Get user's profile data
-  const { data: userData, error: userDataError } = await supabase
+  const { data: userData, error: userError } = await supabase
     .from("users")
     .select("*")
     .eq("id", user.id)
     .single();
 
-  if (userDataError) {
-    console.error("Error fetching user data:", userDataError);
-    return <div>Error fetching user data: {userDataError.message}</div>;
-  }
+  const userPlan = userData?.plan || "free";
+  const userUsage = {
+    websitesActive: userData?.websites_active || 0,
+    websitesGenerated: userData?.websites_generated || 0,
+    aiEditsCount: userData?.ai_edits_count || 0,
+    plan: userData?.plan || "free",
+  };
 
-  const userPlan = userUsage?.plan || "free";
+  // Show banner only for anonymous users
+  const showAnonymousBanner = isAnonymous;
 
   console.log("Rendering ClientEditor");
   return (
-    <ClientEditor
-      initialPageTitle={initialPageTitle}
-      initialContent={page.content || ""}
-      userId={user.id}
-      websiteId={params.website_id}
-      subdomain={website.subdomain}
-      pages={website.pages}
-      userPlan={userPlan}
-      usage={userUsage}
-      user={userData}
-    />
+    <>
+      {showAnonymousBanner && <AnonymousUserBanner />}
+      <ClientEditor
+        initialContent={page.content || ""}
+        userId={website.user_id}
+        websiteId={params.website_id}
+        initialPageTitle={initialPageTitle}
+        subdomain={website.subdomain}
+        pages={validPages}
+        userPlan={userPlan}
+        usage={userUsage}
+        user={userData}
+      />
+    </>
   );
 }

@@ -3,15 +3,17 @@ import { Suspense } from "react";
 import WaitlistForm from "@/components/WaitlistForm";
 import AnimatedLoginContent from "@/components/AnimatedLoginContent";
 import MotionWrapper from "@/components/MotionWrapper";
+import AnonymousSignupForm from "./AnonymousSignupForm";
 
 // Set this to false to enable normal signups
-const WAITLIST_MODE = true;
+const WAITLIST_MODE = false;
 
 export default async function SignupPage(props: {
   params: Promise<{}>;
-  searchParams: Promise<{ message?: string }>;
+  searchParams: Promise<{ message?: string; anonymous?: string }>;
 }) {
   const searchParams = await props.searchParams;
+  const isAnonymousConversion = searchParams.anonymous === "true";
 
   if (WAITLIST_MODE) {
     return (
@@ -52,7 +54,11 @@ export default async function SignupPage(props: {
       <div className="w-3/5 flex items-center justify-center bg-background">
         <div className="w-full max-w-md space-y-8 p-10 bg-card rounded-xl shadow-lg">
           <Suspense fallback={<div>Loading...</div>}>
-            <SignupForm message={searchParams.message} />
+            {isAnonymousConversion ? (
+              <AnonymousSignupForm message={searchParams.message} />
+            ) : (
+              <SignupForm message={searchParams.message} />
+            )}
           </Suspense>
         </div>
       </div>

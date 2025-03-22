@@ -6,13 +6,13 @@ export async function GET(request: Request) {
     const requestUrl = new URL(request.url);
     const code = requestUrl.searchParams.get("code");
     const newsletter = requestUrl.searchParams.get("newsletter") === "true";
-    const next = requestUrl.searchParams.get("next");
+    const redirect_to = requestUrl.searchParams.get("redirect_to");
     const origin = requestUrl.origin;
 
     console.log("Auth Callback Debug:", {
       code: code ? "present" : "missing",
       newsletter,
-      next,
+      redirect_to,
       origin,
       fullUrl: request.url,
       allParams: Object.fromEntries(requestUrl.searchParams)
@@ -69,7 +69,27 @@ export async function GET(request: Request) {
             console.error("Failed to handle newsletter subscription:", err);
           }
         }
-        const redirectUrl = next ? `${origin}${next}` : `${origin}/dashboard`;
+
+        // Determine the redirect URL
+        let redirectUrl = `${origin}/dashboard`;
+
+        // If we have a specific redirect_to parameter, use it
+        if (redirect_to) {
+          // Ensure redirect_to starts with a slash
+          const normalizedRedirectTo = redirect_to.startsWith('/')
+            ? redirect_to
+            : `/${redirect_to}`;
+
+          // Prioritize redirect to editor paths
+          if (normalizedRedirectTo.includes('/editor/')) {
+            console.log("Redirecting to editor path:", normalizedRedirectTo);
+            redirectUrl = `${origin}${normalizedRedirectTo}`;
+          } else {
+            console.log("Redirecting to custom path:", normalizedRedirectTo);
+            redirectUrl = `${origin}${normalizedRedirectTo}`;
+          }
+        }
+
         console.log("Auth successful, redirecting to:", redirectUrl);
         return NextResponse.redirect(redirectUrl);
       }

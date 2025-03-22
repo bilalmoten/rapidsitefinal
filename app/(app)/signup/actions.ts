@@ -2,6 +2,7 @@
 
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
+import { convertToPermanentUser, mergeAnonymousData } from "@/utils/supabase/anon-auth";
 
 
 export async function signUp(formData: FormData) {
@@ -95,4 +96,94 @@ export async function signInWithGoogle(formData?: FormData) {
     // in the auth callback route since we don't have immediate access to the email
 
     return redirect(data.url);
+}
+
+export async function convertAnonymousUser(formData: FormData) {
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
+    const newsletter = formData.get("newsletter") === "on";
+    const redirectPath = formData.get("redirectPath") as string || "/dashboard";
+
+    const siteUrl = process.env.NODE_ENV === 'development'
+        ? 'http://localhost:3000'
+        : 'https://rapidai.website';
+
+    const supabase = await createClient();
+
+    try {
+        // First get the current user to check if they're anonymous
+        const { data: { user: currentUser } } = await supabase.auth.getUser();
+
+        if (!currentUser) {
+            return {
+                error: "No user session found. Please try again."
+            };
+        }
+
+        // Check if they are anonymous (no email)
+        const isAnonymous = !currentUser.email;
+
+        if (!isAnonymous) {
+            return {
+                error: "This account is not anonymous. Please sign in normally."
+            };
+        }
+
+        // Save the current user ID to use for data migration
+        const anonymousUserId = currentUser.id;
+
+        console.log("Converting anonymous user:", {
+            anonymousUserId,
+            email,
+            redirectPath
+        });
+
+        // Prepare redirect URL with the editor path if available
+        let emailRedirectTo = `${siteUrl}/auth/callback`;
+
+        // If we have a specific redirectPath like /dashboard/editor/123, 
+        // include it in the email verification link
+        if (redirectPath && redirectPath !== "/dashboard") {
+            emailRedirectTo = `${siteUrl}/auth/callback?redirect_to=${encodeURIComponent(redirectPath)}`;
+        }
+
+        console.log("Email redirect URL:", emailRedirectTo);
+
+        // Convert anonymous user to permanent
+        const { error } = await supabase.auth.updateUser({
+            email,
+            password,
+            data: {
+                newsletter: newsletter,
+                redirect_url: emailRedirectTo
+            }
+        }, {
+            emailRedirectTo
+        });
+
+        if (error) {
+            console.error("Error converting anonymous user:", error);
+
+            if (error.message.includes("already registered")) {
+                return {
+                    error: "This email is already registered. Please use a different email or log in."
+                };
+            }
+
+            return {
+                error: error.message || "Failed to convert anonymous user"
+            };
+        }
+
+        // Return success message instead of redirecting
+        return {
+            success: true,
+            message: "Check your email to verify your account. Your Express Mode website has been saved to your account."
+        };
+    } catch (error: any) {
+        console.error("Error in convertAnonymousUser:", error);
+        return {
+            error: error.message || "An unexpected error occurred"
+        };
+    }
 } 

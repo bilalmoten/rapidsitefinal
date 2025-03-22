@@ -37,7 +37,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         <Analytics />
         <SpeedInsights />
         <GoogleAnalytics gaId="G-6CS8ZP8T4K" />
-        <ClientTawkWrapper />
+        {process.env.NODE_ENV === "production" && <ClientTawkWrapper />}
       </PostHogProvider>
     </div>
   );

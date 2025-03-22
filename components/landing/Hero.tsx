@@ -8,7 +8,15 @@ import AnimatedPrompts from "@/components/ui/animated-prompts";
 import { Caveat } from "next/font/google";
 import { Badge } from "@/components/ui/badge";
 import { useState } from "react";
-import { Sparkles, Rocket } from "lucide-react";
+import { Sparkles, Rocket, Info } from "lucide-react";
+import { toast } from "sonner";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 const caveat = Caveat({
   weight: "400",
@@ -18,11 +26,95 @@ const caveat = Caveat({
 export default function Hero() {
   const router = useRouter();
   const [inputValue, setInputValue] = useState("");
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [enhancePrompt, setEnhancePrompt] = useState(false);
 
-  const handleBuildNow = (e: React.FormEvent) => {
+  const handleBuildNow = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Will be updated later to handle anonymous auth and Express Mode generation
-    router.push("/dashboard");
+
+    if (!inputValue.trim()) {
+      toast.error("Please describe your website first");
+      return;
+    }
+
+    try {
+      setIsGenerating(true);
+
+      // Step 1: Sign in anonymously (or get existing session)
+      console.log("Starting anonymous authentication...");
+
+      const anonResponse = await fetch("/api/auth/anonymous", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+      });
+
+      if (!anonResponse.ok) {
+        const errorData = await anonResponse.json();
+        console.error("Anonymous auth error:", errorData);
+        throw new Error(errorData.error || "Failed to sign in anonymously");
+      }
+
+      const anonData = await anonResponse.json();
+      console.log("Anonymous auth successful:", anonData);
+
+      if (!anonData.user?.id) {
+        throw new Error("No user ID received from anonymous authentication");
+      }
+
+      // Step 2: Generate website using Express Mode
+      console.log(
+        "Starting website generation with user ID:",
+        anonData.user.id
+      );
+
+      toast.info("Generating your website...", {
+        description: `This will take about ${enhancePrompt ? "2 minutes" : "1 minute"}`,
+        duration: 10000,
+      });
+
+      const generateResponse = await fetch("/api/express-generate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          prompt: inputValue,
+          userId: anonData.user.id,
+          enhancePrompt: enhancePrompt,
+        }),
+      });
+
+      if (!generateResponse.ok) {
+        const errorData = await generateResponse.json();
+        console.error("Website generation error:", errorData);
+        throw new Error(errorData.error || "Failed to generate website");
+      }
+
+      const generateData = await generateResponse.json();
+      console.log("Website generation successful:", generateData);
+
+      if (!generateData.websiteId) {
+        throw new Error("No website ID received from generation");
+      }
+
+      // Step 3: Redirect to editor with the new website ID
+      toast.success("Website generated successfully!", {
+        description: "Redirecting to editor...",
+      });
+
+      router.push(`/dashboard/editor/${generateData.websiteId}`);
+    } catch (error: any) {
+      console.error("Error in express generation:", error);
+      toast.error("Failed to generate website", {
+        description: error.message || "Please try again",
+      });
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   const containerVariants = {
@@ -137,7 +229,45 @@ export default function Hero() {
                         onChange={(e) => setInputValue(e.target.value)}
                         placeholder=""
                         className="h-full w-full bg-transparent border-none rounded-xl text-gray-200 p-4 text-base resize-none focus:ring-0 focus:outline-none"
+                        disabled={isGenerating}
                       />
+                    </div>
+
+                    <div className="mt-2 flex items-center gap-2">
+                      <Checkbox
+                        id="enhance-prompt"
+                        className="border-gray-400 text-cyan-500 focus:ring-cyan-500/50"
+                        checked={enhancePrompt}
+                        onCheckedChange={(checked) =>
+                          setEnhancePrompt(checked as boolean)
+                        }
+                        disabled={isGenerating}
+                      />
+                      <label
+                        htmlFor="enhance-prompt"
+                        className="text-gray-300 text-sm cursor-pointer flex items-center gap-1"
+                      >
+                        Enhance with AI
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger
+                              asChild
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <span>
+                                <Info className="h-4 w-4 text-gray-400" />
+                              </span>
+                            </TooltipTrigger>
+                            <TooltipContent className="max-w-xs">
+                              <p>
+                                AI will expand your prompt with additional
+                                details for a more comprehensive website. This
+                                takes a bit longer but produces better results.
+                              </p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      </label>
                     </div>
                   </div>
 
@@ -145,9 +275,10 @@ export default function Hero() {
                     <Button
                       type="submit"
                       className="bg-gradient-to-r from-cyan-500 to-violet-700 hover:from-cyan-600 hover:to-violet-800 text-white rounded-full px-8 py-7 w-full shadow-lg hover:shadow-cyan-500/20 transition-all text-lg font-medium"
+                      disabled={isGenerating}
                     >
                       <Rocket className="w-5 h-5 mr-2" />
-                      Generate Website
+                      {isGenerating ? "Generating..." : "Generate Website"}
                     </Button>
                     <motion.div className="mt-2 text-center lg:text-left">
                       <span

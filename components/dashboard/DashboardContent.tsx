@@ -26,12 +26,14 @@ interface DashboardContentProps {
     last_updated_at: string;
   }[];
   projectCount: number;
+  isAnonymous?: boolean;
 }
 
 const DashboardContent: React.FC<DashboardContentProps> = ({
   user,
   websites,
   projectCount,
+  isAnonymous = false,
 }) => {
   const [isAIAssistantOpen, setIsAIAssistantOpen] = useState(false);
   const [isRightPanelOpen, setIsRightPanelOpen] = useState(true);
@@ -72,6 +74,18 @@ const DashboardContent: React.FC<DashboardContentProps> = ({
       >
         <main className="relative z-[1] h-screen overflow-y-auto">
           <div className="container h-full mx-auto p-4 lg:p-8 space-y-8">
+            {isAnonymous && (
+              <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6">
+                <h3 className="text-amber-800 font-semibold">
+                  Express Mode Active
+                </h3>
+                <p className="text-amber-700">
+                  You're currently using RapidSite in Express Mode. To save your
+                  websites permanently and access all features, consider
+                  creating an account.
+                </p>
+              </div>
+            )}
             <RecentProjects websites={websites} userId={user.id} />
           </div>
         </main>

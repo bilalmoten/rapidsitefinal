@@ -2,6 +2,7 @@ import React from "react";
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
 import DashboardContent from "@/components/dashboard/DashboardContent";
+import AnonymousUserBanner from "@/components/AnonymousUserBanner";
 
 export default async function DashboardPage() {
   const supabase = await createClient();
@@ -12,6 +13,9 @@ export default async function DashboardPage() {
   if (!user) {
     return redirect("/login");
   }
+
+  // Check if this is an anonymous user
+  const isAnonymous = !user.email;
 
   const { data: websites, error } = await supabase
     .from("websites")
@@ -29,10 +33,14 @@ export default async function DashboardPage() {
   const projectCount = websites.length;
 
   return (
-    <DashboardContent
-      user={user}
-      websites={websites}
-      projectCount={projectCount}
-    />
+    <>
+      {isAnonymous && <AnonymousUserBanner />}
+      <DashboardContent
+        user={user}
+        websites={websites}
+        projectCount={projectCount}
+        isAnonymous={isAnonymous}
+      />
+    </>
   );
 }
