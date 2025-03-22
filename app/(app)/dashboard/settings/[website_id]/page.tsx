@@ -3,12 +3,21 @@ import { redirect } from "next/navigation";
 import { DomainManager } from "@/components/domains/DomainManager";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { Globe, RefreshCw, Search, Lock, Trash2, BarChart } from "lucide-react";
+import {
+  Globe,
+  RefreshCw,
+  Search,
+  Lock,
+  Trash2,
+  BarChart,
+  EyeOff,
+} from "lucide-react";
 import { RegenerateWebsiteButton } from "@/components/dashboard/RegenerateWebsiteButton";
 import { EditWebsiteDialog } from "@/components/dashboard/EditWebsiteDialog";
 import { DeleteWebsiteDialog } from "@/components/DeleteWebsiteDialog";
 import { SEOSettings } from "@/components/dashboard/SEOSettings";
 import SiteAnalytics from "@/components/dashboard/SiteAnalytics";
+import UnpublishWebsiteDialog from "@/components/UnpublishWebsiteDialog";
 
 export default async function WebsiteSettingsPage(props: {
   params: Promise<{ website_id: string }>;
@@ -124,6 +133,28 @@ export default async function WebsiteSettingsPage(props: {
                 </Button>
               </EditWebsiteDialog>
             </div>
+            <div className="flex items-center justify-between border border-neutral-70 rounded-lg px-6 py-4 bg-[#0a0a0b40] backdrop-blur-sm">
+              <div>
+                <p className="text-neutral-20 text-sm mb-1">
+                  Publication Status
+                </p>
+                <p className="text-primary-main text-[20px] font-medium">
+                  {website.is_published
+                    ? "Published - Your website is live and accessible to the public"
+                    : "Not Published - Your website is only visible to you"}
+                </p>
+              </div>
+              <div className="flex items-center">
+                <div
+                  className={`w-2 h-2 rounded-full mr-2 ${website.is_published ? "bg-green-500" : "bg-yellow-500"}`}
+                ></div>
+                <span
+                  className={`text-sm ${website.is_published ? "text-green-500" : "text-yellow-500"}`}
+                >
+                  {website.is_published ? "Live" : "Draft"}
+                </span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -162,6 +193,33 @@ export default async function WebsiteSettingsPage(props: {
             Danger Zone
           </h2>
           <div className="space-y-4">
+            {website.is_published && (
+              <div className="flex items-center justify-between border border-neutral-70 rounded-lg px-6 py-4 bg-[#0a0a0b40] backdrop-blur-sm">
+                <div>
+                  <p className="text-neutral-20 text-sm mb-1">
+                    Unpublish Website
+                  </p>
+                  <p className="text-neutral-40 text-sm">
+                    Take your website offline so it's no longer accessible to
+                    the public. You can publish it again later.
+                  </p>
+                </div>
+                <UnpublishWebsiteDialog
+                  websiteId={params.website_id}
+                  websiteName={website.website_name}
+                  subdomain={website.subdomain}
+                >
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="border-red-500/30 text-red-400 hover:bg-red-950/20 hover:text-red-300"
+                  >
+                    <EyeOff className="w-4 h-4 mr-2" />
+                    Unpublish
+                  </Button>
+                </UnpublishWebsiteDialog>
+              </div>
+            )}
             <div className="flex items-center justify-between border border-neutral-70 rounded-lg px-6 py-4 bg-[#0a0a0b40] backdrop-blur-sm">
               <div>
                 <p className="text-neutral-20 text-sm mb-1">

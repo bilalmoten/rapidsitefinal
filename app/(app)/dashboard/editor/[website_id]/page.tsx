@@ -21,7 +21,7 @@ export default async function EditorPage(props: {
   console.log("Fetching website data for ID:", params.website_id);
   const { data: website, error: websiteError } = await supabase
     .from("websites")
-    .select("subdomain, pages, user_id")
+    .select("subdomain, pages, user_id, website_name, is_published")
     .eq("id", params.website_id)
     .single();
 
@@ -78,25 +78,57 @@ export default async function EditorPage(props: {
     return <div>No content found for this page.</div>;
   }
 
-  // Get user's plan and usage data
+  // Get user's basic info from users table
   const { data: userData, error: userError } = await supabase
     .from("users")
-    .select("*")
+    .select("email, first_name, last_name, avatar_url, plan")
     .eq("id", user.id)
     .single();
 
-  const userPlan = userData?.plan || "free";
+  if (userError) {
+    console.error("Error fetching user data:", userError);
+  }
+
+  // Format user data for ClientEditor component
+  const formattedUserData = userData
+    ? {
+        email: userData.email || "",
+        first_name: userData.first_name,
+        last_name: userData.last_name,
+        avatar_url: userData.avatar_url,
+      }
+    : undefined;
+
+  // Get user's usage data from the user_usage table
+  const { data: userUsageData, error: usageError } = await supabase
+    .from("user_usage")
+    .select("*")
+    .eq("user_id", user.id)
+    .single();
+
+  if (usageError) {
+    console.error("Error fetching user usage data:", usageError);
+    // Continue without usage data, using defaults
+  }
+
+  // Use the plan from user_usage if available, otherwise fallback to users table
+  const userPlan = userUsageData?.plan || userData?.plan || "free";
+
+  // Combine usage data from user_usage table
   const userUsage = {
-    websitesActive: userData?.websites_active || 0,
-    websitesGenerated: userData?.websites_generated || 0,
-    aiEditsCount: userData?.ai_edits_count || 0,
-    plan: userData?.plan || "free",
+    websitesActive: userUsageData?.websites_active || 0,
+    websitesGenerated: userUsageData?.websites_generated || 0,
+    aiEditsCount: userUsageData?.ai_edits_count || 0,
+    plan: userPlan,
+    subscription_status: userUsageData?.subscription_status,
+    subscription_id: userUsageData?.subscription_id,
   };
 
   // Show banner only for anonymous users
   const showAnonymousBanner = isAnonymous;
 
   console.log("Rendering ClientEditor");
+  console.log("user plan", userPlan);
   return (
     <>
       {showAnonymousBanner && <AnonymousUserBanner />}
@@ -109,7 +141,9 @@ export default async function EditorPage(props: {
         pages={validPages}
         userPlan={userPlan}
         usage={userUsage}
-        user={userData}
+        user={formattedUserData}
+        websiteName={website.website_name || ""}
+        isPublished={website.is_published || false}
       />
     </>
   );

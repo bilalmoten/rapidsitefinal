@@ -15,6 +15,7 @@ import {
   Copy,
   ExternalLink,
   Lock,
+  Upload,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import {
@@ -43,6 +44,7 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import SettingsModal from "@/components/dashboard/SettingsModal";
 import { PlanType } from "@/lib/constants/plans";
+import PublishWebsiteDialog from "./PublishWebsiteDialog";
 
 interface TopBarProps {
   onSave: () => void;
@@ -74,6 +76,9 @@ interface TopBarProps {
     last_name?: string;
     avatar_url?: string;
   };
+  websiteId: string;
+  websiteName: string;
+  isPublished: boolean;
 }
 
 const TopBar: React.FC<TopBarProps> = ({
@@ -92,6 +97,9 @@ const TopBar: React.FC<TopBarProps> = ({
   userPlan,
   usage,
   user,
+  websiteId,
+  websiteName,
+  isPublished,
 }) => {
   const router = useRouter();
   const [showSaveDialog, setShowSaveDialog] = React.useState(false);
@@ -314,14 +322,32 @@ const TopBar: React.FC<TopBarProps> = ({
                 <Lock className="w-3 h-3 ml-1.5 text-neutral-40" />
               )}
             </Button>
-            <Button
-              size="sm"
-              className="bg-primary-main hover:bg-primary-main/90 text-neutral-90"
-              onClick={onSave}
-            >
-              <Save className="mr-2 h-4 w-4" />
-              Save
-            </Button>
+
+            {isPublished ? (
+              <Button
+                size="sm"
+                className="bg-primary-main hover:bg-primary-main/90 text-neutral-90"
+                onClick={onSave}
+              >
+                <Save className="mr-2 h-4 w-4" />
+                Save
+              </Button>
+            ) : (
+              <PublishWebsiteDialog
+                websiteId={websiteId}
+                currentName={websiteName}
+                currentSubdomain={subdomain}
+                isProUser={userPlan === "pro" || userPlan === "enterprise"}
+              >
+                <Button
+                  size="sm"
+                  className="bg-primary-main hover:bg-primary-main/90 text-neutral-90"
+                >
+                  <Upload className="mr-2 h-4 w-4" />
+                  Publish
+                </Button>
+              </PublishWebsiteDialog>
+            )}
           </div>
         </div>
 

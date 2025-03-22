@@ -61,6 +61,8 @@ interface ClientEditorProps {
     last_name?: string;
     avatar_url?: string;
   };
+  websiteName?: string; // Add websiteName prop with optional flag
+  isPublished?: boolean; // Add isPublished prop with optional flag
 }
 
 const ClientEditor: React.FC<ClientEditorProps> = ({
@@ -73,6 +75,8 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
   userPlan,
   usage,
   user,
+  websiteName: initialWebsiteName, // Rename prop to initialWebsiteName to avoid conflicts with state
+  isPublished: initialIsPublished, // Rename prop to initialIsPublished to avoid conflicts with state
 }) => {
   // const [siteContent, setSiteContent] = useState<string>(initialContent);
   const [zoom, setZoom] = useState(100);
@@ -137,6 +141,31 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
     height: 0,
   });
   const viewportRef = useRef<HTMLDivElement>(null);
+  const [websiteName, setWebsiteName] = useState(
+    initialWebsiteName || "My Website"
+  ); // New state for website name
+  const [isPublished, setIsPublished] = useState(initialIsPublished || false); // New state for published status
+
+  // Fetch website details including name and published status if not provided
+  useEffect(() => {
+    const fetchWebsiteDetails = async () => {
+      if (!initialWebsiteName || initialIsPublished === undefined) {
+        const supabase = createClient();
+        const { data, error } = await supabase
+          .from("websites")
+          .select("website_name, is_published")
+          .eq("id", websiteId)
+          .single();
+
+        if (!error && data) {
+          setWebsiteName(data.website_name || "My Website");
+          setIsPublished(data.is_published || false);
+        }
+      }
+    };
+
+    fetchWebsiteDetails();
+  }, [websiteId, initialWebsiteName, initialIsPublished]);
 
   // Add resize observer
   useEffect(() => {
@@ -294,6 +323,23 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
         loading: "Saving...",
         success: () => {
           setHasUnsavedChanges(false);
+
+          // Refresh isPublished status after saving
+          const refreshPublishedStatus = async () => {
+            const supabase = createClient();
+            const { data, error } = await supabase
+              .from("websites")
+              .select("is_published")
+              .eq("id", websiteId)
+              .single();
+
+            if (!error && data) {
+              setIsPublished(data.is_published || false);
+            }
+          };
+
+          refreshPublishedStatus();
+
           return "Site saved!";
         },
         error: "Error saving site",
@@ -831,6 +877,9 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
           userPlan={userPlan}
           usage={usage}
           user={user}
+          websiteId={websiteId}
+          websiteName={websiteName}
+          isPublished={isPublished}
         />
         <div className="flex-1 flex items-center justify-center p-2 m-2 rounded-lg overflow-hidden relative z-20">
           <div
