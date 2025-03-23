@@ -1,11 +1,9 @@
 import { NextResponse } from 'next/server';
+import { generateContent } from '@/utils/gemini';
 
 export async function POST(request: Request) {
     try {
         const { elementCode, userRequest, fullPageCode, model, creativity = 0.6 } = await request.json();
-
-        const apiKey = "523a50ed7a7444468d1ae5a384f032bf";
-        const endpoint = model === "o1-mini" ? "https://answerai-bilal.openai.azure.com/openai/deployments/o1-mini/chat/completions?api-version=2024-09-01-preview" : "https://answerai-bilal.openai.azure.com/openai/deployments/gpt-4o-mini/chat/completions?api-version=2024-09-01-preview";
 
         // Craft a specific prompt for modifying HTML
         const prompt = `As a web developer, modify the following HTML code section based on this request: "${userRequest}"
@@ -26,6 +24,24 @@ Requirements:
 7. Remember this is part of a larger page, so consider the context of the page when making changes, and do not change things that arent requested and keep the original structure as much as possible, unless user aks otherwise.
 
 Remember: Your response should be just the HTML code that will replace the current section.`;
+
+        // console.log('Sending AI edit request to Gemini 2.0 Flash');
+
+        // UPDATED IMPLEMENTATION: Using Gemini API
+        const updatedCode = await generateContent(
+            prompt,
+            {
+                temperature: creativity,
+                maxOutputTokens: 2000,
+                systemInstruction: 'You are a web developer expert in HTML and CSS who modifies code according to user requests. Always respond with valid HTML only, no explanations.'
+            },
+            'gemini-2.0-flash-001' // Always use the Flash model for faster response times
+        );
+
+        // PREVIOUS IMPLEMENTATION: Using Azure OpenAI API
+        /*
+        const apiKey = "523a50ed7a7444468d1ae5a384f032bf";
+        const endpoint = model === "o1-mini" ? "https://answerai-bilal.openai.azure.com/openai/deployments/o1-mini/chat/completions?api-version=2024-09-01-preview" : "https://answerai-bilal.openai.azure.com/openai/deployments/gpt-4o-mini/chat/completions?api-version=2024-09-01-preview";
 
         const response = await fetch(endpoint, {
             method: 'POST',
@@ -52,6 +68,7 @@ Remember: Your response should be just the HTML code that will replace the curre
 
         const data = await response.json();
         const updatedCode = data.choices[0].message.content.trim();
+        */
 
         // Basic validation to ensure we got HTML code
         if (!updatedCode.includes('<') || !updatedCode.includes('>')) {

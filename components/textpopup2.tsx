@@ -149,8 +149,8 @@ const TextPopup: React.FC<TextPopupProps> = ({
             onChange={(e) => setRequest(e.target.value)}
             placeholder={
               mode === "quick"
-                ? "Quick edit - faster but simpler changes..."
-                : "Quality edit - more detailed changes..."
+                ? "Quick edit - more predictable changes..."
+                : "Quality edit - more creative changes..."
             }
             className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg 
                      text-sm placeholder:text-gray-400 focus:outline-none 
