@@ -768,12 +768,15 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
         },
         body: JSON.stringify({
           fullPageCode: initialContent,
-          // Always use Gemini Flash regardless of mode, with varying temperature for quality
+          // UPDATED IMPLEMENTATION: Always use Gemini Flash regardless of mode, with varying temperature for quality
           model: "gemini-2.0-flash-001",
           elementCode: selectedElement.outerHTML,
           userRequest: request,
           // Use higher creativity for quality mode
           creativity: mode === "quality" ? 0.8 : 0.6,
+
+          // PREVIOUS IMPLEMENTATION:
+          // model: mode === "quick" ? "o1-mini" : "gpt-4o-mini",
         }),
       });
 
@@ -787,7 +790,7 @@ const ClientEditor: React.FC<ClientEditorProps> = ({
       }
 
       const result = await response.json();
-      console.log("API response:", result);
+      // console.log("API response:", result);
 
       if (result.updatedCode) {
         // Store current state before making changes

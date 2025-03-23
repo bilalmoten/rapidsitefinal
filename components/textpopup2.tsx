@@ -120,6 +120,7 @@ const TextPopup: React.FC<TextPopupProps> = ({
                 ? "bg-white shadow-sm text-blue-600 ring-1 ring-gray-200"
                 : "text-gray-600 hover:bg-gray-100"
             } ${isProcessing ? "opacity-50 cursor-not-allowed" : ""}`}
+            title="Quick mode: Uses Gemini Flash with lower temperature for more predictable edits"
           >
             <Zap className="w-4 h-4" />
             <span className="text-sm font-medium">Quick</span>
@@ -132,6 +133,7 @@ const TextPopup: React.FC<TextPopupProps> = ({
                 ? "bg-white shadow-sm text-blue-600 ring-1 ring-gray-200"
                 : "text-gray-600 hover:bg-gray-100"
             } ${isProcessing ? "opacity-50 cursor-not-allowed" : ""}`}
+            title="Quality mode: Uses Gemini Flash with higher temperature for more creative edits"
           >
             <Sparkles className="w-4 h-4" />
             <span className="text-sm font-medium">Quality</span>
@@ -149,8 +151,8 @@ const TextPopup: React.FC<TextPopupProps> = ({
             onChange={(e) => setRequest(e.target.value)}
             placeholder={
               mode === "quick"
-                ? "Quick edit - more predictable changes..."
-                : "Quality edit - more creative changes..."
+                ? "Quick edit - more predictable changes using Gemini AI..."
+                : "Quality edit - more creative changes using Gemini AI..."
             }
             className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg 
                      text-sm placeholder:text-gray-400 focus:outline-none 

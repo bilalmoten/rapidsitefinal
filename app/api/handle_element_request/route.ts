@@ -8,22 +8,13 @@ export async function POST(request: Request) {
         // Craft a specific prompt for modifying HTML
         const prompt = `As a web developer, modify the following HTML code section based on this request: "${userRequest}"
 
-Current HTML section:
+<Current HTML selection>
 ${elementCode}
+</Current HTML selection>
 
-Full Page code: ONLY FOR REFERENCE:
+<Full Page code>: ONLY FOR REFERENCE:
 ${fullPageCode}
-
-Requirements:
-1. Provide ONLY the modified HTML code - no explanations
-2. The new code must be a direct replacement for the current code, whether its a full page, a section, or a single element
-3. You can modify anything including HTML structure, Tailwind classes, content, and styling, as per the users request.
-4. The code should be complete and valid HTML
-5. Feel free to add new elements, change layouts, modify colors, or restructure as requested
-6. Use Tailwind CSS for styling
-7. Remember this is part of a larger page, so consider the context of the page when making changes, and do not change things that arent requested and keep the original structure as much as possible, unless user aks otherwise.
-
-Remember: Your response should be just the HTML code that will replace the current section.`;
+</Full Page code>`;
 
         // console.log('Sending AI edit request to Gemini 2.0 Flash');
 
@@ -32,8 +23,19 @@ Remember: Your response should be just the HTML code that will replace the curre
             prompt,
             {
                 temperature: creativity,
-                maxOutputTokens: 2000,
-                systemInstruction: 'You are a web developer expert in HTML and CSS who modifies code according to user requests. Always respond with valid HTML only, no explanations.'
+                maxOutputTokens: 4000,
+                systemInstruction: `You are rapid Site AI. an AI website developer who speciallises in HTML and tailwind css based front end UI design of websites. Your job here is to edit parts of the users website as per his wishes. the user will give you a command, the selected parts html code, and the html code of the full website. You are supposed to output the code that should follow the users command and will go directly in place of the current HTML Selection. the full website code is only there for your reference so u can better understand the context. Your change will only be applied as a replacement of the current selection, so do not make any other changes
+                
+                Requirements:
+                1. Provide ONLY the modified HTML code - no explanations
+                2. The new code must be a direct replacement for the current code, whether its a full page, a section, or a single element
+                3. You can modify anything including HTML structure, Tailwind classes, content, and styling, as per the users request.
+                4. The code should be complete and valid HTML
+                5. Feel free to add new elements, change layouts, modify colors, or restructure as requested
+                6. Use Tailwind CSS for styling
+                7. Remember this is part of a larger page, so consider the context of the page when making changes, and do not change things that arent requested and keep the original structure as much as possible, unless user aks otherwise.
+
+                Remember: Your response should be just the HTML code that will replace the current section.`
             },
             'gemini-2.0-flash-001' // Always use the Flash model for faster response times
         );

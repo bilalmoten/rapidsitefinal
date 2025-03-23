@@ -36,12 +36,20 @@ We're adding the ability for users to publish and unpublish their websites, with
 - [x] Properly format user data to match expected types
 - [x] Implement proper fallbacks for missing data
 
+### AI Model Updates
+
+- [x] Replace OpenAI models (o1-mini, gpt-4o-mini) with Google Gemini Flash 2.0 for AI edits
+- [x] Update handle_element_request API to use the generateContent utility
+- [x] Modify ClientEditor to send appropriate parameters to the new API
+- [x] Update UI descriptions to reflect the new model capabilities
+
 ## Potential Future Enhancements
 
 - [ ] Schedule publishing/unpublishing for a future date
 - [ ] Custom publishing settings (robots.txt, sitemap)
 - [ ] Email notifications when site status changes
 - [ ] Analytics dashboard with traffic before/after publishing
+- [ ] Add specific AI model choices for different editing tasks
 
 ## Implementation Notes
 
@@ -50,6 +58,9 @@ We're adding the ability for users to publish and unpublish their websites, with
 - Pro users can customize the subdomain during publishing
 - Unpublishing is a destructive action that requires confirmation
 - The `is_published` field determines whether to show "Save" or "Publish" in the editor
+- AI edits now use Google's Gemini Flash 2.0 model instead of OpenAI models
+- "Quick" mode uses lower temperature (0.6) for more predictable edits
+- "Quality" mode uses higher temperature (0.8) for more creative edits
 
 ## Related Components
 
@@ -58,3 +69,4 @@ We're adding the ability for users to publish and unpublish their websites, with
 - `TopBar.tsx` - Contains the Save/Publish button
 - `app/(app)/dashboard/settings/[website_id]/page.tsx` - Contains website settings including unpublish option
 - `ClientEditor.tsx` - Main editor component that fetches and manages website data
+- `app/api/handle_element_request/route.ts` - API endpoint for AI-powered element edits
