@@ -1,16 +1,22 @@
 "use client";
 
-import React from "react";
-import { useEffect, useState } from "react";
-import { Sparkles } from "lucide-react";
-import { PCChatInterface } from "@/components/pro-chat/PCChatInterface";
-import { useProChatStore, PCMessage } from "@/hooks/useProChatStore";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "@/components/ui/use-toast";
-import OnboardingOverlay from "@/components/pro-chat/OnboardingOverlay";
-import TutorialButton from "@/components/pro-chat/TutorialButton";
 import { createClient } from "@/utils/supabase/client";
+import { useProChatStore } from "@/hooks/useProChatStore";
+import { PCChatInterface } from "@/components/pro-chat/PCChatInterface";
+import { OnboardingOverlay } from "@/components/pro-chat/OnboardingOverlay";
+import { GenerationLoadingScreen } from "@/components/pro-chat/GenerationLoadingScreen";
 import { User } from "@supabase/supabase-js";
+import { Sparkles } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
+import TutorialButton from "@/components/pro-chat/TutorialButton";
+import dynamic from "next/dynamic";
+// import { LoadingSpinner } from "@/components/common/LoadingSpinner";
+// import { PCChatInterface } from "@/components/pro-chat/PCChatInterface";
+// import { OnboardingOverlay } from "@/components/pro-chat/OnboardingOverlay";
+// import { User } from "@supabase/supabase-js";
 
 export interface ProChatPageProps {
   params: Promise<{
@@ -41,6 +47,7 @@ export default function ProChatPage({ params }: ProChatPageProps) {
   const [isCompleted, setIsCompleted] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [restorationComplete, setRestorationComplete] = useState(false);
+  const [showGenerationLoading, setShowGenerationLoading] = useState(false);
 
   // Check authentication and load website data
   useEffect(() => {
@@ -488,13 +495,14 @@ export default function ProChatPage({ params }: ProChatPageProps) {
 
     try {
       setIsLoading(true);
+      // Show loading screen
+      setShowGenerationLoading(true);
 
       // Save chat state and brief to database
       const { error: updateError } = await supabase
         .from("websites")
         .update({
           status: "generating",
-          updated_at: new Date().toISOString(),
           last_updated_at: new Date().toISOString(),
           project_brief: brief,
           chat_state: useProChatStore.getState().chatState,
@@ -506,21 +514,20 @@ export default function ProChatPage({ params }: ProChatPageProps) {
         throw updateError;
       }
 
-      // Call website generation API
-      const response = await fetch(
-        `https://rapidsite-new.azurewebsites.net/api/start_website_generation?user_id=${user.id}&website_id=${websiteId}&model=claude-3-sonnet-20240229`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            brief: brief,
-            chat_state: useProChatStore.getState().chatState,
-            messages: useProChatStore.getState().messages,
-          }),
-        }
-      );
+      // Call our new local pro-website-generation API
+      const response = await fetch(`/api/pro-website-generation`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          brief: brief,
+          chatState: useProChatStore.getState().chatState,
+          messages: useProChatStore.getState().messages,
+          userId: user.id,
+          websiteId: websiteId,
+        }),
+      });
 
       if (!response.ok) {
         const errorText = await response.text();
@@ -530,20 +537,23 @@ export default function ProChatPage({ params }: ProChatPageProps) {
       toast({
         title: "Website generation started!",
         description:
-          "Your website is being generated. You'll be notified when it's ready.",
+          "Your website is being generated with Claude 3.7 Sonnet. You'll be notified by email when it's ready.",
       });
 
-      // Redirect to dashboard with a success parameter
-      router.push(`/dashboard?generation_started=${websiteId}`);
+      // We no longer immediately redirect to dashboard - loading screen handles this
+      // The user will see the loading screen with option to go to dashboard
     } catch (error: any) {
       console.error("Error generating website:", error);
+
+      // Hide loading screen on error
+      setShowGenerationLoading(false);
 
       // Update website status to error
       await supabase
         .from("websites")
         .update({
           status: "error",
-          updated_at: new Date().toISOString(),
+          last_updated_at: new Date().toISOString(),
         })
         .eq("id", websiteId);
 
@@ -601,7 +611,6 @@ export default function ProChatPage({ params }: ProChatPageProps) {
         const { error } = await supabase
           .from("websites")
           .update({
-            updated_at: new Date().toISOString(),
             chat_conversation: safeMessages, // Using the stringified version
             project_brief: safeBrief, // Using the stringified version
             chat_state: currentStore.chatState,
@@ -624,7 +633,6 @@ export default function ProChatPage({ params }: ProChatPageProps) {
         const { error } = await supabase
           .from("websites")
           .update({
-            updated_at: new Date().toISOString(),
             chat_conversation: chatConversation,
             project_brief: projectBrief,
             chat_state: currentStore.chatState,
@@ -656,7 +664,6 @@ export default function ProChatPage({ params }: ProChatPageProps) {
       const { error } = await supabase
         .from("websites")
         .update({
-          updated_at: new Date().toISOString(),
           chat_conversation: "[]", // Empty array as string
           project_brief: "{}", // Empty object as string
           chat_state: "INTRODUCTION",
@@ -709,26 +716,42 @@ export default function ProChatPage({ params }: ProChatPageProps) {
 
   return (
     <div className="flex flex-col h-dvh bg-zinc-50 dark:bg-background relative">
+      {isLoading && !restorationComplete && (
+        <div className="flex flex-col items-center justify-center h-screen">
+          <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full"></div>
+          <p className="mt-4 text-center text-lg font-medium">
+            Loading Pro Chat...
+          </p>
+          <p className="text-sm text-muted-foreground">
+            Preparing your website design session
+          </p>
+        </div>
+      )}
+
+      {/* Onboarding Overlay */}
+      <OnboardingOverlay
+        isOpen={showOnboarding}
+        onComplete={handleOnboardingComplete}
+        onSkip={handleOnboardingSkip}
+      />
+
+      {/* Website Generation Loading Screen */}
+      {showGenerationLoading && (
+        <GenerationLoadingScreen websiteName={websiteName} />
+      )}
+
       <div className="h-full relative">
-        <PCChatInterface
-          websiteId={websiteId as string}
-          userId={user?.id}
-          onManualSave={handleManualSave}
-          clearChatData={clearChatData}
-          onGenerate={(brief) =>
-            console.log("Generate website with brief", brief)
-          }
-          onAssetUpload={async (file, label, description) => {
-            console.log("Asset upload requested", { file, label, description });
-            // Since we don't have the actual asset upload implementation here,
-            // we'll just return a mock response
-            return {
-              id: Date.now().toString(),
-              url: URL.createObjectURL(file),
-            };
-          }}
-          isGenerating={false}
-        />
+        {restorationComplete && (
+          <PCChatInterface
+            websiteId={websiteId as string}
+            userId={user?.id}
+            onManualSave={handleManualSave}
+            clearChatData={clearChatData}
+            onGenerate={handleGenerateWebsite}
+            onAssetUpload={handleAssetUpload}
+            isGenerating={isLoading}
+          />
+        )}
       </div>
     </div>
   );
