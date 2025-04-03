@@ -1,3 +1,5 @@
+// @/utils/gemini.ts
+
 import { vertex } from '@ai-sdk/google-vertex';
 import { generateText } from 'ai';
 
@@ -62,7 +64,7 @@ export async function generateContent(
 
         console.log(`API call completed in ${callDuration.toFixed(2)} seconds`);
         console.log(`Response length: ${result.text.length} characters`);
-        console.log(`Response preview: ${result.text.substring(0, 200)}...`);
+        console.log(`Response preview: ${result.text}...`);
         console.log(`======================================\n`);
 
         return result.text;

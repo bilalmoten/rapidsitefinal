@@ -210,8 +210,8 @@ export default function Showcase() {
                           .title
                       }
                       fill
-                      style={{ objectFit: "cover" }}
-                      className="transition-transform duration-[30000ms] ease-linear group-hover:translate-y-[-66%]"
+                      style={{ objectFit: "cover", transitionDuration: "30s" }}
+                      className="transition-transform ease-linear group-hover:translate-y-[-66%]"
                     />
                   </div>
 

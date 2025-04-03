@@ -60,7 +60,7 @@ export async function POST(request: Request) {
             website_name: title,
             website_description: description,
             subdomain,
-            thumbnail_url: "https://example.com/placeholder.jpg",
+            thumbnail_url: "https://placehold.co/600x400/003125/18e299.jpeg?text=website+preview\ncoming+soon",
             pages: [],
             is_public: true,
             seo_indexed: requestBody.seoIndexed || false,
