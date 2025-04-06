@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/utils/supabase/server";
 import { generateContent } from "@/utils/gemini";
 import { createWebsiteRecord, saveGeneratedPages } from "@/utils/express-mode";
+import serverLogger from "@/utils/server-logger";
 
 // System prompts for the AI
 const ENHANCEMENT_SYSTEM_PROMPT = `You are a professional web designer and developer tasked with enhancing user prompts for website generation. 
@@ -209,6 +210,9 @@ IMPORTANT FORMATTING INSTRUCTIONS:
 6. DO NOT WORRY ABOUT OUTPUT LENGTH - longer code is completely fine and expected for sophisticated designs. You can output as much code as needed to create a truly impressive website. Each page and section should be FULLY IMPLEMENTED with extensive detail - do not simplify or reduce features to save space.`;
 
 export async function POST(request: NextRequest) {
+  const startTime = Date.now();
+  let authenticatedUserId: string | undefined;
+
   try {
     // Get prompt from request body
     const { prompt, userId, enhancePrompt = true } = await request.json();
@@ -220,7 +224,7 @@ export async function POST(request: NextRequest) {
     const supabase = await createClient();
 
     // If userId is not provided, check for authenticated user
-    let authenticatedUserId = userId;
+    authenticatedUserId = userId;
     if (!authenticatedUserId) {
       const {
         data: { user },
@@ -238,6 +242,14 @@ export async function POST(request: NextRequest) {
         );
       }
     }
+
+    // Track generation start
+    serverLogger.track('website_generation_started', authenticatedUserId, {
+      mode: 'express',
+      prompt_length: prompt.length,
+      enhance_prompt: enhancePrompt,
+      timestamp: new Date().toISOString()
+    });
 
     // Save the original prompt before enhancement
     const originalPrompt = prompt;
@@ -259,6 +271,13 @@ export async function POST(request: NextRequest) {
         }
       );
       const enhancementEndTime = Date.now();
+
+      // Track successful prompt enhancement
+      serverLogger.track('prompt_enhancement_completed', authenticatedUserId, {
+        original_length: originalPrompt.length,
+        enhanced_length: enhancedPrompt.length,
+        duration_ms: enhancementEndTime - enhancementStartTime
+      });
 
       console.log("Enhanced prompt:", enhancedPrompt);
       console.log(`Enhancement completed in ${(enhancementEndTime - enhancementStartTime) / 1000} seconds`);
@@ -291,7 +310,7 @@ export async function POST(request: NextRequest) {
         maxOutputTokens: 8192,
         systemInstruction: WEBSITE_GENERATION_SYSTEM_PROMPT
       },
-      "gemini-2.0-flash-001" // do not change the mdoel
+      "gemini-2.0-flash-001" // do not change the model
     );
     const generationEndTime = Date.now();
 
@@ -323,6 +342,17 @@ export async function POST(request: NextRequest) {
       websiteCode
     );
 
+    // Track successful generation
+    serverLogger.track('website_generation_completed', authenticatedUserId, {
+      mode: 'express',
+      website_id: website.id,
+      generation_time_ms: Date.now() - startTime,
+      has_final_code: hasFinalCodeTags,
+      has_thinking: hasThinkingTags,
+      has_file_headers: hasFileHeaders,
+      status: 'success'
+    });
+
     // Step 5: Return success response with website details
     return NextResponse.json({
       success: true,
@@ -330,6 +360,16 @@ export async function POST(request: NextRequest) {
       message: "Website generated successfully",
     });
   } catch (error: any) {
+    // Track generation failure
+    if (authenticatedUserId) {
+      serverLogger.track('website_generation_failed', authenticatedUserId, {
+        mode: 'express',
+        error_type: error.name || 'unknown',
+        error_message: error.message || String(error),
+        generation_time_ms: Date.now() - startTime
+      });
+    }
+
     console.error("Error in express-generate API:", error);
     return NextResponse.json(
       { error: error.message || "Failed to generate website" },
