@@ -18,6 +18,14 @@ import { Separator } from "@/components/ui/separator";
 import { createClient } from "@/utils/supabase/client";
 import { toast } from "@/components/ui/use-toast";
 import { Loader2 } from "lucide-react";
+import { logger } from "@/utils/logger";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export default function ClaudeTestPage() {
   const [userEmail, setUserEmail] = useState<string>("");
@@ -32,6 +40,19 @@ export default function ClaudeTestPage() {
     useState<string>("Test Website");
   const [testWebsiteId, setTestWebsiteId] = useState<string>("test-123");
   const [isSendingEmail, setIsSendingEmail] = useState<boolean>(false);
+
+  // New state variables for logger testing
+  const [logLevel, setLogLevel] = useState<"debug" | "info" | "warn" | "error">(
+    "info"
+  );
+  const [logMessage, setLogMessage] = useState<string>("Test log message");
+  const [logFeature, setLogFeature] = useState<string>("logger-test");
+  const [logComponent, setLogComponent] = useState<string>("claude-test-page");
+  const [includeError, setIncludeError] = useState<boolean>(false);
+  const [logResponse, setLogResponse] = useState<string>("");
+  const [isLoggingClient, setIsLoggingClient] = useState<boolean>(false);
+  const [isLoggingServer, setIsLoggingServer] = useState<boolean>(false);
+  const [userId, setUserId] = useState<string>("");
 
   // Check user authentication
   useEffect(() => {
@@ -51,6 +72,7 @@ export default function ClaudeTestPage() {
 
         if (user && user.email === "bilalmoten2@gmail.com") {
           setUserEmail(user.email);
+          setUserId(user.id);
           setIsAuthorized(true);
         } else {
           setIsAuthorized(false);
@@ -171,6 +193,127 @@ export default function ClaudeTestPage() {
     }
   };
 
+  // Add new function to test client-side logger
+  const testClientLogger = () => {
+    setIsLoggingClient(true);
+    setLogResponse("");
+
+    try {
+      // Create test error if needed
+      const testError = includeError
+        ? new Error("This is a test error for client-side logging")
+        : undefined;
+
+      // Log using our logger utility
+      if (logLevel === "debug") {
+        logger.debug(logMessage, {
+          feature: logFeature,
+          component: logComponent,
+        });
+      } else if (logLevel === "info") {
+        logger.info(logMessage, {
+          feature: logFeature,
+          component: logComponent,
+          sendToAnalytics: true,
+        });
+      } else if (logLevel === "warn") {
+        logger.warn(logMessage, {
+          feature: logFeature,
+          component: logComponent,
+        });
+      } else if (logLevel === "error") {
+        logger.error(logMessage, testError, {
+          feature: logFeature,
+          component: logComponent,
+        });
+      }
+
+      // If we're tracking an event
+      logger.track("logger_test_event", {
+        level: logLevel,
+        feature: logFeature,
+        component: logComponent,
+        includeError,
+        timestamp: new Date().toISOString(),
+      });
+
+      setLogResponse(
+        `Client-side log sent successfully!\n\nLevel: ${logLevel}\nMessage: ${logMessage}\nFeature: ${logFeature}\nComponent: ${logComponent}`
+      );
+
+      toast({
+        title: "Success",
+        description: "Client-side log sent successfully!",
+      });
+    } catch (error) {
+      console.error("Client logger test error:", error);
+      setLogResponse(
+        `Error: ${error instanceof Error ? error.message : String(error)}`
+      );
+
+      toast({
+        title: "Error",
+        description: "Failed to test client-side logger",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoggingClient(false);
+    }
+  };
+
+  // Add function to test server-side logger
+  const testServerLogger = async () => {
+    setIsLoggingServer(true);
+    setLogResponse("");
+
+    try {
+      const response = await fetch("/api/test/logger", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          level: logLevel,
+          message: logMessage,
+          feature: logFeature,
+          component: logComponent,
+          includeError,
+          userId: userId,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(
+          errorData.details ||
+            `API request failed with status ${response.status}`
+        );
+      }
+
+      const data = await response.json();
+      setLogResponse(JSON.stringify(data, null, 2));
+
+      toast({
+        title: "Success",
+        description: "Server-side log sent successfully!",
+      });
+    } catch (error) {
+      console.error("Server logger test error:", error);
+
+      setLogResponse(
+        `Error: ${error instanceof Error ? error.message : String(error)}`
+      );
+
+      toast({
+        title: "Error",
+        description: "Failed to test server-side logger",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoggingServer(false);
+    }
+  };
+
   // Handle unauthorized access or loading state
   if (isLoading) {
     return (
@@ -200,13 +343,15 @@ export default function ClaudeTestPage() {
     <div className="container mx-auto py-8 px-4">
       <h1 className="text-3xl font-bold mb-2">RapidSite Testing Tools</h1>
       <p className="text-muted-foreground mb-6">
-        Private testing page for Claude 3.7 Sonnet and email functionality.
+        Private testing page for Claude 3.7 Sonnet, email, and logger
+        functionality.
       </p>
 
       <Tabs defaultValue="claude">
         <TabsList className="mb-6">
           <TabsTrigger value="claude">Claude 3.7 Test</TabsTrigger>
           <TabsTrigger value="email">Email Test</TabsTrigger>
+          <TabsTrigger value="logger">Logger Test</TabsTrigger>
         </TabsList>
 
         <TabsContent value="claude">
@@ -320,6 +465,128 @@ export default function ClaudeTestPage() {
                 )}
               </Button>
             </CardFooter>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="logger">
+          <Card>
+            <CardHeader>
+              <CardTitle>Test Logger System</CardTitle>
+              <CardDescription>
+                Test the client-side and server-side logging functionality that
+                integrates with PostHog.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="logLevel">Log Level</Label>
+                    <Select
+                      defaultValue={logLevel}
+                      onValueChange={(val) => setLogLevel(val as any)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select log level" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="debug">Debug</SelectItem>
+                        <SelectItem value="info">Info</SelectItem>
+                        <SelectItem value="warn">Warning</SelectItem>
+                        <SelectItem value="error">Error</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="includeError">Include Error Object</Label>
+                    <div className="flex items-center space-x-2 pt-2">
+                      <input
+                        type="checkbox"
+                        id="includeError"
+                        checked={includeError}
+                        onChange={(e) => setIncludeError(e.target.checked)}
+                        className="h-4 w-4 rounded border-gray-300"
+                      />
+                      <Label htmlFor="includeError">
+                        {includeError ? "Yes" : "No"}
+                      </Label>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="logMessage">Log Message</Label>
+                    <Input
+                      id="logMessage"
+                      value={logMessage}
+                      onChange={(e) => setLogMessage(e.target.value)}
+                      placeholder="Enter log message"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="logFeature">Feature</Label>
+                    <Input
+                      id="logFeature"
+                      value={logFeature}
+                      onChange={(e) => setLogFeature(e.target.value)}
+                      placeholder="Enter feature name"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="logComponent">Component</Label>
+                    <Input
+                      id="logComponent"
+                      value={logComponent}
+                      onChange={(e) => setLogComponent(e.target.value)}
+                      placeholder="Enter component name"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex flex-col space-y-4 md:flex-row md:space-y-0 md:space-x-4">
+                  <Button
+                    onClick={testClientLogger}
+                    disabled={isLoggingClient}
+                    className="flex-1"
+                  >
+                    {isLoggingClient ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />{" "}
+                        Testing Client Logger...
+                      </>
+                    ) : (
+                      "Test Client-Side Logger"
+                    )}
+                  </Button>
+
+                  <Button
+                    onClick={testServerLogger}
+                    disabled={isLoggingServer}
+                    className="flex-1"
+                  >
+                    {isLoggingServer ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />{" "}
+                        Testing Server Logger...
+                      </>
+                    ) : (
+                      "Test Server-Side Logger"
+                    )}
+                  </Button>
+                </div>
+
+                {logResponse && (
+                  <div className="space-y-2">
+                    <Label>Response</Label>
+                    <div className="p-4 bg-muted rounded-md overflow-auto max-h-96">
+                      <pre className="whitespace-pre-wrap">{logResponse}</pre>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </CardContent>
           </Card>
         </TabsContent>
       </Tabs>
