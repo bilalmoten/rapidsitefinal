@@ -38,3 +38,4 @@ next-env.d.ts
 
 # Google credentials
 config/eng-venture-*.json
+google-credentials-temp.json

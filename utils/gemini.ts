@@ -1,5 +1,9 @@
 // @/utils/gemini.ts
 
+// Ensure environment variables are set
+process.env.GOOGLE_VERTEX_LOCATION = process.env.GOOGLE_VERTEX_LOCATION || 'us-central1';
+process.env.GOOGLE_VERTEX_PROJECT_ID = process.env.GOOGLE_VERTEX_PROJECT_ID || 'eng-venture-439304-b2';
+
 import { vertex } from '@ai-sdk/google-vertex';
 import { generateText } from 'ai';
 
@@ -39,6 +43,10 @@ export async function generateContent(
         console.log(`Prompt Preview: ${prompt.substring(0, 200)}...`);
 
         const callStartTime = Date.now();
+
+        // Check and log environment variables
+        console.log(`GOOGLE_VERTEX_LOCATION: ${process.env.GOOGLE_VERTEX_LOCATION || 'not set'}`);
+        console.log(`GOOGLE_VERTEX_PROJECT_ID: ${process.env.GOOGLE_VERTEX_PROJECT_ID || 'not set'}`);
 
         // Using any type assertion to avoid TypeScript errors with module compatibility
         const model = vertex(modelName) as any;
