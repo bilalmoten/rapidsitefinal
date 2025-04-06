@@ -1,6 +1,7 @@
-import { createClient } from "@/utils/supabase/server";
 import { NextResponse } from "next/server";
 import crypto from "crypto";
+import serverLogger from "@/utils/server-logger";
+import { createClient } from "@/utils/supabase/server";
 
 const WEBHOOK_SECRET = process.env.LEMONSQUEEZY_WEBHOOK_SECRET;
 
@@ -42,11 +43,61 @@ export async function POST(request: Request) {
         const { event_name: type, custom_data } = event.meta;
         const userId = custom_data?.user_id;
 
-        console.log('Processing webhook event:', { type, userId });
-
         if (!userId) {
             console.error("No user ID in webhook payload:", event);
-            return new NextResponse("No user ID in custom data", { status: 400 });
+            return new Response("No user ID in custom data", { status: 400 });
+        }
+
+        console.log('Processing webhook event:', { type, userId });
+
+        // Track subscription events with PostHog
+        if (userId) {
+            const data = event.data.attributes;
+
+            switch (type) {
+                case 'subscription_created':
+                    serverLogger.track('subscription_created', userId, {
+                        plan: data.product_name || 'unknown',
+                        price: data.total,
+                        currency: data.currency,
+                        interval: data.billing_frequency,
+                        status: data.status,
+                        timestamp: new Date().toISOString()
+                    });
+                    break;
+                case 'subscription_updated':
+                    serverLogger.track('subscription_updated', userId, {
+                        plan: data.product_name || 'unknown',
+                        price: data.total,
+                        currency: data.currency,
+                        interval: data.billing_frequency,
+                        status: data.status,
+                        timestamp: new Date().toISOString()
+                    });
+                    break;
+                case 'subscription_cancelled':
+                    serverLogger.track('subscription_cancelled', userId, {
+                        plan: data.product_name || 'unknown',
+                        timestamp: new Date().toISOString()
+                    });
+                    break;
+                case 'order_created':
+                    serverLogger.track('payment_successful', userId, {
+                        amount: data.total,
+                        currency: data.currency,
+                        order_id: data.order_id,
+                        timestamp: new Date().toISOString()
+                    });
+                    break;
+                case 'subscription_payment_failed':
+                    serverLogger.track('payment_failed', userId, {
+                        amount: data.total,
+                        currency: data.currency,
+                        order_id: data.order_id,
+                        timestamp: new Date().toISOString()
+                    });
+                    break;
+            }
         }
 
         const supabase = await createClient();
@@ -70,10 +121,11 @@ export async function POST(request: Request) {
 
             if (createError) {
                 console.error("Error creating user_usage:", createError);
-                return new NextResponse("Error creating user usage record", { status: 500 });
+                return new Response("Error creating user usage record", { status: 500 });
             }
         }
 
+        // Process the webhook event
         switch (type) {
             case "order_created": {
                 // Log the order but wait for subscription confirmation

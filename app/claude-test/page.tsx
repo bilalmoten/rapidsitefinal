@@ -26,6 +26,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import posthog from "posthog-js";
 
 export default function ClaudeTestPage() {
   const [userEmail, setUserEmail] = useState<string>("");
@@ -237,6 +238,8 @@ export default function ClaudeTestPage() {
         timestamp: new Date().toISOString(),
       });
 
+      posthog.capture("test-event", { test: "test-event-property" });
+
       setLogResponse(
         `Client-side log sent successfully!\n\nLevel: ${logLevel}\nMessage: ${logMessage}\nFeature: ${logFeature}\nComponent: ${logComponent}`
       );
@@ -265,6 +268,8 @@ export default function ClaudeTestPage() {
   const testServerLogger = async () => {
     setIsLoggingServer(true);
     setLogResponse("");
+
+    posthog.capture("test-event", { test: "test-event-property" });
 
     try {
       const response = await fetch("/api/test/logger", {

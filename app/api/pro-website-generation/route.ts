@@ -10,6 +10,7 @@ import { PCMessage } from '@/hooks/useProChatStore';
 import { sendWebsiteGenerationCompleteEmail } from "@/utils/email";
 import https from 'https';
 import crypto from 'crypto';
+import serverLogger from "@/utils/server-logger";
 
 // --- AWS SDK Configuration via Environment Variables ---
 // Set these at the top level to ensure they are applied globally before any client initialization
@@ -201,6 +202,17 @@ export async function POST(request: NextRequest) {
 
     if (!brief || !messages || !chatState) {
       return NextResponse.json({ error: "Required data is missing" }, { status: 400 });
+    }
+
+    // Track website generation start
+    if (userId) {
+      serverLogger.track('website_generation_started', userId, {
+        mode: 'pro',
+        websiteId,
+        brief_type: brief.type || 'custom',
+        message_count: messages.length,
+        timestamp: new Date().toISOString()
+      });
     }
 
     // Generate a unique job ID
@@ -453,6 +465,17 @@ Based on the above conversation and project brief, please generate a complete we
             console.error("Failed to send email notification:", emailError);
           }
         }
+
+        // Track generation completion
+        if (userId) {
+          serverLogger.track('website_generation_completed', userId, {
+            mode: 'pro',
+            websiteId,
+            generation_time_ms: Date.now() - startTime,
+            file_count: Object.keys(files).length,
+            status: 'success'
+          });
+        }
       } catch (dbError) {
         console.error("Error saving generated files:", dbError);
         throw new Error(`Database error: ${dbError instanceof Error ? dbError.message : String(dbError)}`);
@@ -485,6 +508,17 @@ Based on the above conversation and project brief, please generate a complete we
           last_updated_at: new Date().toISOString(),
         })
         .eq("id", websiteId);
+    }
+
+    // Track generation failure
+    if (userId) {
+      serverLogger.track('website_generation_failed', userId, {
+        mode: 'pro',
+        websiteId,
+        error_type: error instanceof Error ? error.name : 'unknown',
+        error_message: error instanceof Error ? error.message : String(error),
+        generation_time_ms: Date.now() - startTime
+      });
     }
 
     throw error;
