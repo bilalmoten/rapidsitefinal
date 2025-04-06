@@ -48,11 +48,6 @@ export const config = {
     // Add explicit timeout configuration for the API route
     externalResolver: true,
   },
-  experimental: {
-    serverTimeout: EXTENDED_TIMEOUT_MS,
-    serverActionsTimeout: EXTENDED_TIMEOUT_MS,
-    serverComponentsTimeout: EXTENDED_TIMEOUT_MS,
-  },
 };
 
 // Define a system prompt for high-quality website generation

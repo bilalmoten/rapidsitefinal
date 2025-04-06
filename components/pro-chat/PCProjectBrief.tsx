@@ -74,16 +74,16 @@ export const PCProjectBriefSidebar: React.FC<PCProjectBriefSidebarProps> = ({
 
   // Function to copy project brief to clipboard
   // TODO: Remove this function and button in production
-  const copyProjectBrief = () => {
-    const briefData = JSON.stringify(brief, null, 2);
-    navigator.clipboard.writeText(briefData).then(() => {
-      toast({
-        title: "Copied to clipboard",
-        description: "Project brief data copied to clipboard",
-        duration: 3000,
-      });
-    });
-  };
+  // const copyProjectBrief = () => {
+  //   const briefData = JSON.stringify(brief, null, 2);
+  //   navigator.clipboard.writeText(briefData).then(() => {
+  //     toast({
+  //       title: "Copied to clipboard",
+  //       description: "Project brief data copied to clipboard",
+  //       duration: 3000,
+  //     });
+  //   });
+  // };
 
   // Determine if we have enough details to generate a website
   const hasMinimumDetails = brief.purpose && brief.purpose.trim() !== "";
@@ -98,7 +98,7 @@ export const PCProjectBriefSidebar: React.FC<PCProjectBriefSidebarProps> = ({
         <h2 className="text-lg font-semibold">Project Brief</h2>
         <div className="flex gap-2">
           {/* TODO: Remove this copy button in production */}
-          <TooltipProvider>
+          {/* <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
@@ -114,7 +114,7 @@ export const PCProjectBriefSidebar: React.FC<PCProjectBriefSidebarProps> = ({
                 <p className="text-xs">Copy project brief data (dev only)</p>
               </TooltipContent>
             </Tooltip>
-          </TooltipProvider>
+          </TooltipProvider> */}
           {onClose && (
             <Button
               variant="ghost"

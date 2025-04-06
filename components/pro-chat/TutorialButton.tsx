@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { HelpCircle } from "lucide-react";
-import OnboardingOverlay from "./OnboardingOverlay";
+import { OnboardingOverlay } from "./OnboardingOverlay";
 
 interface TutorialButtonProps {
   className?: string;
@@ -39,7 +39,11 @@ export const TutorialButton: React.FC<TutorialButtonProps> = ({
       </Button>
 
       {showTutorial && (
-        <OnboardingOverlay onComplete={handleComplete} onSkip={handleSkip} />
+        <OnboardingOverlay
+          isOpen={showTutorial}
+          onComplete={handleComplete}
+          onSkip={handleSkip}
+        />
       )}
     </>
   );

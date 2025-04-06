@@ -209,131 +209,131 @@ IMPORTANT FORMATTING INSTRUCTIONS:
 6. DO NOT WORRY ABOUT OUTPUT LENGTH - longer code is completely fine and expected for sophisticated designs. You can output as much code as needed to create a truly impressive website. Each page and section should be FULLY IMPLEMENTED with extensive detail - do not simplify or reduce features to save space.`;
 
 export async function POST(request: NextRequest) {
-    try {
-        // Get prompt from request body
-        const { prompt, userId, enhancePrompt = true } = await request.json();
+  try {
+    // Get prompt from request body
+    const { prompt, userId, enhancePrompt = true } = await request.json();
 
-        if (!prompt) {
-            return NextResponse.json({ error: "Prompt is required" }, { status: 400 });
-        }
-
-        const supabase = await createClient();
-
-        // If userId is not provided, check for authenticated user
-        let authenticatedUserId = userId;
-        if (!authenticatedUserId) {
-            const {
-                data: { user },
-            } = await supabase.auth.getUser();
-
-            if (user) {
-                authenticatedUserId = user.id;
-                // Check if this is an anonymous user
-                const isAnonymous = !user.email;
-                console.log(`User is ${isAnonymous ? 'anonymous' : 'registered'}, ID: ${user.id}`);
-            } else {
-                return NextResponse.json(
-                    { error: "User authentication required" },
-                    { status: 401 }
-                );
-            }
-        }
-
-        // Save the original prompt before enhancement
-        const originalPrompt = prompt;
-        let enhancedPrompt = prompt; // Default to original if enhancement is skipped
-
-        // Step 1: Enhance the prompt using Gemini Flash if enhancePrompt is true
-        if (enhancePrompt) {
-            console.log("========== PROMPT ENHANCEMENT PHASE ==========");
-            console.log("Original user prompt:", prompt);
-            console.log("System prompt for enhancement:", ENHANCEMENT_SYSTEM_PROMPT);
-
-            const enhancementStartTime = Date.now();
-            enhancedPrompt = await generateContent(
-                prompt,
-                {
-                    temperature: 0.7,
-                    maxOutputTokens: 8000,
-                    systemInstruction: ENHANCEMENT_SYSTEM_PROMPT
-                }
-            );
-            const enhancementEndTime = Date.now();
-
-            console.log("Enhanced prompt:", enhancedPrompt);
-            console.log(`Enhancement completed in ${(enhancementEndTime - enhancementStartTime) / 1000} seconds`);
-            console.log("==============================================");
-        } else {
-            console.log("Prompt enhancement skipped as per user request");
-        }
-
-        // Step 2: Create a website record in Supabase
-        console.log("Creating website record...");
-        const website = await createWebsiteRecord(
-            authenticatedUserId,
-            "Express Website", // Default name, can be updated later
-            originalPrompt, // Use full original prompt as description
-            undefined, // Let the function generate a random subdomain
-            "express", // Set mode to express
-            enhancedPrompt // Save the enhanced prompt (or original if enhancement skipped)
-        );
-
-        // Step 3: Generate the website using Gemini Pro with the enhanced prompt
-        console.log("========== WEBSITE GENERATION PHASE ==========");
-        console.log("Prompt being sent for generation:", enhancedPrompt);
-        console.log("System prompt for website generation:", WEBSITE_GENERATION_SYSTEM_PROMPT);
-
-        const generationStartTime = Date.now();
-        const websiteCode = await generateContent(
-            enhancedPrompt,
-            {
-                temperature: 0.7,
-                maxOutputTokens: 8192,
-                systemInstruction: WEBSITE_GENERATION_SYSTEM_PROMPT
-            },
-            "gemini-2.0-flash-001" // do not change the mdoel
-        );
-        const generationEndTime = Date.now();
-
-        console.log("Website generation completed");
-        console.log(`Website generation completed in ${(generationEndTime - generationStartTime) / 1000} seconds`);
-        // Log the full response for debugging
-        console.log("FULL AI RESPONSE:");
-        console.log(websiteCode);
-        console.log("==============================================");
-
-        // Step 4: Parse and save the generated website to Supabase
-        console.log("Saving generated website...");
-        console.log("Website code length:", websiteCode.length);
-
-        // Check if the output contains the expected format markers
-        const hasFinalCodeTags = websiteCode.includes("<final_code>") && websiteCode.includes("</final_code>");
-        const hasThinkingTags = websiteCode.includes("<thinking>") && websiteCode.includes("</thinking>");
-        const hasFileHeaders = websiteCode.includes("## ");
-
-        console.log("Output format check:", {
-            hasFinalCodeTags,
-            hasThinkingTags,
-            hasFileHeaders
-        });
-
-        await saveGeneratedPages(
-            authenticatedUserId,
-            website.id,
-            websiteCode
-        );
-
-        // Step 5: Return success response with website details
-        return NextResponse.json({
-            success: true,
-            websiteId: website.id,
-            message: "Website generated successfully",
-        });
-    } catch (error: any) {
-        console.error("Error in express-generate API:", error);
-        return NextResponse.json(
-            { error: error.message || "Failed to generate website" },
-            { status: 500 }
-        );
+    if (!prompt) {
+      return NextResponse.json({ error: "Prompt is required" }, { status: 400 });
     }
+
+    const supabase = await createClient();
+
+    // If userId is not provided, check for authenticated user
+    let authenticatedUserId = userId;
+    if (!authenticatedUserId) {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (user) {
+        authenticatedUserId = user.id;
+        // Check if this is an anonymous user
+        const isAnonymous = !user.email;
+        console.log(`User is ${isAnonymous ? 'anonymous' : 'registered'}, ID: ${user.id}`);
+      } else {
+        return NextResponse.json(
+          { error: "User authentication required" },
+          { status: 401 }
+        );
+      }
+    }
+
+    // Save the original prompt before enhancement
+    const originalPrompt = prompt;
+    let enhancedPrompt = prompt; // Default to original if enhancement is skipped
+
+    // Step 1: Enhance the prompt using Gemini Flash if enhancePrompt is true
+    if (enhancePrompt) {
+      console.log("========== PROMPT ENHANCEMENT PHASE ==========");
+      console.log("Original user prompt:", prompt);
+      console.log("System prompt for enhancement:", ENHANCEMENT_SYSTEM_PROMPT);
+
+      const enhancementStartTime = Date.now();
+      enhancedPrompt = await generateContent(
+        prompt,
+        {
+          temperature: 0.7,
+          maxOutputTokens: 8000,
+          systemInstruction: ENHANCEMENT_SYSTEM_PROMPT
+        }
+      );
+      const enhancementEndTime = Date.now();
+
+      console.log("Enhanced prompt:", enhancedPrompt);
+      console.log(`Enhancement completed in ${(enhancementEndTime - enhancementStartTime) / 1000} seconds`);
+      console.log("==============================================");
+    } else {
+      console.log("Prompt enhancement skipped as per user request");
+    }
+
+    // Step 2: Create a website record in Supabase
+    console.log("Creating website record...");
+    const website = await createWebsiteRecord(
+      authenticatedUserId,
+      "Express Website", // Default name, can be updated later
+      originalPrompt, // Use full original prompt as description
+      undefined, // Let the function generate a random subdomain
+      "express", // Set mode to express
+      enhancedPrompt // Save the enhanced prompt (or original if enhancement skipped)
+    );
+
+    // Step 3: Generate the website using Gemini flash with the enhanced prompt
+    console.log("========== WEBSITE GENERATION PHASE ==========");
+    console.log("Prompt being sent for generation:", enhancedPrompt);
+    console.log("System prompt for website generation:", WEBSITE_GENERATION_SYSTEM_PROMPT);
+
+    const generationStartTime = Date.now();
+    const websiteCode = await generateContent(
+      enhancedPrompt,
+      {
+        temperature: 0.7,
+        maxOutputTokens: 8192,
+        systemInstruction: WEBSITE_GENERATION_SYSTEM_PROMPT
+      },
+      "gemini-2.0-flash-001" // do not change the mdoel
+    );
+    const generationEndTime = Date.now();
+
+    console.log("Website generation completed");
+    console.log(`Website generation completed in ${(generationEndTime - generationStartTime) / 1000} seconds`);
+    // Log the full response for debugging
+    console.log("FULL AI RESPONSE:");
+    console.log(websiteCode);
+    console.log("==============================================");
+
+    // Step 4: Parse and save the generated website to Supabase
+    console.log("Saving generated website...");
+    console.log("Website code length:", websiteCode.length);
+
+    // Check if the output contains the expected format markers
+    const hasFinalCodeTags = websiteCode.includes("<final_code>") && websiteCode.includes("</final_code>");
+    const hasThinkingTags = websiteCode.includes("<thinking>") && websiteCode.includes("</thinking>");
+    const hasFileHeaders = websiteCode.includes("## ");
+
+    console.log("Output format check:", {
+      hasFinalCodeTags,
+      hasThinkingTags,
+      hasFileHeaders
+    });
+
+    await saveGeneratedPages(
+      authenticatedUserId,
+      website.id,
+      websiteCode
+    );
+
+    // Step 5: Return success response with website details
+    return NextResponse.json({
+      success: true,
+      websiteId: website.id,
+      message: "Website generated successfully",
+    });
+  } catch (error: any) {
+    console.error("Error in express-generate API:", error);
+    return NextResponse.json(
+      { error: error.message || "Failed to generate website" },
+      { status: 500 }
+    );
+  }
 } 
