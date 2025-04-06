@@ -142,6 +142,59 @@ export default function ClaudeTestPage() {
     }
   };
 
+  // Test Gemini model through the API route
+  const testgeminimodel = async () => {
+    if (!prompt) {
+      toast({
+        title: "Error",
+        description: "Please enter a prompt to test the gemini model.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsGenerating(true);
+    setResponse("");
+
+    try {
+      const response = await fetch("/api/test/gemini", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ prompt }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(
+          errorData.details ||
+            `API request failed with status ${response.status}`
+        );
+      }
+
+      const data = await response.json();
+      setResponse(data.response);
+
+      toast({
+        title: "Success",
+        description: "gemini flash response received!",
+      });
+    } catch (error) {
+      console.error("gemini test error:", error);
+      toast({
+        title: "Error",
+        description:
+          error instanceof Error
+            ? error.message
+            : "Failed to test gemini model",
+        variant: "destructive",
+      });
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
   // Test email functionality through the server-side API
   const testEmailSending = async () => {
     if (!testWebsiteName || !testWebsiteId) {
@@ -404,6 +457,22 @@ export default function ClaudeTestPage() {
                   </>
                 ) : (
                   "Test Claude Model"
+                )}
+              </Button>
+            </CardFooter>
+            <CardFooter>
+              <Button
+                onClick={testgeminimodel}
+                disabled={isGenerating || !prompt}
+                className="ml-auto"
+              >
+                {isGenerating ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Generating...
+                  </>
+                ) : (
+                  "Test Gemini Model"
                 )}
               </Button>
             </CardFooter>

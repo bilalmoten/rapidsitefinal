@@ -1,11 +1,37 @@
 // @/utils/gemini.ts
 
-// Ensure environment variables are set
-process.env.GOOGLE_VERTEX_LOCATION = process.env.GOOGLE_VERTEX_LOCATION || 'us-central1';
-process.env.GOOGLE_VERTEX_PROJECT_ID = process.env.GOOGLE_VERTEX_PROJECT_ID || 'eng-venture-439304-b2';
-
-import { vertex } from '@ai-sdk/google-vertex';
+import { createVertex, } from '@ai-sdk/google-vertex';
 import { generateText } from 'ai';
+// import fs from 'fs';
+// import path from 'path';
+
+// // Function to initialize Google credentials
+// function initializeGoogleCredentials() {
+//     try {
+//         // Initialize Google credentials from base64-encoded JSON
+//         const credentialsJson = process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON;
+//         if (!credentialsJson) {
+//             throw new Error('GOOGLE_APPLICATION_CREDENTIALS_JSON environment variable is not set');
+//         }
+
+//         try {
+//             // Decode and parse the credentials
+//             const credentials = JSON.parse(Buffer.from(credentialsJson, 'base64').toString());
+
+//             // Set the credentials for Google Cloud
+//             process.env.GOOGLE_APPLICATION_CREDENTIALS = JSON.stringify(credentials);
+//         } catch (error) {
+//             console.error('Error parsing Google credentials:', error);
+//             throw new Error('Invalid GOOGLE_APPLICATION_CREDENTIALS_JSON format');
+//         }
+
+//     } catch (error) {
+//         console.error('Error initializing Google credentials:', error);
+//     }
+// }
+
+// // Initialize credentials
+// initializeGoogleCredentials();
 
 // Default model to use
 const DEFAULT_MODEL = 'gemini-2.0-flash-001';
@@ -44,9 +70,14 @@ export async function generateContent(
 
         const callStartTime = Date.now();
 
-        // Check and log environment variables
-        console.log(`GOOGLE_VERTEX_LOCATION: ${process.env.GOOGLE_VERTEX_LOCATION || 'not set'}`);
-        console.log(`GOOGLE_VERTEX_PROJECT_ID: ${process.env.GOOGLE_VERTEX_PROJECT_ID || 'not set'}`);
+        const vertex = createVertex({
+            googleAuthOptions: {
+                credentials: {
+                    client_email: process.env.GOOGLE_CLIENT_EMAIL,
+                    private_key: process.env.GOOGLE_PRIVATE_KEY!.replace(/\\n/g, '\n'),
+                },
+            },
+        });
 
         // Using any type assertion to avoid TypeScript errors with module compatibility
         const model = vertex(modelName) as any;
@@ -111,6 +142,15 @@ export async function generateContentWithContinuation(
         console.log(`Prompt Preview: ${prompt.substring(0, 200)}...`);
 
         const callStartTime = Date.now();
+
+        const vertex = createVertex({
+            googleAuthOptions: {
+                credentials: {
+                    client_email: process.env.GOOGLE_CLIENT_EMAIL,
+                    private_key: process.env.GOOGLE_PRIVATE_KEY!.replace(/\\n/g, '\n'),
+                },
+            },
+        });
 
         // Using any type assertion to avoid TypeScript errors with module compatibility
         const model = vertex(modelName) as any;

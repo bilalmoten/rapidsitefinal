@@ -25,6 +25,27 @@ const nextConfig = {
     //     serverActionsTimeout: 3600, // in seconds (10 minutes)
     //     serverComponentsTimeout: 3600, // in seconds (10 minutes)
     // },
+
+    webpack: (config, { isServer }) => {
+        if (!isServer) {
+            // Don't resolve 'net' module on the client
+            config.resolve.fallback = {
+                ...config.resolve.fallback,
+                net: false,
+                tls: false,
+                fs: false,
+                http: false,
+                https: false,
+                crypto: false,
+                stream: false,
+                os: false,
+                zlib: false,
+                path: false,
+                child_process: false,
+            };
+        }
+        return config;
+    },
 };
 
 module.exports = withMDX(nextConfig);
