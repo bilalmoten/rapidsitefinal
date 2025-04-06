@@ -2,7 +2,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "npm install --legacy-peer-deps && next build",
     "start": "next start",
     "test-auth": "node -r dotenv/config --loader ts-node/esm scripts/test-gcloud-auth.mts",
     "typecheck": "tsc --noEmit"
