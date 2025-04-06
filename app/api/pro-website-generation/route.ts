@@ -437,60 +437,30 @@ Based on the above conversation and project brief, please generate a complete we
 
     // If we have valid website ID and user ID, save the generated pages
     if (userId && websiteId) {
-      const filesToSave = { ...files };
-      const totalSize = JSON.stringify(filesToSave).length;
-
-      // PostgreSQL JSONB limit is typically around 1GB, but let's be conservative
-      // and warn if over 5MB as this might be an issue in practice
-      const SIZE_LIMIT_WARNING = 5 * 1024 * 1024; // 5MB
-
-      console.log(`Attempting to save generated pages to database for website ID ${websiteId}`, {
-        pageCount: Object.keys(filesToSave).length,
-        totalSize: totalSize,
-        sizeInMB: (totalSize / (1024 * 1024)).toFixed(2) + " MB",
-        status: "live"
-      });
-
-      if (totalSize > SIZE_LIMIT_WARNING) {
-        console.warn(`Generated pages size (${(totalSize / (1024 * 1024)).toFixed(2)} MB) may be too large for database storage`);
-        // If needed, we could compress or truncate content here
-      }
-
       try {
-        const { data: updateData, error: updateError } = await supabase
-          .from("websites")
-          .update({
-            status: "live",
-            last_updated_at: new Date().toISOString(),
-            generated_pages: filesToSave,
-          })
-          .eq("id", websiteId)
-          .select();
-
-        if (updateError) {
-          console.error("Error updating website with generated pages:", updateError);
-          throw new Error(`Failed to save generated pages: ${updateError.message}`);
-        }
-
-        console.log("Successfully updated website with generated pages:", {
-          websiteId,
-          updateResult: updateData,
-          timestamp: new Date().toISOString()
+        console.log(`Saving generated files to database for website ID ${websiteId}`, {
+          pageCount: Object.keys(files).length,
+          fileNames: Object.keys(files)
         });
-      } catch (dbError) {
-        console.error("Exception during database update:", dbError);
-        // Continue with sending email even if DB update failed
-      }
 
-      // Send email notification
-      if (userEmail) {
-        const websiteName = websiteData?.name || websiteData?.website_name || "Your new website";
-        try {
-          await sendWebsiteGenerationCompleteEmail(userEmail, websiteName, websiteId);
-          console.log(`Email notification sent to ${userEmail} for website ${websiteName} (ID: ${websiteId})`);
-        } catch (emailError) {
-          console.error("Failed to send email notification:", emailError);
+        // Save files to database using the proper approach
+        await saveGeneratedFilesToDatabase(userId, websiteId, files);
+
+        console.log(`Successfully saved website pages for ID ${websiteId}`);
+
+        // Send email notification
+        if (userEmail) {
+          const websiteName = websiteData?.name || websiteData?.website_name || "Your new website";
+          try {
+            await sendWebsiteGenerationCompleteEmail(userEmail, websiteName, websiteId);
+            console.log(`Email notification sent to ${userEmail} for website ${websiteName} (ID: ${websiteId})`);
+          } catch (emailError) {
+            console.error("Failed to send email notification:", emailError);
+          }
         }
+      } catch (dbError) {
+        console.error("Error saving generated files:", dbError);
+        throw new Error(`Database error: ${dbError instanceof Error ? dbError.message : String(dbError)}`);
       }
     }
 
@@ -589,4 +559,53 @@ function extractFilesFromResponse(response: string): Record<string, string> {
 
   console.log(`Extraction complete. Found ${Object.keys(files).length} files`);
   return files;
+}
+
+// Helper function to save generated files to the database
+async function saveGeneratedFilesToDatabase(
+  userId: string,
+  websiteId: string,
+  files: Record<string, string>
+): Promise<void> {
+  const supabase = await createClient();
+
+  // Convert the files object to array format needed for database
+  const filesToInsert = Object.entries(files).map(([fileName, content]) => ({
+    user_id: userId,
+    website_id: websiteId,
+    title: fileName,
+    content: content,
+  }));
+
+  console.log(`Inserting ${filesToInsert.length} pages into database for website ${websiteId}`);
+
+  // Insert all pages in one operation
+  const { error: insertError } = await supabase
+    .from("pages")
+    .insert(filesToInsert);
+
+  if (insertError) {
+    console.error("Error inserting pages:", insertError);
+    throw new Error(`Failed to save pages: ${insertError.message}`);
+  }
+
+  // Get just the file names for the website record
+  const fileNames = Object.keys(files);
+
+  console.log(`Updating website with page list: ${fileNames.join(', ')}`);
+
+  // Update the website record with the list of page names and status
+  const { error: updateError } = await supabase
+    .from("websites")
+    .update({
+      status: "live",
+      last_updated_at: new Date().toISOString(),
+      pages: fileNames
+    })
+    .eq("id", websiteId);
+
+  if (updateError) {
+    console.error("Error updating website with page list:", updateError);
+    throw new Error(`Failed to update website: ${updateError.message}`);
+  }
 } 

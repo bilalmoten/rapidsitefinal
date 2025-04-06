@@ -433,28 +433,43 @@ export const PCMessageList: React.FC<PCMessageListProps> = ({
                     {/* Show quick reply options if available */}
                     {message.options && message.options.length > 0 && (
                       <div className="flex flex-wrap gap-2 mt-3">
-                        {message.options.map((option, index) => (
-                          <Button
-                            key={index}
-                            size="sm"
-                            variant="secondary"
-                            className="text-xs flex items-center gap-1"
-                            onClick={() =>
-                              onSendMessage(
-                                typeof option === "string"
-                                  ? option
-                                  : option.value
-                              )
-                            }
-                          >
-                            <span>
-                              {typeof option === "string"
-                                ? option
-                                : option.text}
-                            </span>
-                            <ChevronRight size={14} />
-                          </Button>
-                        ))}
+                        {message.options.map((option, index) => {
+                          // Handle nested object structure with type safety
+                          const optionValue =
+                            typeof option === "string"
+                              ? option
+                              : typeof option.value === "string"
+                                ? option.value
+                                : option.value &&
+                                    typeof option.value === "object" &&
+                                    "value" in option.value
+                                  ? (option.value as any).value
+                                  : "";
+
+                          const optionText =
+                            typeof option === "string"
+                              ? option
+                              : typeof option.text === "string"
+                                ? option.text
+                                : option.text &&
+                                    typeof option.text === "object" &&
+                                    "text" in option.text
+                                  ? (option.text as any).text
+                                  : "Option";
+
+                          return (
+                            <Button
+                              key={index}
+                              size="sm"
+                              variant="secondary"
+                              className="text-xs flex items-center gap-1"
+                              onClick={() => onSendMessage(optionValue)}
+                            >
+                              <span>{optionText}</span>
+                              <ChevronRight size={14} />
+                            </Button>
+                          );
+                        })}
                       </div>
                     )}
 
