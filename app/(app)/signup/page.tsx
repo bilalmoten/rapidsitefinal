@@ -6,7 +6,7 @@ import MotionWrapper from "@/components/MotionWrapper";
 import AnonymousSignupForm from "./AnonymousSignupForm";
 
 // Set this to false to enable normal signups
-const WAITLIST_MODE = false;
+const WAITLIST_MODE = true;
 
 export default async function SignupPage(props: {
   params: Promise<{}>;
