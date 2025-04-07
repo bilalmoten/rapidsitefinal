@@ -1,6 +1,6 @@
 // @/utils/gemini.ts
 
-import { createVertex, } from '@ai-sdk/google-vertex';
+import { createVertex, vertex } from '@ai-sdk/google-vertex';
 import { generateText } from 'ai';
 // import fs from 'fs';
 // import path from 'path';
@@ -70,14 +70,14 @@ export async function generateContent(
 
         const callStartTime = Date.now();
 
-        const vertex = createVertex({
-            googleAuthOptions: {
-                credentials: {
-                    client_email: process.env.GOOGLE_CLIENT_EMAIL,
-                    private_key: process.env.GOOGLE_PRIVATE_KEY!.replace(/\\n/g, '\n'),
-                },
-            },
-        });
+        // const vertex = createVertex({
+        //     googleAuthOptions: {
+        //         credentials: {
+        //             client_email: process.env.GOOGLE_CLIENT_EMAIL,
+        //             private_key: process.env.GOOGLE_PRIVATE_KEY!.replace(/\\n/g, '\n'),
+        //         },
+        //     },
+        // });
 
         // Using any type assertion to avoid TypeScript errors with module compatibility
         const model = vertex(modelName) as any;
@@ -143,14 +143,14 @@ export async function generateContentWithContinuation(
 
         const callStartTime = Date.now();
 
-        const vertex = createVertex({
-            googleAuthOptions: {
-                credentials: {
-                    client_email: process.env.GOOGLE_CLIENT_EMAIL,
-                    private_key: process.env.GOOGLE_PRIVATE_KEY!.replace(/\\n/g, '\n'),
-                },
-            },
-        });
+        // const vertex = createVertex({
+        //     googleAuthOptions: {
+        //         credentials: {
+        //             client_email: process.env.GOOGLE_CLIENT_EMAIL,
+        //             private_key: process.env.GOOGLE_PRIVATE_KEY!.replace(/\\n/g, '\n'),
+        //         },
+        //     },
+        // });
 
         // Using any type assertion to avoid TypeScript errors with module compatibility
         const model = vertex(modelName) as any;
